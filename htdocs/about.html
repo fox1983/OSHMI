@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="ISO-8859-1">
+  <meta name="application-name" content="OSHMI-Open Substation HMI">
+  <meta name="description" content="About OSHMI">
+  <meta name="author" content="Ricardo L. Olsen">
+  <title></title>
+  <script src="lib/jquery-1.7.2.js"></script>
+  </head>
+  <body bgcolor="black" scroll="no" style="margin:0;">
+
+<!-- HTML Codes by Quackit.com -->
+
+<style type="text/css">
+  
+.html-marquee {
+border-color:white;
+border-width:1;
+height:600px;width:800px;
+font-family:Helvetica;font-size:18pt;
+color:#FF0000;-webkit-user-select:none;
+text-shadow:
+  3px 4px 1px #300000,
+  3px 6px 1px #400000,
+  3px 8px 1px #500000,
+  3px 10px 1px #600000,
+  3px 12px 1px #700000,
+  3px 14px 2px #800000,
+  3px 16px 3px #900000;
+-transform: perspective(300px) rotateX(25deg);
+-moz-transform-origin: 50% 100%;
+-moz-transform: perspective(300px) rotateX(25deg);
+background-image: url('images/oshmi.svg');
+}
+
+html {
+overflow:hidden;
+}
+
+</style>
+<div style="position:relative;top:-5;left:-8;width:800;height:600;overflow:hidden;">
+<video id="vidabout" loop tabindex="0"  width="800" height="600">
+  <source src="images/about.ogv" type='video/ogg' />
+</video>
+</div>
+<div style="position:absolute;top:0;left:0;overflow:hidden;width:99%">
+<marquee id="credits" class="html-marquee"  direction="up" behavior="scroll" scrollamount="2" >
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+Enter your marquee text here, and/or enter an image below...<BR>
+</marquee>
+
+<script>
+// OSHMI/Open Substation HMI - Copyright 2008-2014 - Ricardo L. Olsen
+
+document.title = "About OSHMI";
+$.get('../release_notes.txt', function(data) {
+  document.getElementById("credits").innerText=data;
+});
+var myvid = document.getElementById('vidabout');
+myvid.play();
+document.oncontextmenu = function() {return false;};
+
+</script>
+  
+</div>
+  </body>
+</html>

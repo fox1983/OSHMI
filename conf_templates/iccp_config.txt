@@ -1,0 +1,28 @@
+// Name of the VCC on the remote server
+IDICCP="COS";
+
+// Name or IP of the remote iccp servers (tries to connect in ascending order)
+SERVER_NAME_1="10.63.5.41";
+SERVER_NAME_2="10.63.5.41";
+SERVER_NAME_3="10.63.5.41";
+SERVER_NAME_4="10.63.5.41";
+SERVER_NAME_5="10.63.5.41";
+SERVER_NAME_6="10.63.5.41";
+SERVER_NAME_7="10.63.5.41";
+SERVER_NAME_8="10.63.5.41";
+
+//Name or IP of the IHM (if no IHM configured use "no")
+//IHM_ADDRESS="10.63.77.174";
+IHM_ADDRESS="127.0.0.1";
+
+// Name of the configuration file
+CONFIG_FILE="sage_id.txt";
+
+// Time in seconds for buffering an event on a dataset before reporting to the client
+DATASET_ANALOG_BUFFER_INTERVAL="10";
+DATASET_DIGITAL_BUFFER_INTERVAL="1";
+DATASET_EVENTS_BUFFER_INTERVAL="1";
+
+// Time in seconds for Integrity check (configured on the remote server on initialization)
+DATASET_INTEGRITY_TIME="180";
+
