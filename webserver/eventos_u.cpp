@@ -282,10 +282,23 @@ else
   unxtm.tm_hour = Hora;
   unxtm.tm_min = Minuto;
   unxtm.tm_sec = Segundo;
-  unxtm.tm_isdst = isdst;
+  unxtm.tm_isdst = 1; // isdst;
   time_t unxdatetime = mktime( &unxtm );
 
-  S = "update soe set recon=" + (String)(1+RecApaga) + (String)" where nponto='" + (String)NPONTO + "' and recon<2 " + (String)"and data='" + (String)unxdatetime + (String)"' and msec=" + (String)Milisegundo;
+  unxtm.tm_year = Ano - 1900;
+  unxtm.tm_mon = Mes - 1;
+  unxtm.tm_mday = Dia;
+  unxtm.tm_hour = Hora;
+  unxtm.tm_min = Minuto;
+  unxtm.tm_sec = Segundo;
+  unxtm.tm_isdst = 0;
+  time_t unxdatetime2 = mktime( &unxtm );
+
+  S = "update soe set recon=" +
+      (String)(1+RecApaga) +
+      (String)" where nponto='" + (String)NPONTO +
+      "' and recon<2 " +
+      (String)"and ( data='" + (String)unxdatetime + "' or data='" + (String)unxdatetime2 +(String)"') and msec=" + (String)Milisegundo;
   fmSDE->lbRec->Caption=(String)"REC ponto " + (String)NPONTO;
   }
 

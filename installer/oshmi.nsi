@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.0RC3"
+!define VERSION "v.3.0"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -93,7 +93,7 @@ ShowInstDetails show
 
 Section "" ; empty string makes it hidden, so would starting with -
 
-; Fecha processos que vão ser sobrescritos
+; Fecha processos que vï¿½o ser sobrescritos
   nsExec::Exec 'taskkill /F /IM nginx.exe'
   nsExec::Exec 'taskkill /F /IM cmd.exe'
   nsExec::Exec 'taskkill /F /IM php-cgi.exe'
@@ -160,7 +160,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   CreateDirectory "$INSTDIR\extprogs"
   CreateDirectory "$INSTDIR\htdocs"
   CreateDirectory "$INSTDIR\htdocs\images"
-  CreateDirectory "$INSTDIR\htdocs\clipart"
+; CreateDirectory "$INSTDIR\htdocs\clipart"
   CreateDirectory "$INSTDIR\i18n"
   CreateDirectory "$INSTDIR\linux"
   CreateDirectory "$INSTDIR\logs"
@@ -186,6 +186,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\etc\webserver_query.iqy"  
   File /a "..\etc\simtr_example.txt"
   File /a "..\etc\*.reg"
+  File /a "..\etc\*.bat"
 
   SetOutPath $INSTDIR\extprogs
   File /a "..\extprogs\download_external_progs.bat"
@@ -251,6 +252,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\extprogs\SumatraPDF-2.5.2-install.exe"
   File /a "..\extprogs\vcredist_x86.exe"
   File /a "..\extprogs\vcredist_x86-2012.exe"
+  File /a "..\extprogs\vcredist_x86-2013.exe"
 
   SetOutPath $INSTDIR\browser
   File /a /r "..\browser\*.*"
@@ -298,12 +300,13 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\svg\kor1.svg"
   File /a "..\conf_templates\screen_list.js"
 
-  SetOutPath "$INSTDIR\htdocs\clipart"
-  File /a "..\htdocs\clipart\*.*"
+; SetOutPath "$INSTDIR\htdocs\clipart"
+; File /a "..\htdocs\clipart\*.*"
 
-; Visual C redist: necessário para executar o PHP
+; Visual C redist: necessï¿½rio para executar o PHP
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86.exe" /q'
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86-2012.exe" /q'
+  nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86-2013.exe" /q'
 ; Visualizador de PDF
   nsExec::Exec '$INSTDIR\extprogs\SumatraPDF-2.5.2-install.exe /s /opt plugin'
 ; CopyFiles "$INSTDIR\conf_templates\sumatrapdfrestrict.ini" "$PROGRAMFILES\SumatraPDF\"
@@ -398,19 +401,17 @@ Section "" ; empty string makes it hidden, so would starting with -
   Pop $0 ; return error(1)/success(0)
   SimpleFC::AddPort 8099 "OSHMI Webserver" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
-  SimpleFC::AddPort 80 "OSHMI Shell" 256 0 2 "" 1
+  SimpleFC::AddPort 51909 "OSHMI Shell" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
   SimpleFC::AddPort 8081 "OSHMI Mon_Proc" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
-  SimpleFC::AddPort 51909 "OSHMI Shell" 256 0 2 "" 1
-  Pop $0 ; return error(1)/success(0)
-  SimpleFC::AddPort 51908 "OSHMI Shell" 256 0 2 "" 1
+  SimpleFC::AddPort 51908 "OSHMI Webserver" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
   SimpleFC::AddPort 2404 "OSHMI QTester104" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
-  SimpleFC::AddPort 2404 "OSHMI QTester104" 65280 0 2 "" 1
+  SimpleFC::AddPort 65280 "OSHMI QTester104" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
-  SimpleFC::AddPort 2404 "OSHMI QTester104" 65281 0 2 "" 1
+  SimpleFC::AddPort 65281 "OSHMI QTester104" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
   SimpleFC::AddPort 51909 "OSHMI NGINX" 256 0 2 "" 1
   Pop $0 ; return error(1)/success(0)
@@ -492,6 +493,8 @@ Section "Uninstall"
   WriteRegStr  HKCU "Software\Microsoft\Windows NT\CurrentVersion\Winlogon" "Shell" "explorer.exe"
   WriteRegDword HKCU "Software\Microsoft\Windows\CurrentVersion\Policies\System" "DisableTaskMgr" 0x00
   
+  nsExec::Exec '$INSTDIR\etc\remove_services.bat'
+  
   Delete "$INSTDIR\*.*"
   Delete "$INSTDIR\bin\*.*"
   Delete "$INSTDIR\conf_templates\*.*"
@@ -503,7 +506,7 @@ Section "Uninstall"
   Delete "$INSTDIR\extprogs\*.*"
   Delete "$INSTDIR\htdocs\*.*"
   Delete "$INSTDIR\htdocs\images\*.*"
-  Delete "$INSTDIR\htdocs\clipart\*.*"
+; Delete "$INSTDIR\htdocs\clipart\*.*"
   Delete "$INSTDIR\i18n\*.*"
   Delete "$INSTDIR\linux\*.*"
   Delete "$INSTDIR\logs\*.*"

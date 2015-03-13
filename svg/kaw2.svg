@@ -26,13 +26,13 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="1.005"
-     inkscape:cx="145.3651"
+     inkscape:cx="-8.3662433"
      inkscape:cy="1179.2563"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="884"
-     inkscape:window-height="991"
+     inkscape:window-height="900"
      inkscape:window-x="37"
      inkscape:window-y="104"
      inkscape:window-maximized="0"
@@ -2539,7 +2539,8 @@
        sodipodi:nodetypes="cc" />
     <g
        id="g1637"
-       inkscape:label="{&quot;attr&quot;:&quot;tooltips&quot;,&quot;param&quot;:[&quot;Subestação KAW2&quot;,&quot;&quot;],&quot;size&quot;:12,&quot;style&quot;:&quot;&quot;}">
+       inkscape:label="{&quot;attr&quot;:&quot;tooltips&quot;,&quot;param&quot;:[&quot;Subestação KAW2&quot;,&quot;&quot;],&quot;size&quot;:12,&quot;style&quot;:&quot;&quot;}"
+       transform="matrix(0.31012578,0,0,0.33665008,-2.7303358,-295.1682)">
       <text
          xml:space="preserve"
          style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#666666;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
@@ -15859,8 +15860,8 @@
     </g>
     <a
        xlink:href="kor1.svg"
-       transform="translate(-3.9800999,-2.9850746)"
-       id="a7142">
+       id="a7142"
+       transform="translate(-28.855722,-45.771144)">
       <text
          inkscape:label="{&quot;attr&quot;:&quot;color&quot;,&quot;list&quot;:[{&quot;data&quot;:&quot;-999999&quot;,&quot;param&quot;:&quot;-cor-14|&quot;,&quot;tag&quot;:&quot;99999&quot;}]},{&quot;attr&quot;:&quot;open&quot;,&quot;height&quot;:400,&quot;istag&quot;:0,&quot;src&quot;:&quot;kor1.svg&quot;,&quot;type&quot;:&quot;_self&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100},{&quot;attr&quot;:&quot;popup&quot;,&quot;height&quot;:400,&quot;src&quot;:&quot;block&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100}"
          sodipodi:linespacing="125%"
@@ -15877,9 +15878,9 @@
     </a>
     <a
        xlink:href="knh2.svg"
-       style="display:inline"
+       transform="translate(-28.855722,-23.771108)"
        id="a7142-9"
-       transform="translate(-3.9800999,19.014962)">
+       style="display:inline">
       <text
          inkscape:label="{&quot;attr&quot;:&quot;color&quot;,&quot;list&quot;:[{&quot;data&quot;:&quot;-999999&quot;,&quot;param&quot;:&quot;-cor-14|&quot;,&quot;tag&quot;:&quot;99999&quot;}]},{&quot;attr&quot;:&quot;open&quot;,&quot;height&quot;:400,&quot;istag&quot;:0,&quot;src&quot;:&quot;knh2.svg&quot;,&quot;type&quot;:&quot;_self&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100},{&quot;attr&quot;:&quot;popup&quot;,&quot;height&quot;:400,&quot;src&quot;:&quot;block&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100}"
          sodipodi:linespacing="125%"
@@ -15896,9 +15897,9 @@
     </a>
     <a
        xlink:href="kik3.svg"
-       style="display:inline"
+       transform="translate(-28.855722,-1.7711077)"
        id="a7142-90"
-       transform="translate(-3.9800999,41.014962)">
+       style="display:inline">
       <text
          inkscape:label="{&quot;attr&quot;:&quot;color&quot;,&quot;list&quot;:[{&quot;data&quot;:&quot;-999999&quot;,&quot;param&quot;:&quot;-cor-14|&quot;,&quot;tag&quot;:&quot;99999&quot;}]},{&quot;attr&quot;:&quot;open&quot;,&quot;height&quot;:400,&quot;istag&quot;:0,&quot;src&quot;:&quot;kik3.svg&quot;,&quot;type&quot;:&quot;_self&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100},{&quot;attr&quot;:&quot;popup&quot;,&quot;height&quot;:400,&quot;src&quot;:&quot;block&quot;,&quot;width&quot;:500,&quot;x&quot;:100,&quot;y&quot;:100}"
          sodipodi:linespacing="125%"

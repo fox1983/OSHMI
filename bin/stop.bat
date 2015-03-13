@@ -10,9 +10,9 @@ taskkill /F /IM sim_tr.exe
 taskkill /F /IM procexp.exe
 start /wait close_webserver.vbs
 
-..\bd\terminate_soe.bat
-..\bd\terminate_dumpdb.bat
-..\bd\terminate_hist.bat
+..\db\terminate_soe.bat
+..\db\terminate_dumpdb.bat
+..\db\terminate_hist.bat
 
 ping 127.0.0.1 -n 2 -w 1000
 

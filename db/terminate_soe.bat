@@ -8,6 +8,6 @@ FOR /f "tokens=3 delims=," %%G IN (' wmic process get commandline^,processid /FO
 
 IF %_pid% EQU 0 GOTO FIM 
 
-TASKKILL /PID %_pid%
+TASKKILL /F /PID %_pid%
 
 :FIM

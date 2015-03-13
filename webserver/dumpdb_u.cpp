@@ -111,11 +111,11 @@ char buff[500];
 char tipo;
 
 // se ainda não fez integridade, não faz dump, a menos seja forcado 
-if ( BL.GetIntegridade() == 0 && forcagrv == 0 )
-  {
-  Acessa=0;
-  return;
-  }
+//if ( BL.GetIntegridade() == 0 && forcagrv == 0 )
+//  {
+//  Acessa=0;
+//  return;
+//  }
 
 try
   {

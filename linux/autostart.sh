@@ -12,8 +12,8 @@ rm -rf ~/.wine/drive_c/oshmi/nginx_php
 
 # SQL data processing
 sh ~/.wine/drive_c/oshmi/db/process_dumpdb.sh &
-sh ~/.wine/drive_c/oshmi/db/processa_soe.sh &
-sh ~/.wine/drive_c/oshmi/db/processa_hist.sh &
+sh ~/.wine/drive_c/oshmi/db/process_soe.sh &
+sh ~/.wine/drive_c/oshmi/db/process_hist.sh &
 
 # OSHMI shell
 wine ~/.wine/drive_c/oshmi/bin/hmishell.exe &

@@ -526,7 +526,7 @@ if (fp)
       if ( nf < 16 )
          {
          if ( cnterr == 0 )
-           Loga( (String)"Error in point list! Line with insuficient parameters: " + cntline );
+           Loga( (String)"Error in point list! Line with insufficient parameters: " + cntline );
          cnterr++;
          continue;
          }
@@ -545,7 +545,7 @@ if (fp)
 
     if ( strchr(buff, '\"') == NULL )
       {
-      Loga( (String)"Error in point list! Line with insuficient parameters: " + cntline );
+      Loga( (String)"Error in point list! Line with insufficient parameters: " + cntline );
       cnterr++;
       continue;
       }

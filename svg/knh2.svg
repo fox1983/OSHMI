@@ -37,13 +37,13 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="1.9448922"
-     inkscape:cx="1040.6642"
-     inkscape:cy="1008.1709"
+     inkscape:cx="210.54107"
+     inkscape:cy="1378.3714"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="900"
-     inkscape:window-height="1578"
+     inkscape:window-width="1600"
+     inkscape:window-height="877"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -3182,7 +3182,8 @@
        style="color:#000000;fill:none;stroke:#808080;stroke-width:7.41802502;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <g
        id="g_senome"
-       inkscape:label="{&quot;attr&quot;:&quot;tooltips&quot;,&quot;param&quot;:[&quot;SE KNH2&quot;,&quot;&quot;,&quot;&quot;],&quot;size&quot;:12,&quot;style&quot;:&quot;&quot;}">
+       inkscape:label="{&quot;attr&quot;:&quot;tooltips&quot;,&quot;param&quot;:[&quot;SE KNH2&quot;,&quot;&quot;,&quot;&quot;],&quot;size&quot;:12,&quot;style&quot;:&quot;&quot;}"
+       transform="matrix(0.30088775,0,0,0.26973338,-2.612469,-325.61451)">
       <text
          xml:space="preserve"
          style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#666666;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"

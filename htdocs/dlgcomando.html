@@ -175,10 +175,9 @@ function init() { // executa quando termina de carregar o documento
                 function() { self.close(); },
                 { 'type':'keydown', 'propagate':false,	'target':document } );
 
-  window.resizeTo( window.outerWidth, $('#SAIR').position().top + 180 );
   setInterval( testOpener, 1000 );
   window.opener.WebSAGE.showValsCmd2( 0 );
-  tout_cmd();
+  setTimeout( tout_cmd, 2000 );
 
   // torna elementos não selecionáveis
   $("html > head").append("<style> body { user-select:none; -webkit-user-select:none; } </style>");

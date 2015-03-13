@@ -8,15 +8,16 @@ OSHMI - Open Substation HMI
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     
 The system will install to "c:\oshmi\".
 
 Acknowledgements:
+
   Inkscape + SAGE: https://sourceforge.net/projects/sage-scada/
   Chromium: by "The Chromium Authors". Binaries finder: http://chromium.woolyss.com
   ICCP Client by Fernando Covatti: https://github.com/fcovatti/iccp/
@@ -35,16 +36,19 @@ Acknowledgements:
   CCS Animation Cheat Sheet: http://www.justinaguilar.com/animations/
   Some icons from: http://keyamoon.com/icomoon and http://raphaeljs.com/icons/
   D3JS: http://d3js.org
+  Radar-chart-d3: https://github.com/alangrafu/radar-chart-d3/
+  NSSM - the Non-Sucking Service Manager: http://nssm.cc/
 
 -------------------------------------------------------------------
 
 QUICKSTART:
+
 To quickly run the system after installed, open the OSHMI desktop folder and execute the "HMIShell" program.
 Next open the Screen Viewer and the Events Viewer using the HMIShell or the icons on the OSHMI folder.
 The system is preconfigured to run a simulation with an example point list and screens.
 To simulate a command, click on a breaker and push the "Command" button then choose an action like "open" or "close" and push the action button.
 To stop the system click on the "Stop_All" icon on the OSHMI folder.
-To edit and create new SVG screens, download and use Inkscape+SAGE, screens are in "c:\oshmi\svg\".
+To edit and create new SVG screens, download and use Inkscape+SAGE. Screens are in "c:\oshmi\svg\".
 OSHMI configuration files are in "c:\oshmi\conf\".
 For more info about configuration please read the OSHMI Configuration Manual.
 
@@ -80,19 +84,19 @@ User interface can be used on:
 To compile the source code on Windows you will need the folowing environments:
 
 Webserver, HMIShell, Mon_Proc and Sim_TR:
- - Borland C++ Builder 5
+ - Borland C++ Builder 5, version 6 or later may also work
  - Indy 9 Components - http://www.indyproject.org/download/Files/Indy9.html
 
 QTester104:
- - QT 5.2.1
+ - QT 5.3.2
 
 -------------------------------------------------------------------
 
 Notes for the version 3.0 (first public release):
 
 Includes:
- - Chromium 39.0.2146.0.
- - NGinx 1.0.11.
+ - Chromium 42.0.2309.0.
+ - NGINX 1.0.11.
  - PHP 5.4.17.
- - SQLite 3.8.6.
-
+ - SQLite 3.8.8.2
+ - NSSM 2.24

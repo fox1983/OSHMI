@@ -412,6 +412,7 @@ g_sha1ant_dig : "",
 g_hidetoolbar: 0,
 g_timeOutPreview: 1500, // tempo para mostrar preview de tela linkada
 g_timerPreviewID: 0,  // timer para mostrar preview de tela linkada
+g_hasRadar: false, // register the presence of a radar chart
 
 // tamanhos para zoom/pan
 g_zpX: 0, 
@@ -1852,7 +1853,79 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
       case "set":
          switch ( inksage_labelvec[lbv].tag )
            {
-           case "#exec": // exec a script one time
+           case "#radar": // radar chart, defined under a rectangle
+               // Lib: https://github.com/alangrafu/radar-chart-d3
+               if ( item.tagName !== "rect" )
+                 break;
+               if ( ! WebSAGE.g_hasRadar )
+                 {
+                 WebSAGE.g_hasRadar = true;
+                 // insert css for radar (spider) charts into the screen SVG
+                 var el = $( document.createElementNS('http://www.w3.org/2000/svg', 'style') );
+                 $(el).load( "lib/radar-chart.css", function() {
+                        SVGDoc.getElementsByTagName("svg").item(0).appendChild( el[0] );
+                        } ) ;
+                 }
+                 
+               item.style.display = 'none'; // hide the rectangle
+               item.dta = [ {
+                 className: 'teste',
+                 axes: 
+                   [
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1},
+                   {axis: "med", value: 1}
+                   ]
+                 } ];
+               
+               // point list in the Source field
+               item.pnts = inksage_labelvec[lbv].src.split(",");
+               for ( j = 0; j < item.pnts.length; j++ )
+                 {
+                 WebSAGE.acrescentaPontoLista( item.pnts[j] );
+                 }                 
+               item.dta[0].axes.splice( 0, item.dta[0].axes.length - item.pnts.length );
+               item.chart = RadarChart.chart();    
+               var jsoncfg = {};
+               // load the chart config from the Prompt field
+               if ( inksage_labelvec[lbv].prompt !== "" )
+                 {
+                 jsoncfg = JSON.parse( inksage_labelvec[lbv].prompt );
+                 }
+               // size and color from the rectangle
+               jsoncfg.w = item.getAttributeNS( null, 'width' );
+               jsoncfg.h = item.getAttributeNS( null, 'height' );
+               jsoncfg.color = d3.scale.ordinal().range( [ item.style.fill ] );
+               item.chart.config( jsoncfg );
+               var svg = d3.select( SVGDoc.getElementsByTagName("svg").item(0) );
+               // insert the chart under layer1 of the Inkscape drawing
+               item.cht = svg.select("#layer1").append('g').datum(item.dta).call( item.chart );
+               // position according to the rectangle
+               item.cht[0][0].setAttributeNS( null, 
+                                        'transform', 
+                                        ( item.getAttributeNS( null, "transform" ) || "" )  + 
+                                        " translate(" + item.getAttributeNS( null, "x" ) + "," + 
+                                        item.getAttributeNS( null, "y" ) + ") " ); 
+               break;
+            case "#exec": // exec a script one time
                try 
                  {
                  eval( 'var thisobj=window.SVGDoc.getElementById("' + item.id + '"); ' + inksage_labelvec[lbv].src );
@@ -3208,10 +3281,23 @@ for ( x in V )
         WebSAGE.visibEtiq( tag );      
       } 
 
-    if ( vt != "????" || WebSAGE.InkSage[i].attr === "color" )
+    if ( vt != "????" || WebSAGE.InkSage[i].attr === "color" || WebSAGE.InkSage[i].attr === "set" )
       {  
       switch ( WebSAGE.InkSage[i].attr )
          {
+         case "set":
+            switch ( WebSAGE.InkSage[i].tag )
+               { 
+               case "#radar": // radar chart animation
+                 for ( j = 0; j < WebSAGE.InkSage[i].parent.pnts.length; j++ )
+                   {
+                   WebSAGE.InkSage[i].parent.dta[0].axes[j].value = WebSAGE.valorTagueado( WebSAGE.InkSage[i].parent.pnts[j] );
+                   WebSAGE.InkSage[i].parent.dta[0].axes[j].axis = BAYS[ WebSAGE.InkSage[i].parent.pnts[j] ] || "";
+                   }
+                 WebSAGE.InkSage[i].parent.cht.datum( WebSAGE.InkSage[i].parent.dta ).call( WebSAGE.InkSage[i].parent.chart );
+                 break;
+               }
+            break;  
          case "open":
             // graphic plot ?
             if ( WebSAGE.InkSage[i].istag == 1 )
@@ -4626,6 +4712,16 @@ init: function()
                            },
                 {'type':'keydown', 'propagate':false, 'target':document} );           
 
+  shortcut.add( "shift+enter", // make a snapshot that can be saved as a webpage complete  
+                 function() { var html = d3.select( SVGDoc.getElementsByTagName("svg").item(0))
+                                                      .attr("version", 1.1)
+                                                      .attr("xmlns", "http://www.w3.org/2000/svg")
+                                                      .node().parentNode.rootElement.innerHTML;
+		                      var doc = document.open("image/svg+xml", "blank");
+                              doc.write( '<p>' + Data + '</p><svg  width="2400" height="1500" style="background-color:' + VisorTelas_BackgroundSVG + ';" >' + html + '</svg>');
+		                    },
+                {'type':'keydown', 'propagate':false, 'target':document} );           
+				
   Core.addEventListener( document.getElementById("CORFUNDO_ID"), "click", 
       function()
       {

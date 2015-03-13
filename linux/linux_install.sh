@@ -32,9 +32,9 @@ rm -rf ../db/*.bat
 rm -rf ../bin/mon_proc.exe
 rm -rf ../nginx_php
 
-cp process_dumpdb.sh ../db/
-cp process_soe.sh ../db/
-cp process_hist.sh ../db/
+sudo cp process_dumpdb.sh ../db/
+sudo cp process_soe.sh ../db/
+sudo cp process_hist.sh ../db/
 
 sudo cp nginx.conf /etc/nginx/
 sudo cp php.ini /etc/php5/fpm/
