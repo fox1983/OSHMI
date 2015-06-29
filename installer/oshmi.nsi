@@ -1,6 +1,6 @@
 ; oshmi.nsi
 ; OSHMI installer script
-; Copyright 2008-2014 - Ricardo L. Olsen
+; Copyright 2008-2015 - Ricardo L. Olsen
 
 ; NSIS (Nullsoft Scriptable Install System) - http://nsis.sourceforge.net/Main_Page
 
@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.0"
+!define VERSION "v.3.1"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -99,11 +99,15 @@ Section "" ; empty string makes it hidden, so would starting with -
   nsExec::Exec 'taskkill /F /IM php-cgi.exe'
   nsExec::Exec 'taskkill /F /IM mon_proc.exe'
   nsExec::Exec 'taskkill /F /IM procexp.exe'
+  nsExec::Exec 'taskkill /F /IM iccp_client.exe'
   nsExec::Exec 'taskkill /F /IM QTester104.exe'
   nsExec::Exec 'taskkill /F /IM hmishell.exe'
   nsExec::Exec 'taskkill /F /IM webserver.exe'
   nsExec::Exec 'taskkill /F /IM chrome.exe'
   nsExec::Exec 'taskkill /F /IM sqlite3.exe'
+  nsExec::Exec 'net stop OSHMI_rtwebsrv'
+  nsExec::Exec 'net stop OSHMI_iec104'
+  nsExec::Exec 'net stop OSHMI_iccp'
 
   SetOverwrite on
 
@@ -149,6 +153,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   RMDir /r "$INSTDIR\browser-data" 
 
   CreateDirectory "$INSTDIR\bin"
+  CreateDirectory "$INSTDIR\bin\platforms"
   CreateDirectory "$INSTDIR\browser"
   CreateDirectory "$INSTDIR\browser-data"
   CreateDirectory "$INSTDIR\conf"
@@ -160,7 +165,6 @@ Section "" ; empty string makes it hidden, so would starting with -
   CreateDirectory "$INSTDIR\extprogs"
   CreateDirectory "$INSTDIR\htdocs"
   CreateDirectory "$INSTDIR\htdocs\images"
-; CreateDirectory "$INSTDIR\htdocs\clipart"
   CreateDirectory "$INSTDIR\i18n"
   CreateDirectory "$INSTDIR\linux"
   CreateDirectory "$INSTDIR\logs"
@@ -175,11 +179,13 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\icons\favicon.ico"
 
   SetOutPath $INSTDIR\bin
-
   File /a "..\bin\*.exe"
   File /a "..\bin\*.dll"
   File /a "..\bin\*.vbs"
   File /a "..\bin\*.bat"
+
+  SetOutPath $INSTDIR\bin\platforms
+  File /a "..\bin\platforms\*.dll"
 
   SetOutPath $INSTDIR\etc
   File /a "..\etc\dyn_sheet.xlsx"
@@ -299,9 +305,6 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\svg\knh2.svg"
   File /a "..\svg\kor1.svg"
   File /a "..\conf_templates\screen_list.js"
-
-; SetOutPath "$INSTDIR\htdocs\clipart"
-; File /a "..\htdocs\clipart\*.*"
 
 ; Visual C redist: necess�rio para executar o PHP
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86.exe" /q'
@@ -497,6 +500,7 @@ Section "Uninstall"
   
   Delete "$INSTDIR\*.*"
   Delete "$INSTDIR\bin\*.*"
+  Delete "$INSTDIR\bin\platforms\*.*"
   Delete "$INSTDIR\conf_templates\*.*"
   Delete "$INSTDIR\conf\*.*"
   Delete "$INSTDIR\db\db_cold\*.*"
@@ -506,13 +510,13 @@ Section "Uninstall"
   Delete "$INSTDIR\extprogs\*.*"
   Delete "$INSTDIR\htdocs\*.*"
   Delete "$INSTDIR\htdocs\images\*.*"
-; Delete "$INSTDIR\htdocs\clipart\*.*"
   Delete "$INSTDIR\i18n\*.*"
   Delete "$INSTDIR\linux\*.*"
   Delete "$INSTDIR\logs\*.*"
   Delete "$INSTDIR\scripts\*.*"
   Delete "$INSTDIR\svg\*.*"
   RMDir /r "$INSTDIR\bin" 
+  RMDir /r "$INSTDIR\bin\platforms" 
   RMDir /r "$INSTDIR\browser" 
   RMDir /r "$INSTDIR\browser-data" 
   RMDir /r "$INSTDIR\conf" 

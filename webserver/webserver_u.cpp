@@ -385,7 +385,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
                                                FilterMod.c_str(),
                                                lista,
                                                tipo_alm,
-                                               1 );
+                                               0 );
 
      // coloca a data/hora da resposta
      AResponseInfo->ContentText = "Data='" + FormatDateTime( WEBSERVER_DATE_FMT, Now() ) + "';\n";
@@ -664,9 +664,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
                case 1:
                  if ( pt.EhEventoDigital() && pt.AlarmeNaoReconhecido() )
                    {
-                   Linha = Linha + (String)pt.GetEstadoOn() +
-                                   // (String)"/" + (String)pt.GetEstadoOff() +
-                                   (String)SEP;
+                   Linha = Linha + (String)pt.GetEstadoOn() + (String)SEP;
                    }
                  else
                    {
@@ -1339,11 +1337,12 @@ switch ( ARequestInfo->UnparsedParams[1] )
 
            // sendo pelo iec104m, manda para a outra ihm também, pois a pode ser a outra que está com o 104 conectado.
            // se tem outro ihm e não veio dele vou encaminhar a mensagem
-           if ( IHMRED_IP_OUTRO_IHM != "" )
-           if ( ARequestInfo->RemoteIP != IHMRED_IP_OUTRO_IHM )
-              {
-              lstHTTPReq_OutroIHM.push_back( ARequestInfo->Document + "?" + ARequestInfo->UnparsedParams );
-              }
+           // if ( IHMRED_IP_OUTRO_IHM != "" )
+           // if ( ARequestInfo->RemoteIP != IHMRED_IP_OUTRO_IHM )
+           //   {
+           //   lstHTTPReq_OutroIHM.push_back( ARequestInfo->Document + "?" + ARequestInfo->UnparsedParams );
+           //   }
+           
            Loga( (String)"Command Sent(IEC): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
            }
          else

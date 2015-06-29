@@ -18,8 +18,11 @@ sh ~/.wine/drive_c/oshmi/db/process_hist.sh &
 # OSHMI shell
 wine ~/.wine/drive_c/oshmi/bin/hmishell.exe &
 
+
+cd ~/.wine/drive_c/oshmi/bin
+
 # OSHMI realtime database server
-wine ~/.wine/drive_c/oshmi/bin/webserver.exe &
+wine webserver.exe &
 
 # OSHMI iec104 protocol driver via Wine
 # wine ~/.wine/drive_c/oshmi/bin/qtester104.exe &

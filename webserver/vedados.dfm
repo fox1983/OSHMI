@@ -1,6 +1,6 @@
 object fmVeDados: TfmVeDados
-  Left = 0
-  Top = 466
+  Left = 9
+  Top = 420
   Width = 898
   Height = 609
   BorderIcons = [biMinimize, biMaximize]

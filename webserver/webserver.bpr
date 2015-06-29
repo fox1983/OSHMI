@@ -56,8 +56,8 @@
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=2
-MinorVer=3
+MajorVer=3
+MinorVer=1
 Release=0
 Build=0
 Debug=0
@@ -71,13 +71,13 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=OSHMI
 FileDescription=Webserver
-FileVersion=3.0.0.0
+FileVersion=3.1.0.0
 InternalName=Webserver
-LegalCopyright=(c) 2008-2014 Ricardo Olsen
+LegalCopyright=(c) 2008-2015 RLO
 LegalTrademarks=
 OriginalFilename=webserver.exe
-ProductName=OSHMI: Open Substation HMI
-ProductVersion=3.0.0.0
+ProductName=OSHMI: Open Substation HMI / Penguin IHM
+ProductVersion=3.1.0.0
 Comments=
 
 [HistoryLists\hlDebugSourcePath]

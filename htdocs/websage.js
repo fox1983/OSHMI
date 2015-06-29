@@ -3177,7 +3177,7 @@ for ( x in V )
         }
         
       // if ( (F[x] & 0x400) ) // se está inibido, fica amarelo
-      //  { elem.style.stroke=ScreenViewer_ColorTableAlarmeInibido; }
+      //  { elem.style.stroke=VisorTelas_CorAlarmeInibido; }
       }
     else
     if  ( elem.tagName === "rect" ) // disjuntor tem que ser retângulo
@@ -3209,7 +3209,7 @@ for ( x in V )
       elem.setAttributeNS( null, "style", borda + preen );
 
       //if ( (F[x] & 0x400) ) // se está inibido
-      //  elem.style.stroke=ScreenViewer_ColorTableAlarmeInibido;
+      //  elem.style.stroke=VisorTelas_CorAlarmeInibido;
         
       elem.style.cursor = "pointer";  
       }
@@ -4449,7 +4449,7 @@ TraduzCor: function( cor )
       cor = ScreenViewer_ToolbarColor;
       break;
     case "-cor-almini":
-      cor = ScreenViewer_ColorTableAlarmeInibido;
+      cor = VisorTelas_CorAlarmeInibido;
       break;
     case "-cor-medfal":
       cor = VisorTelas_Medidas_Cor_Falha;
