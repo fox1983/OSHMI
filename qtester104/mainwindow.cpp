@@ -200,6 +200,9 @@ void MainWindow::slot_BDTR_pronto_para_ler()
     unsigned char br[2000]; // buffer de recepcao
     int bytesrec;
 
+    while ( udps->hasPendingDatagrams() )
+    {
+
     QHostAddress address;
     quint16 port;
     bytesrec = udps->readDatagram ( (char *)br, sizeof(br), &address, &port );
@@ -336,6 +339,7 @@ void MainWindow::slot_BDTR_pronto_para_ler()
     default:
         BDTR_Loga( "--> BDTR: IGNORED MSG" );
         break;
+    }
     }
 }
 

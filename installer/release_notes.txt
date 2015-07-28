@@ -21,7 +21,7 @@ Acknowledgements:
   Inkscape + SAGE: https://sourceforge.net/projects/sage-scada/
   Chromium: by "The Chromium Authors". Binaries finder: http://chromium.woolyss.com
   ICCP Client by Fernando Covatti: https://github.com/fcovatti/iccp/
-  QT: http://qt-project.org
+  QT: http://www.qt.io/
   NSIS (Nullsoft Scriptable Install System): http://nsis.sourceforge.net/Main_Page/
   JQuery: http://jquery.com
   JQuery UI: http://jqueryui.com
@@ -34,11 +34,15 @@ Acknowledgements:
   X3DOM: http://www.x3dom.org
   TabSystem: http://www.developer-x.com
   CCS Animation Cheat Sheet: http://www.justinaguilar.com/animations/
-  Some icons from: http://keyamoon.com/icomoon and http://raphaeljs.com/icons/
   D3JS: http://d3js.org
   Radar-chart-d3: https://github.com/alangrafu/radar-chart-d3/
   NSSM - the Non-Sucking Service Manager: http://nssm.cc/
-
+  NGINX - http://nginx.org/
+  PHP - http://php.net
+  WGet - http://www.gnu.org/software/wget/
+  SQLite - https://www.sqlite.org/
+  Some icons from: http://keyamoon.com/icomoon and http://raphaeljs.com/icons/
+  
 -------------------------------------------------------------------
 
 QUICKSTART:
@@ -89,6 +93,13 @@ Webserver, HMIShell, Mon_Proc and Sim_TR:
 
 QTester104:
  - QT 5.4
+
+-------------------------------------------------------------------
+
+Notes for the version 3.2:
+
+QTester104:
+  - Updated to version 1.07.
 
 -------------------------------------------------------------------
 
