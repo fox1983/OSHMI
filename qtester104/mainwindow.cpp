@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
     i104.setPortTCP( settings.value( "RTU1/TCP_PORT", i104.getPortTCP() ).toInt() );
 
     // this is for using with the OSHMI HMI in a dual architecture
-    QSettings settings_bdtr( "../conf/ihm.ini", QSettings::IniFormat );
+    QSettings settings_bdtr( "../conf/hmi.ini", QSettings::IniFormat );
     BDTR_host_dual = settings_bdtr.value( "REDUNDANCIA/IP_OUTRO_IHM", "" ).toString();
     BDTR_host = "127.0.0.1";
     BDTR_CntDnToBePrimary = BDTR_CntToBePrimary;

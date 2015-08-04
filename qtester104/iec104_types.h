@@ -145,7 +145,7 @@ struct iec_type7 {
 
 // M_ME_NA_1 - normalized measured value
 struct iec_type9 {
-    unsigned short mv; // normalized value
+    short mv; // normalized value
     unsigned char ov :1; // overflow/no overflow
     unsigned char res :3;
     unsigned char bl :1; // blocked/not blocked
@@ -156,7 +156,7 @@ struct iec_type9 {
 
 // M_ME_NB_1 - scaled measured value
 struct iec_type11 {
-    unsigned short mv; // scaled value
+    short mv; // scaled value
     unsigned char ov :1; // overflow/no overflow
     unsigned char res :3;
     unsigned char bl :1; // blocked/not blocked
@@ -225,7 +225,7 @@ struct iec_type33 {
 
 // M_ME_TD_1 - scaled measured value with time tag
 struct iec_type34 {
-    unsigned short mv; // scaled value
+    short mv; // scaled value
     unsigned char ov :1; // overflow/no overflow
     unsigned char res :3;
     unsigned char bl :1; // blocked/not blocked
@@ -237,7 +237,7 @@ struct iec_type34 {
 
 // M_ME_TE_1 - scaled measured value with time tag
 struct iec_type35 {
-    unsigned short mv; // scaled value
+    short mv; // scaled value
     unsigned char ov :1; // overflow/no overflow
     unsigned char res :3;
     unsigned char bl :1; // blocked/not blocked

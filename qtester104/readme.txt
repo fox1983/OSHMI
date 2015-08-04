@@ -1,4 +1,4 @@
-QTester104 version 1.05 Copyright © 2010-2014 Ricardo L. Olsen.
+QTester104 version 1.07 Copyright © 2010-2015 Ricardo L. Olsen.
 
 This software implements an IEC 60870-5-104 protocol tester.
 IEC 60870-5-104 is a commonly used protocol for data acquisition and control of power substations.
