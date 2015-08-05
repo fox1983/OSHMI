@@ -223,9 +223,9 @@ struct iec_type33 {
     cp56time2a time;
 };
 
-// M_ME_TD_1 - scaled measured value with time tag
+// M_ME_TD_1 - normalized measured value with time tag
 struct iec_type34 {
-    short mv; // scaled value
+    short mv; // normalized value
     unsigned char ov :1; // overflow/no overflow
     unsigned char res :3;
     unsigned char bl :1; // blocked/not blocked

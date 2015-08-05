@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // this is for using with the OSHMI HMI in a dual architecture
     QSettings settings_bdtr( "../conf/hmi.ini", QSettings::IniFormat );
-    BDTR_host_dual = settings_bdtr.value( "REDUNDANCIA/IP_OUTRO_IHM", "" ).toString();
+    BDTR_host_dual = settings_bdtr.value( "REDUNDANCY/OTHER_HMI_IP", "" ).toString();
     BDTR_host = "127.0.0.1";
     BDTR_CntDnToBePrimary = BDTR_CntToBePrimary;
 
@@ -448,15 +448,18 @@ void MainWindow::BDTR_processPoints( iec_obj *obj, int numpoints )
         }
         break;
 
-      case iec104_class::M_ST_NA_1: // tap
-      case iec104_class::M_ME_NA_1: // 9
-      case iec104_class::M_ME_NB_1: // 11
+      case iec104_class::M_ST_NA_1: // 5 = step
+      case iec104_class::M_ME_NA_1: // 9 = normalized
+      case iec104_class::M_ME_NB_1: // 11 = scaled
+      case iec104_class::M_ST_TB_1: // 32 = step with time tag
+      case iec104_class::M_ME_TD_1: // 34 = normalized with time tag
+      case iec104_class::M_ME_TE_1: // 35 = scaled with time tag
         {
         msg_ana *msgana;
 
         tam_msg = sizeof( A_ana ) * numpoints + sizeof( msg_ana ) - sizeof( A_ana );
         msgana = (msg_ana*) malloc( tam_msg );
-        if ( obj->type == iec104_class::M_ME_NA_1 )
+        if ( obj->type == iec104_class::M_ME_NA_1 || obj->type == iec104_class::M_ME_TD_1 )
           msgana->COD = T_NORM;
         else
           msgana->COD = T_ANA;
@@ -474,7 +477,7 @@ void MainWindow::BDTR_processPoints( iec_obj *obj, int numpoints )
           qfa.Subst = obj->bl || obj->sb;
           qfa.Tipo = TFA_TIPOANA;
           qfa.Falha = obj->iv || obj->nt || obj->ov;
-          if (obj->type == iec104_class::M_ST_NA_1) // tap
+          if ( obj->type == iec104_class::M_ST_NA_1 || obj->type == iec104_class::M_ST_TB_1 ) // tap
              qfa.Falha =  qfa.Falha || obj->t; // transient = falha
 
           msgana->PONTO[cntpnt].ID = obj->address;
@@ -490,6 +493,7 @@ void MainWindow::BDTR_processPoints( iec_obj *obj, int numpoints )
         break;
 
       case iec104_class::M_ME_NC_1: // 13
+      case iec104_class::M_ME_TF_1: // 36
         {
         msg_float *msgflt;
 
@@ -650,11 +654,15 @@ void MainWindow::slot_dataIndication( iec_obj *obj, int numpoints )
               sprintf( buf, "%s%s%s%s%s", dblmsg[obj->dcs], obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"" );
               break;
           case iec104_class::M_ST_NA_1: // 5
+          case iec104_class::M_ST_TB_1: // 32
               sprintf( buf, "%s%s%s%s%s%s", obj->ov?"ov ":"", obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"", obj->t?"t ":"" );
               break;
           case iec104_class::M_ME_NA_1: // 9
           case iec104_class::M_ME_NB_1: // 11
           case iec104_class::M_ME_NC_1: // 13
+          case iec104_class::M_ME_TD_1: // 34
+          case iec104_class::M_ME_TE_1: // 35
+          case iec104_class::M_ME_TF_1: // 36
               sprintf( buf, "%s%s%s%s%s", obj->ov?"ov ":"", obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"" );
               break;
           }
