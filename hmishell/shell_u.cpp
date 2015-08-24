@@ -200,6 +200,8 @@ void __fastcall TfmShell::popTelasItemsClick(TObject *Sender)
 __fastcall TfmShell::TfmShell(TComponent* Owner)
         : TForm(Owner)
 {
+TemBeep = 0;
+PROC_BEEP = 0;
 SHRINK = 0;
 WebServerOk = false;
 glAlpha = 0;
@@ -209,8 +211,14 @@ tbHist->Enabled = false;
 tbAnormais->Enabled = false;
 tbTabular->Enabled = false;
 tbCurvas->Enabled = false;
-tbSilencia->Enabled = false;
 WEBSERVER_DATE_FMT = "yy/mm/dd hh:nn:ss";
+
+// espera mudar segundo par, para sincronizar beep
+int tt = time(NULL)/2;
+do {
+Sleep(10);
+} while( tt == time(NULL)/2 );
+Timer2->Enabled = true;
 
 // vai para o diretório do executável
 chdir(ExtractFilePath(Application->ExeName).c_str());
@@ -251,6 +259,7 @@ if ( pIni != NULL )
   SERVER1 = pIni->ReadString( "HMISHELL", "SERVER1", SERVER1 ).Trim();
   SERVER2 = pIni->ReadString( "HMISHELL", "SERVER2", SERVER2 ).Trim();
   LAST_SERVER = pIni->ReadInteger( "HMISHELL", "LAST_SERVER", LAST_SERVER );
+  PROC_BEEP = pIni->ReadInteger( "HMISHELL", "BEEP", PROC_BEEP );
   if ( LAST_SERVER == 2 )
     {
     LAST_SERVER = 1;
@@ -431,6 +440,7 @@ if ( JANELA_ENCONTRADA == 0 ) // se não achou executa
 
 void __fastcall TfmShell::tbSilenciaClick(TObject *Sender)
 {
+SilenciaBeep();
 try
   {
   String Rq = (String)"http://" +
@@ -551,7 +561,18 @@ if ( !fmSair->PasswdTest( fmSair->edSenha->Text.c_str() ) )
 
 void __fastcall TfmShell::Timer2Timer(TObject *Sender)
 {
-// static int cnt = 0;
+static int Cnt = 0;
+
+// Processa beep
+if ( PROC_BEEP )
+if ( ! ( Cnt % 2 ) || ( HaBeepAtivo() == BEEP_CRITICO ) )
+  if ( HaBeepAtivo() )
+     {
+     if ( HaBeepAtivo() == BEEP_CRITICO )
+       MessageBeep( MB_ICONASTERISK );
+     else
+       MessageBeep( MB_OK );
+     }
 
 TDateTime nw = Now();
 String dttm = FormatDateTime( WEBSERVER_DATE_FMT, nw );
@@ -563,17 +584,7 @@ if ( dt != Label1->Caption )
 
 Label2->Caption = dttm.SubString( posspc + 1, 99 );
 
-// blink
-//TColor cl;
-//switch ( cnt % 2 )
-//  {
-//  case 0: cl = clDkGray; break;
-//  default: cl = clBlack; break;
-//  }
-//Label1->Font->Color = cl;
-//Label2->Font->Color = cl;
-
-// cnt++;
+Cnt++;
 }
 
 //---------------------------------------------------------------------------
@@ -598,7 +609,6 @@ catch ( Exception &E )
    tbAnormais->Enabled = false;
    tbTabular->Enabled = false;
    tbCurvas->Enabled = false;
-   tbSilencia->Enabled = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -612,7 +622,13 @@ tbHist->Enabled = true;
 tbAnormais->Enabled = true;
 tbTabular->Enabled = true;
 tbCurvas->Enabled = true;
-tbSilencia->Enabled = true;
+if ( NMHTTP1->Body.Pos("HA_ALARMES=1") )
+  AtivaBeep( BEEP_NORMAL );
+else
+if ( NMHTTP1->Body.Pos("HA_ALARMES=2") )
+  AtivaBeep( BEEP_CRITICO );
+else
+  SilenciaBeep();
 }
 //---------------------------------------------------------------------------
 
@@ -625,7 +641,6 @@ tbHist->Enabled = false;
 tbAnormais->Enabled = false;
 tbTabular->Enabled = false;
 tbCurvas->Enabled = false;
-tbSilencia->Enabled = false;
 }
 //---------------------------------------------------------------------------
 
@@ -1238,8 +1253,19 @@ FormMouseMove(Sender,Shift,X,Y);
 }
 //---------------------------------------------------------------------------
 
+void TfmShell::SilenciaBeep()
+{
+TemBeep = BEEP_NENHUM;
+}
 
+int TfmShell::HaBeepAtivo()
+{
+return TemBeep;
+}
 
-
-
+void TfmShell::AtivaBeep( int tipo )
+{
+if ( TemBeep == BEEP_NENHUM || TemBeep == BEEP_NORMAL )
+  TemBeep = tipo;
+}
 

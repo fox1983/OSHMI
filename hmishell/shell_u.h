@@ -153,6 +153,12 @@ private:	// User declarations
         String TITULO_VISOR_CURVAS;
         String TELAS[MAX_ATALHOS_TELAS];
         String WEBSERVER_DATE_FMT;
+        int PROC_BEEP;
+        int TemBeep; // informa se o alarme bipa
+        void SilenciaBeep();
+        int HaBeepAtivo();
+        void AtivaBeep( int tipo );
+
 public:		// User declarations
         __fastcall TfmShell(TComponent* Owner);
 };
@@ -163,6 +169,11 @@ extern PACKAGE TfmShell *fmShell;
 #define ARQ_CONF "..\\conf\\hmishell.ini"
 #define ARQ_CONFI18N "..\\i18n\\messages_i18n.ini"
 #define ARQ_CONF_IHM "..\\conf\\hmi.ini"
+
+// estados possíveis de beep 
+#define BEEP_NENHUM 0
+#define BEEP_NORMAL 1
+#define BEEP_CRITICO 2
 
 void ExecExternApp(char * cmd);
 

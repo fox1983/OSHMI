@@ -901,7 +901,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
        AResponseInfo->ContentText = AResponseInfo->ContentText + "Sha1Dig='" + SD + "';\n";
 
        if ( BL.HaBeepAtivo() )
-         AResponseInfo->ContentText = AResponseInfo->ContentText + "HA_ALARMES=1;\n";
+         AResponseInfo->ContentText = AResponseInfo->ContentText + "HA_ALARMES=" + (String)BL.HaBeepAtivo() + (String)";\n";
        else
          AResponseInfo->ContentText = AResponseInfo->ContentText + "HA_ALARMES=0;\n";
 
