@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.5"
+!define VERSION "v.3.6"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -181,8 +181,6 @@ Section "" ; empty string makes it hidden, so would starting with -
   SetOutPath $INSTDIR\bin
   File /a "..\bin\*.exe"
   File /a "..\bin\*.dll"
-  File /a "..\bin\*.vbs"
-  File /a "..\bin\*.bat"
 
   SetOutPath $INSTDIR\bin\platforms
   File /a "..\bin\platforms\*.dll"
@@ -192,7 +190,6 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\etc\webserver_query.iqy"  
   File /a "..\etc\simtr_example.txt"
   File /a "..\etc\*.reg"
-  File /a "..\etc\*.bat"
 
   SetOutPath $INSTDIR\extprogs
   File /a "..\extprogs\download_external_progs.bat"
@@ -278,6 +275,13 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\docs\inkscape-shortcuts2.svg"
   
   SetOverwrite off
+
+  SetOutPath $INSTDIR\bin
+  File /a "..\bin\*.vbs"
+  File /a "..\bin\*.bat"
+
+  SetOutPath $INSTDIR\etc
+  File /a "..\etc\*.bat"
 
   SetOutPath $INSTDIR\conf
   File /a "..\conf_templates\config_viewers.js"

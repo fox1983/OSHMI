@@ -96,6 +96,21 @@ QTester104:
 
 -------------------------------------------------------------------
 
+Notes for the version 3.6:
+QTester104:
+  - Updated to version 1.11. Added the possibility of scannig a redundant RTU.
+  
+SQLite:
+  - Updated to version 3.8.11.1.
+  
+Webserver:
+  - Avoid closing by request on logout when running as a service.
+  
+Installer:
+  - Changed to avoid overwriting bat files on "bin" and "etc" folders.
+
+-------------------------------------------------------------------
+
 Notes for the version 3.5:
 
 HMIShell:

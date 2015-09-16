@@ -74,9 +74,14 @@ void iec104_class::setPortTCP( unsigned port )
     Port = port;
 }
 
-void iec104_class::setSecondaryIP(char * ip)
+void iec104_class::setSecondaryIP( char * ip )
 {
     strncpy( slaveIP, ip, 20 );
+}
+
+void iec104_class::setSecondaryIP_backup( char * ip )
+{
+    strncpy( slaveIP_backup, ip, 20 );
 }
 
 char * iec104_class::getSecondaryIP()
@@ -84,7 +89,12 @@ char * iec104_class::getSecondaryIP()
     return slaveIP;
 }
 
-void iec104_class::setSecondaryAddress(int addr)
+char * iec104_class::getSecondaryIP_backup()
+{
+    return slaveIP_backup;
+}
+
+void iec104_class::setSecondaryAddress( int addr )
 {
     slaveAddress = addr;
 }
@@ -94,7 +104,7 @@ int iec104_class::getSecondaryAddress()
     return slaveAddress;
 }
 
-void iec104_class::setPrimaryAddress(int addr)
+void iec104_class::setPrimaryAddress( int addr )
 {
     masterAddress = addr;
 }

@@ -65,9 +65,25 @@ void QIec104::dataIndication( iec_obj *obj, int numpoints )
 
 void QIec104::connectTCP()
 {
+static int cnt = 0;
+char buf[100];
+
     tcps->close();
     if ( !mEnding && mAllowConnect )
-      tcps->connectToHost( getSecondaryIP(), getPortTCP(), QIODevice::ReadWrite );
+      { // alternate main and backup UTR IP address, if configured
+      if ( (++cnt) % 2 || strcmp(getSecondaryIP_backup(), "") == 0 )
+        {
+        tcps->connectToHost( getSecondaryIP(), getPortTCP(), QIODevice::ReadWrite );
+        sprintf( buf, "Try to connect IP: %s", getSecondaryIP() );
+        mLog.pushMsg( (const char *)buf );
+        }
+      else
+        {
+        tcps->connectToHost( getSecondaryIP_backup(), getPortTCP(), QIODevice::ReadWrite );
+        sprintf( buf, "Try to connect IP: %s", getSecondaryIP_backup() );
+        mLog.pushMsg( (const char *)buf );
+        }
+      }
 }
 
 void QIec104::disconnectTCP()

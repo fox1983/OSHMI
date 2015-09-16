@@ -139,7 +139,9 @@ class iec104_class
 
     void solicitGI();  // General Interrogation
     void setSecondaryIP( char * ip );
+    void setSecondaryIP_backup( char * ip );
     char * getSecondaryIP();
+    char * getSecondaryIP_backup();
     void setSecondaryAddress( int addr );
     int getSecondaryAddress();
     void setPrimaryAddress( int addr );
@@ -164,7 +166,8 @@ class iec104_class
     unsigned char masterAddress; // master link address (primary address, originator address, oa)
     unsigned short slaveAddress; // slave link address (secondary address, common address of ASDU, ca)
     unsigned Port; // iec104 tcp port (defaults to 2404)
-    char slaveIP[20]; // slave (secondary, RTU) IP address
+    char slaveIP[20]; // slave (secondary, main RTU) IP address
+    char slaveIP_backup[20]; // slave (secondary, backup RTU) IP address
     static const int t3_testfr = 10;
     static const int t2_supervisory = 8;
     static const int t1_startdtact = 6;

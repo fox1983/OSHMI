@@ -1,4 +1,4 @@
-QTester104 version 1.09 Copyright © 2010-2015 Ricardo L. Olsen.
+QTester104 version 1.11 Copyright © 2010-2015 Ricardo L. Olsen.
 
 This software implements an IEC 60870-5-104 protocol tester.
 IEC 60870-5-104 is a commonly used protocol for data acquisition and control of power substations.
@@ -26,7 +26,9 @@ PRIMARY_ADDRESS=1        ; link address of the primary station (computer)
 [RTU1]                   ; communicates with only one RTU in this version
 SECONDARY_ADDRESS=1      ; protocol link address of the RTU
 IP_ADDRESS=10.63.1.201   ; IP address of the RTU
+;IP_ADDRESS_BACKUP=10.63.1.202   ; IP address of the BACKUP RTU
 ALLOW_COMMANDS=1         ; 1=allow sending commands, 0=don't permit commands
+; PORT=2404              ; Protocol port (default=2404))
 
 Thank you for the interest, please fell free to comment.
 

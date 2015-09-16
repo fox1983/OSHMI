@@ -50,8 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
     i104.SendCommands = settings.value( "RTU1/ALLOW_COMMANDS", 0 ).toInt();
 
     QString IPEscravo;
+    IPEscravo = settings.value( "RTU1/IP_ADDRESS_BACKUP", "" ).toString();
+    i104.setSecondaryIP_backup( (char *)IPEscravo.toStdString().c_str() );
     IPEscravo = settings.value( "RTU1/IP_ADDRESS", "" ).toString();
-    i104.setSecondaryIP ( (char *)IPEscravo.toStdString().c_str() );
+    i104.setSecondaryIP( (char *)IPEscravo.toStdString().c_str() );
     i104.setPortTCP( settings.value( "RTU1/TCP_PORT", i104.getPortTCP() ).toInt() );
 
     // this is for using with the OSHMI HMI in a dual architecture
@@ -744,6 +746,7 @@ BDTR_Loga( "<-- BDTR: INTERROGATION END" );
 
 void MainWindow::slot_tcpconnect()
 {
+    ui->leIPRemoto->setText( i104.tcps->peerAddress().toString() );
     ui->lbStatus->setText( "<font color='green'> TCP CONNECTED!</font>" );
     ui->pbGI->setEnabled( true );
     ui->pbSendCommandsButton->setEnabled( true );

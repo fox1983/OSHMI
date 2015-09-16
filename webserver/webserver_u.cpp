@@ -331,9 +331,20 @@ switch ( ARequestInfo->UnparsedParams[1] )
      }
      break;
   case 'Y': // solicitação de desligamento comportado do computador
+     {
+     // quando rodando como serviço não sai por esta solicitação
+
      AResponseInfo->ContentText = "";
-     Timer2->Interval = 2000;
-     Timer2->Tag = 1; // forca fechamento de programa, após o tempo vai executar o TfmVeDados::FormCloseQuery(TObject *Sender, bool &CanClose), onde são feitos os procedimentos de fechamento do programa
+
+     TCHAR username[200 + 1];
+     DWORD size = 200 + 1;
+     GetUserName((TCHAR*)username, &size);
+     if ( (String)username != (String)"SYSTEM" && (String)username != (String)"SISTEMA" )
+       {
+       Timer2->Interval = 2000;
+       Timer2->Tag = 1; // força fechamento de programa, após o tempo vai executar o TfmVeDados::FormCloseQuery(TObject *Sender, bool &CanClose), onde são feitos os procedimentos de fechamento do programa
+       }
+     }
      break;
 
   case 'H':
