@@ -71,13 +71,14 @@ Recommended utils (can be downloaded running the "download_external_progs.bat" s
      http://notepad-plus-plus.org/
      
 Recommended OS's:
- - Windows 8/8.1 Pro
+ - Windows 10 Pro 32 or 64 bits
+ - Windows 8/8.1 Pro 32 or 64 bits
  - Windows 7 Pro 32 or 64 bits
 
 Can also run on:
  - Windows Vista 32 bits (legacy system, not recommended)
  - Windows XP 32 bits (legacy system, not recommended)
- - Ubuntu Linux 12.10 64 bits (under Wine, experimental)
+ - Ubuntu Linux 12.10 32 or 64 bits (under Wine, experimental)
  
 User interface can be used on:
  - IOS 7+ devices.
@@ -93,6 +94,16 @@ Webserver, HMIShell, Mon_Proc and Sim_TR:
 
 QTester104:
  - QT 5.4
+
+-------------------------------------------------------------------
+
+Notes for the version 3.7:
+QTester104:
+  - Updated to version 1.12. Added the possibility to stay simultaneously connected to 2 redundant RTU's.
+
+Tabular Viewer:
+  - Corrected shortcut [F8] to ack all alarms.
+  - Scrollbar to show many substation alarm filters
 
 -------------------------------------------------------------------
 

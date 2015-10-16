@@ -44,6 +44,7 @@ public:
     explicit QIec104(QObject *parent = 0);
     ~QIec104();
     int SendCommands; // 1 = allow sending commands, 0 = don't send commands
+    int BDTRForcePrimary; // 1 = force primary (cant't stay secondary) , 0 = can be secondary
     QTimer *tmKeepAlive; // 1 second timer
     QTcpSocket *tcps; // socket for iec104 (tcp)
     void terminate();

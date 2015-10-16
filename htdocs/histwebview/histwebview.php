@@ -475,8 +475,8 @@ echo '</SMALL></FORM></div>';
 echo '		<div class="tabpage">';
 echo '			<h3>Sheet</h3>';
 
-    print '<BUTTON id="btcopy" onClick="if (document.all) { CpyClip(holdtext);  } else { document.getElementById(\'holdtext\').style.display=\'\';  document.getElementById(\'holdtext\').focus(); }">Copy to clipboard (Excel)</BUTTON>&nbsp;&nbsp;&nbsp;<BR><BR>';
-    print '<BUTTON id="btcopy" onClick="if (document.all) { CpyClip(holdtext2); } else { document.getElementById(\'holdtext2\').style.display=\'\'; document.getElementById(\'holdtext2\').focus(); } ">Copy to clipboard (Excel), alternative format</BUTTON>&nbsp;&nbsp;&nbsp;';
+    print '<BUTTON id="btcopy" onClick="if (document.all) { CpyClip(holdtext);  } else { document.getElementById(\'holdtext\').style.display=\'\';  document.getElementById(\'holdtext\').focus(); if (document.execCommand(\'copy\')) document.getElementById(\'holdtext\').style.display=\'none\'; }">Copy to clipboard (Excel)</BUTTON>&nbsp;&nbsp;&nbsp;<BR><BR>';
+    print '<BUTTON id="btcopy" onClick="if (document.all) { CpyClip(holdtext2); } else { document.getElementById(\'holdtext2\').style.display=\'\'; document.getElementById(\'holdtext2\').focus(); if (document.execCommand(\'copy\')) document.getElementById(\'holdtext2\').style.display=\'none\'; } ">Copy to clipboard (Excel), alternative format</BUTTON>&nbsp;&nbsp;&nbsp;';
     print "\n<BR><BR><span style='font-size: 7pt'>Qualifier: unity for analogs ou state for digitals followed by:<br>F=Failed, E=Estimated, S=Substituted, C=Calculated, M=Manual, H=Time Set G=Large Error V=Variation</span><BR><BR>";
 
     try 

@@ -36,6 +36,7 @@ QIec104::QIec104( QObject *parent ) :
 mEnding = false;
 mAllowConnect = true;
 SendCommands = 0;
+BDTRForcePrimary = 0;
 mLog.activateLog();
 mLog.doLogTime();
 

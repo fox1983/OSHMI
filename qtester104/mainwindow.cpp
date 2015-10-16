@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings settings( "../conf/qtester104.ini", QSettings::IniFormat );
 
     i104.setPrimaryAddress( settings.value( "IEC104/PRIMARY_ADDRESS", 1 ).toInt() );
+    i104.BDTRForcePrimary = settings.value( "BDTR/FORCE_PRIMARY", 0 ).toInt();
     i104.setSecondaryAddress( settings.value( "RTU1/SECONDARY_ADDRESS", 1 ).toInt() );
     i104.SendCommands = settings.value( "RTU1/ALLOW_COMMANDS", 0 ).toInt();
 
@@ -244,7 +245,9 @@ void MainWindow::slot_BDTR_pronto_para_ler()
         }
         break;
     case T_HORA:
-        if ( address == BDTR_host_dual )
+        // if BDTRForcePrimary==1 don't become secondary when received keep alive messages from other machine
+        // if BDTRForcePrimary==0 become secondary when received keep alive messages from other machine
+        if ( address == BDTR_host_dual && i104.BDTRForcePrimary == 0 )
           {
           if ( isPrimary )
             {

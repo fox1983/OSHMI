@@ -899,13 +899,20 @@ showVals: function()
             cntpr++;
           }            
 
+        // container to put in per substation filters
+        if ( document.getElementById( "DIV_SUBSTALMFILT" ) === null )
+           $( "body" ).append("<div id='DIV_SUBSTALMFILT' style='overflow:auto;top:42px;left:0;width:100%;height:35px;position:absolute;text-align:center;'><div>");
+
         if ( document.getElementById( "DIV_" + substorpri ) === null )
           { // create priority and substation alm boxes
-          $( "body" ).append(
+          if ( WebSAGE.g_alminfo[substorpri].is_subst )
+            { // create substation filters inside a div
+            ytop=0;
+            $( "#DIV_SUBSTALMFILT" ).append(
             "<div id='DIV_" + substorpri + "' " +
                " onclick='WebSAGE.g_alminfo[&quot;" + substorpri + "&quot;].filterout = ! WebSAGE.g_alminfo[&quot;" + substorpri + "&quot;].filterout;WebSAGE.applyTableStyle();'" +
-               " style='position:absolute;text-align:center;top:" + ytop + "px;" + 
-                       "left:" + ( xleft + ( WebSAGE.g_alminfo[substorpri].is_subst ? cntsb : cntpr ) * 58 ) + "px;" + 
+               " style='position:relative;float:left;text-align:center;margin-bottom:7px;margin-left:3px;top:" + ytop + "px;" + 
+                       // "left:" + ( xleft + ( WebSAGE.g_alminfo[substorpri].is_subst ? cntsb : cntpr ) * 58 ) + "px;" + 
                        "cursor:pointer;box-shadow: 2px 2px 2px #666666;background-color:white;width:48px;height:20px;border-radius:4px;border:1px solid black;padding-top:2px;padding-left:2px;padding-right:2px;line-height:80%;font-size:15px;font-family:trebuchet ms,tahoma,helvetica,arial'>"+ 
               substorpri + 
               "<br>" + 
@@ -916,6 +923,25 @@ showVals: function()
                   "' style='float:right;text-align:center;font-size:12px;border-radius:15px;border:2px solid;margin:1px;'>" + 
               "</span>" + 
             "</div>" );
+            }
+          else
+            { // create priority filters directly over the body
+            $( "body" ).append(
+            "<div id='DIV_" + substorpri + "' " +
+               " onclick='WebSAGE.g_alminfo[&quot;" + substorpri + "&quot;].filterout = ! WebSAGE.g_alminfo[&quot;" + substorpri + "&quot;].filterout;WebSAGE.applyTableStyle();'" +
+               " style='position:absolute;float:left;text-align:center;top:" + ytop + "px;" + 
+                        "left:" + ( xleft + ( WebSAGE.g_alminfo[substorpri].is_subst ? cntsb : cntpr ) * 58 ) + "px;" + 
+                       "cursor:pointer;box-shadow: 2px 2px 2px #666666;background-color:white;width:48px;height:20px;border-radius:4px;border:1px solid black;padding-top:2px;padding-left:2px;padding-right:2px;line-height:80%;font-size:15px;font-family:trebuchet ms,tahoma,helvetica,arial'>"+ 
+              substorpri + 
+              "<br>" + 
+              "<span id='SP_" + substorpri +  "_ACK" +
+                  "' style='float:right;-webkit-filter:contrast(.7);text-align:center;font-size:12px;border-radius:15px;border:2px solid;margin:1px;'>" + 
+              "</span>" + 
+              "<span id='SP_" + substorpri + "_NACK" +
+                  "' style='float:right;text-align:center;font-size:12px;border-radius:15px;border:2px solid;margin:1px;'>" + 
+              "</span>" + 
+            "</div>" );
+            }
           }
         else
           {
@@ -1110,7 +1136,9 @@ try
         }
   }
 catch ( e ) 
-  { }        
+  { 
+  document.getElementById("VENTOINHA").title = e.stack;
+  }        
 },
 
 doReconheceTudo: function(rec_apaga)
@@ -1598,6 +1626,9 @@ init: function()
 
     setTimeout( WebSAGE.leListaSEs, 500 );
 
+    shortcut.add( "F8", // reconhece tudo
+                  function() { WebSAGE.doReconheceTudo(0); },
+                  { 'type':'keydown', 'propagate':true,	'target':document } );
     shortcut.add( "F9",
                   function() { WebSAGE.doSilenciaBeep(); },
                   { 'type':'keydown', 'propagate':true, 'target':document } );
