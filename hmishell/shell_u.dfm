@@ -2449,4 +2449,15 @@ object fmShell: TfmShell
     Left = 770
     Top = 18
   end
+  object NMHTTP2: TNMHTTP
+    Port = 0
+    ReportLevel = 0
+    Body = 'Default.htm'
+    Header = 'Head.txt'
+    InputFileMode = False
+    OutputFileMode = False
+    ProxyPort = 0
+    Left = 298
+    Top = 18
+  end
 end

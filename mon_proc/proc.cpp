@@ -51,6 +51,7 @@ TFormMain *FormMain;
 
 vector <String> Processos;
 vector <String> Args;
+vector <String> Exec;
 vector <int> Modo;
 vector <int> WDCnt;
 vector <int> WDCntToRestart;  // x TimerWatchdog.Interval/1000 = seconds to restart hanged processes
@@ -106,6 +107,7 @@ for ( int i = 1; i < 20; i++ )
     Processos.push_back( str ); // caminho completo do executável
     Args.push_back( Ini->ReadString(section, "Args", "") ); // argumentos de linha de comando
     Modo.push_back( Ini->ReadInteger(section, "Mode", 0) ); // modo
+    Exec.push_back( Ini->ReadString(section, "Exec", "") ); // linha de comando completa para execução (caminho + argumentos), se não existir executa PROC+ARGS
     WDCnt.push_back(0); // contagem inicial zerada
     WDCntToRestart.push_back( Ini->ReadInteger(section, "RestartCount", 12) ); // tempo para restart
     }
@@ -266,6 +268,10 @@ DWORD id;
        FormMain->ListBox1->Items->Add( Processos[i]+ " ---> Not found!" );
        String cmdline = Processos[i]+" ";
        cmdline = cmdline + Args[i];
+       if ( Exec[i] != "" )
+         { // se tiver a linha exec definida, ignora PROC e ARGS, executa EXEC
+         cmdline = Exec[i];
+         }
        WinExec( cmdline.c_str(), SW_SHOWNORMAL );  // executa
        Loga( (AnsiString)"Process created " + Processos[i] );
        }
@@ -390,3 +396,4 @@ else
 */  
 Close();
 }
+

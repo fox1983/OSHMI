@@ -1,5 +1,5 @@
 OSHMI - Open Substation HMI
-    Copyright 2008-2015 - Ricardo L. Olsen
+    Copyright 2008-2016 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,7 +97,54 @@ QTester104:
 
 -------------------------------------------------------------------
 
+Notes for the version 3.11:
+
+HMIShell:
+  - Corrected problem when starting HMIShell.
+  
+MonProc:
+  - Added option to specify a complete command line to execute a process.
+
+-------------------------------------------------------------------
+
+Notes for the version 3.10:
+
+QTester104:
+  - Updated to version 1.13. Added copy of log to clipboard.
+
+-------------------------------------------------------------------
+
+Notes for the version 3.9:
+
+Webserver:
+  - Removed limit of the number of synchonized alarms for redundant HMI's.
+
+Screen Viewer:
+  - Color interpolation on animations.
+  - Screenshot to SVG file (SHIFT+ENTER).
+  - Better mouse event handlers.
+  - More options to plot measures.
+  - Avoid showing some errors from alarm box not yet created.
+
+Alarms and Events Viewers:
+  - New form of highlighting priority 0 alarms.
+
+Chromium:
+  - Updated to version 50.0.2628.0.
+SQLite:
+  - Updated to version 3.10.2
+
+-------------------------------------------------------------------
+
+Notes for the version 3.8:
+
+ICCP Client:
+  - Corrected bug related to redundancy control.
+
+-------------------------------------------------------------------
+
 Notes for the version 3.7:
+
 QTester104:
   - Updated to version 1.12. Added the possibility to stay simultaneously connected to 2 redundant RTU's.
 
@@ -108,6 +155,7 @@ Tabular Viewer:
 -------------------------------------------------------------------
 
 Notes for the version 3.6:
+
 QTester104:
   - Updated to version 1.11. Added the possibility of scannig a redundant RTU.
   

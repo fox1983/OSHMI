@@ -1,6 +1,6 @@
 /*
  * This software implements an IEC 60870-5-104 protocol tester.
- * Copyright © 2010,2011,2012 Ricardo L. Olsen
+ * Copyright ï¿½ 2010,2011,2012 Ricardo L. Olsen
  *
  * Disclaimer
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -75,6 +75,8 @@ private slots:
     void slot_commandActConfIndication( iec_obj *obj );
     void slot_commandActTermIndication( iec_obj *obj );
 
+    void on_pbCopyClipb_clicked();
+
 private:
     std::map <int, QTableWidgetItem *> mapPtItem_ColAddress; // map of points to cells of table
     std::map <int, QTableWidgetItem *> mapPtItem_ColValue;
@@ -95,18 +97,18 @@ private:
     void BDTR_Loga( QString str, int id=0 ); // BDTR: log messages
     void BDTR_processPoints( iec_obj *obj, int numpoints ); // BDTR: process points
     inline bool BDTR_HaveDualHost() { return ( BDTR_host_dual != (QHostAddress)"0.0.0.0"); };
-    bool isPrimary; // define se modo primário ou secundário (o secundário permanece desconectado pelo IEC104)
+    bool isPrimary; // define se modo primï¿½rio ou secundï¿½rio (o secundï¿½rio permanece desconectado pelo IEC104)
     static const int BDTR_CntToBePrimary = 2; // counts necessary to be primary when not receiving keepalive messages
     int BDTR_CntDnToBePrimary; // countdown to be primary when not receiving keepalive messages
     int BDTR_Logar; // controla log das mensagens BDTR
     QTimer *tmBDTR_kamsg; // timer to send keep alive messages to the dual host
     static const int BDTR_seconds_kamsg = 7;
     QUdpSocket *udps; // BDTR: udp socket
-    QHostAddress BDTR_host; // endereço IP do cliente BDTR (normalmente a própria máquina)
-    QHostAddress BDTR_host_dual; // endereço IP do cliente BDTR dual
+    QHostAddress BDTR_host; // endereï¿½o IP do cliente BDTR (normalmente a prï¿½pria mï¿½quina)
+    QHostAddress BDTR_host_dual; // endereï¿½o IP do cliente BDTR dual
     static const int BDTR_porta = 65280; // porta UDP para envio de dados aos clientes BDTR
     static const int BDTR_porta_escuta = 65281; // porta UDP para envio de dados aos clientes BDTR
-    static const unsigned char BDTR_orig = 0; // endereço de origem BDTR
+    static const unsigned char BDTR_orig = 0; // endereï¿½o de origem BDTR
 
 };
 

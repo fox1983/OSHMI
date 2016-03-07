@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// HMI SHELL - Copyright 2008-2014 - Ricardo L. Olsen
+// HMI SHELL - Copyright 2008-2016 - Ricardo L. Olsen
 //
 // Este programa tem por objetivo proporcionar um shell para o Windows
 // específico para controlar o IHM. De forma a restringir o acesso
@@ -343,21 +343,22 @@ if ( REMOTE_HOST != "127.0.0.1" )
   VISOR_TENDENCIAS = StrReplace( VISOR_TENDENCIAS, "127.0.0.1", REMOTE_HOST );
 
   // busca o lista telas remoto
-  bool itemp = NMHTTP1->InputFileMode;
+  // bool itemp = NMHTTP1->InputFileMode;
   try
      {
-     NMHTTP1->InputFileMode =  true;
-     NMHTTP1->Body = LISTA_TELAS_FILE;
-     NMHTTP1->TimeOut = 1000;
+     NMHTTP2->InputFileMode =  true;
+     NMHTTP2->Body = LISTA_TELAS_FILE;
+     NMHTTP2->Header = "";
+     NMHTTP2->TimeOut = 2000;
      String Rq = (String)"http://" +
                  (String)REMOTE_HOST + (String)":" +
                  (String)REMOTE_PORT + (String)"/" +
                  (String)LISTA_TELAS_WEB;
-     NMHTTP1->Get( Rq );
-     NMHTTP1->InputFileMode =  false;
+     NMHTTP2->Get( Rq );
+     // NMHTTP2->InputFileMode =  false;
      } catch ( Exception &E ) {}
 
-  NMHTTP1->InputFileMode =  itemp;
+  // NMHTTP1->InputFileMode =  itemp;
   }
 }
 //---------------------------------------------------------------------------
@@ -1031,6 +1032,9 @@ void __fastcall TfmShell::Timer8Timer(TObject *Sender)
 String S;
 
 // fecha janelas proibidas, exceto quando estiver com login administrativo (senha válida)
+if ( !fmSair )
+  return;
+
 if ( !fmSair->PasswdTest( fmSair->edSenha->Text.c_str()) )
   {
   EnumWindows( (int (__stdcall *)()) enumwndprc1, 0 );

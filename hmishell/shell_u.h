@@ -71,6 +71,7 @@ __published:	// IDE-managed Components
         TToolButton *ToolButton5;
         TToolButton *ToolButton6;
         TToolButton *ToolButton7;
+        TNMHTTP *NMHTTP2;
         void __fastcall tbSairClick(TObject *Sender);
         void __fastcall tbCurvasClick(TObject *Sender);
         void __fastcall tbEventosClick(TObject *Sender);

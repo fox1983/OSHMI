@@ -1024,6 +1024,7 @@ try
   {
       var stl = '';
       id = parseInt(id);
+      var pri = parseInt( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).charAt(0) );      
       
       if ( rec == 2 )
           {
@@ -1046,25 +1047,33 @@ try
             }
           else  
             {
-              stl = 'color: ' + EventsViewer_AlmTxtColor + ';';
+              if ( pri === 0 )
+                {
+                stl = 'color: ' + ColorOfPriority[ pri ] + ';';
+                stl += 'font-weight: bold;font-style: italic;';
+                }
+              else  
+                {
+                stl = 'color: ' + EventsViewer_AlmTxtColor + ';';
+                }                
             }
 
           // let the qualifiers columns be in the color of priority
           WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_QUALIF].style.backgroundColor = 
-            ColorOfPriority[ parseInt( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).charAt(0) ) ];
+            ColorOfPriority[ pri ];
           WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_QUALIF].style.borderRadius = "10px";
           WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_QUALIF].style.color = "black";
           WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_QUALIF].style.textAlign = "center";
           }
-
+/*
       if ( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_ID ).indexOf(Viewers_IDTxtHighlight2) != -1 && 
            WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_DESCR ).indexOf(Viewers_DescrTxtHighlight2) != -1 &&
            WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).indexOf("K") == -1
          )
           { // coloca fundo nas linhas de disjuntor
-            // stl = stl + 'background-color: ' + EventsViewer_LineColorHighight2 + ';';
-            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_DESCR].style.borderLeft = EventsViewer_LineColorHighight2 + " 4px solid";
-            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_EVENTO].style.borderLeft = EventsViewer_LineColorHighight2 + " 4px solid";
+            stl = stl + 'background-color: ' + EventsViewer_LineColorHighight2 + ';';
+            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_DESCR].style.borderLeft = EventsViewer_LineColorHighight2;
+            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_EVENTO].style.borderLeft = EventsViewer_LineColorHighight2;
           }
       else
       if ( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_EVENTO ) == Viewers_AlmTxtHighlight1 )
@@ -1084,7 +1093,7 @@ try
             WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_DESCR].style.borderLeft = "";
             WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_EVENTO].style.borderLeft = "";
           }
-        
+*/        
       // represent time by a horizontal bar   
       WebSAGE.g_tbl.setRowTextStyle( id, stl );
       WebSAGE.g_tbl.rows[id+1].style.float = "left";

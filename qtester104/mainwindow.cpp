@@ -27,6 +27,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include <QClipboard>
 #include <QDir>
 #include <QCloseEvent>
 #include <string>
@@ -702,7 +703,7 @@ void MainWindow::slot_timer_logmsg()
 
     if ( i104.mLog.haveMsg() )
     {
-      if (ui->lwLog->count() > 5000)
+      if (ui->lwLog->count() > 20000)
       {
           ui->lwLog->clear();
           ui->lwLog->addItem( "*** Message list auto cleaned!" );
@@ -901,4 +902,14 @@ void MainWindow::on_cbLog_clicked()
         i104.mLog.activateLog();
     else
         i104.mLog.deactivateLog();
+}
+
+void MainWindow::on_pbCopyClipb_clicked()
+{
+    int itemsCount = ui->lwLog->count();
+    QStringList strings;
+    for (int i = 0; i < itemsCount; ++i)
+       strings << ui->lwLog->item(i)->text();
+
+    QApplication::clipboard()->setText(strings.join("\n"));
 }

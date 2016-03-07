@@ -49,6 +49,9 @@
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::NoSelection</enum>
+      </property>
       <property name="resizeMode">
        <enum>QListView::Adjust</enum>
       </property>
@@ -235,7 +238,14 @@
        </font>
       </property>
       <property name="text">
-       <string>v1.12 © 2010-2015 Ricardo L. Olsen</string>
+       <string>v1.13 © 2010-2015 Ricardo L. Olsen</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="3">
+     <widget class="QPushButton" name="pbCopyClipb">
+      <property name="text">
+       <string>Copy to Clipboard</string>
       </property>
      </widget>
     </item>

@@ -281,9 +281,6 @@ switch ( ARequestInfo->UnparsedParams[1] )
            AResponseInfo->ContentText = AResponseInfo->ContentText + buf;
            cnt++;
            }
-
-         if ( cnt > 10000 )
-            break;
          }
      }
      break;

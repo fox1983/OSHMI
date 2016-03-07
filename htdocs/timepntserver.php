@@ -1,11 +1,11 @@
 <?PHP
 
-// OSHMI/Open Substation HMI - Copyright 2008-2014 - Ricardo L. Olsen
+// OSHMI/Open Substation HMI - Copyright 2008-2016 - Ricardo L. Olsen
 
 // Parâmetros:
 //
 // Valores de foto ou série histórica:
-// &P=LISTAPONTOS &H=HORA &D=DATA &T=$DATEFMT &U=UNIXTIME &F=FUNCAO B=CALLBACK
+// &P=LISTAPONTOS &H=HORA &D=DATA INICIAL [&E=DATA FINAL] [&I=INTERVALO EM min] &T=$DATEFMT &U=UNIXTIME &F=FUNCAO B=CALLBACK
 //
 // HORA : hora no formato hh:mm:ss
 // DATA : data no formato dd/mm/yyyy ou mm/dd/yyyy
@@ -36,7 +36,9 @@ if ( ! isset( $p_P ) )
 $ARRPNTS = explode( ",", trim($p_P ,",") );
 if ( isset( $p_H ) ) $HORA = $p_H; else $HORA = "00:00:00";
 if ( isset( $p_T ) ) $DATEFMT = $p_T; else $DATEFMT = "DD/MM/YYYY";
-if ( isset( $p_D ) ) $DATA = $p_D; else $DATA = "";
+if ( isset( $p_D ) ) $DATAINI = $p_D; else $DATAINI = "";
+if ( isset( $p_E ) ) $DATAFIM = $p_E; else $DATAFIM = time();
+if ( isset( $p_I ) ) $INTERVALO = $p_I; else $INTERVALO = 1;
 if ( isset( $p_U ) ) $UNIXTIME = $p_U; else $UNIXTIME = 0;
 if ( isset( $p_B ) ) $CALLBACK = $p_B; else $CALLBACK = "";
 if ( isset( $p_F ) ) $FUNCAO = $p_F; else $FUNCAO = 'F';
@@ -45,21 +47,21 @@ if ( $UNIXTIME != 0 )
   {
   $FILTDH = $UNIXTIME;   
   $dt = getdate( $UNIXTIME );
-  $DATA = sprintf( "%02d/%02d/%02d" , $dt["mday"], $dt["mon"], $dt["year"] );
+  $DATAINI = sprintf( "%02d/%02d/%02d" , $dt["mday"], $dt["mon"], $dt["year"] );
   $HORA = sprintf( "%02d:%02d:%02d" , $dt["hours"], $dt["minutes"], $dt["seconds"] );
   }
 else
   {
   if ( $DATEFMT == "DD/MM/YYYY" )
     {
-    $DATAF = str_replace ("/", "-", $DATA);
+    $DATAF = str_replace ("/", "-", $DATAINI);
     }  
-  $FILTDH = strtotime($DATAF." ".$HORA);   
+  $FILTDH = $DATAINI;   
   }
 
 if ( $FUNCAO == "F" )
   {
-  echo "Data='".$DATA." ".$HORA."';\n";
+  echo "Data='".$DATAINI." ".$HORA."';\n";
   }
 
 try 
@@ -76,12 +78,12 @@ try
       {
       printf( "var hvalues = [];\n" );
       }
-              
+
     $cntpnt = 0;
     $maxtm = 0;
-    $mintm = time();	
+    $mintm = time();
     while ( 1 )
-    {    
+    {
     $sql = "";
     $uni = "";
     $cntsql = 0;
@@ -90,7 +92,10 @@ try
       $pnt = $ARRPNTS[$cntpnt];
       if ( $FUNCAO == "S" )
         {
-        $sql = $sql . $uni . "SELECT NPONTO, VALOR, FLAGS, DATA as DATA from hist where nponto = $pnt and data > $FILTDH and data < " . time() ;
+        if ( $INTERVALO != 0 )
+          $sql = $sql . $uni . "SELECT NPONTO, avg(VALOR) as VALOR, max(FLAGS) as FLAGS, (cast(data as int)/(60*$INTERVALO))*(60*$INTERVALO) as DATA from hist where nponto = $pnt and data > $FILTDH and data < " . $DATAFIM . " GROUP BY (cast(data as int)/(60*$INTERVALO))*(60*$INTERVALO)";
+        else
+          $sql = $sql . $uni . "SELECT NPONTO, VALOR, FLAGS, DATA as DATA from hist where nponto = $pnt and data > $FILTDH and data < " . $DATAFIM ;
         }
       else
         {
@@ -100,8 +105,9 @@ try
       $cntsql++;
       if ( $cntsql > 50 )
        break;
-      }    
-    if ( $sql != "" )         
+      }
+    // echo $sql;  
+    if ( $sql != "" )
     foreach ( $dbhist->query( $sql ) as $row )
       {
       $nponto = $row['NPONTO'];
@@ -112,14 +118,14 @@ try
       $unxtime = $row['DATA'] * 1000;
 
       if ( $row['DATA'] > $maxtm )
-	     {
+         {
          $maxtm = $row['DATA'];
-		 }
+         }
       if ( $row['DATA'] < $mintm )
          {
-		 $mintm = $row['DATA'];	
-         }		 
-		 
+         $mintm = $row['DATA'];	
+         }
+
       if ( $FUNCAO == "S" )
         {
         printf( "hvalues.push( { 'nponto':$nponto,'valor':$valor,'flags':$flags,'unxtime':$unxtime } );\n" );
