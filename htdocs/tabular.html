@@ -21,6 +21,7 @@
 <script src="lib/jquery-1.8.3.js"></script>
 <script src="lib/core-1.0.js"></script>
 <script src="lib/shortcut-2.01b.js"></script>
+<script src="lib/chroma.js"></script>
 <script src="fan.js"></script>
 <script src="legacy_options.js"></script>
 <script src="config_viewers_default.js"></script>
@@ -33,7 +34,7 @@
 
 // Este script coloca em uma tabela os dados dos pontos supervisionados filtrados por SE e módulo. 
 //
-// OSHMI/Open Substation HMI - Copyright 2008-2014 - Ricardo L. Olsen
+// OSHMI/Open Substation HMI - Copyright 2008-2016 - Ricardo L. Olsen
 
 var L = []; // aqui o servidor colocará lista de eventos 
 var V = []; // aqui o servidor colocará os valores dos pontos
@@ -1064,7 +1065,11 @@ try
 
       if ( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).indexOf("L") == -1 || rec )
           { // reconhecido
-            stl = 'color: ' + TabularViewer_AckTxtColor + ';';
+          // Se alarme inibido, mostra texto mais claro
+          if  ( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).indexOf("I") != -1 )
+            stl = 'color: ' + chroma(TabularViewer_AckTxtColor).brighten().brighten() + ';';
+          else
+            stl = 'color: ' + TabularViewer_AckTxtColor + ';';                        
           }
       else    
           { // não reconhecido (alarmado)

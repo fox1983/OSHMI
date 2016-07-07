@@ -1,4 +1,26 @@
 //---------------------------------------------------------------------------
+// LUA_U.CPP
+// Interpreta scripts Lua.
+//---------------------------------------------------------------------------
+/*
+OSHMI - Open Substation HMI
+	Copyright 2008-2016 - Ricardo L. Olsen
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
 #include <stdio.h>
@@ -17,6 +39,7 @@ TfmLua *fmLua;
 
 #define LUASCRIPTFILE "..\\scripts\\script.lua"
 
+// imprime strings na console lua
 static int hmi_print( lua_State *L )
 {
  char buff[5000];
@@ -38,6 +61,27 @@ static int hmi_print( lua_State *L )
  return 0;
 }
 
+// consulta o número do ponto pela tag
+static int hmi_getnpt( lua_State *L )
+{
+ int n = lua_gettop( L );
+
+ if ( n >= 1 )
+ if ( lua_isstring( L, 1 ) )
+   {
+   bool found;
+   TPonto &pt = BL.GetRefPontoByTag( lua_tostring( L, 1 ), found );
+   if ( found )
+     {
+     lua_pushinteger( L, pt.NPonto );
+     return 1;
+     }
+   }
+
+ lua_pushinteger( L, 0 );
+ return 1;
+}
+
 // altera o tempo de execução do script Lua cíclico.
 // argumento: tempo em ms
 static int hmi_settimer( lua_State *L )
@@ -54,7 +98,7 @@ static int hmi_settimer( lua_State *L )
 }
 
 // Busca informações sobre o ponto
-// retorna: valor (estado duplo para digitais), falha, tipo analógico, substituido
+// retorna: valor (estado duplo para digitais), falha, tipo analógico, substituido, possui anotação
 // argumento: nponto
 static int hmi_getpoint( lua_State *L )
 {
@@ -66,7 +110,8 @@ static int hmi_getpoint( lua_State *L )
     lua_pushnil( L );
     lua_pushnil( L );
     lua_pushnil( L );
-    return 4;
+    lua_pushnil( L );
+    return 5;
     }
 
   int nponto = lua_tointeger( L, 1 );
@@ -76,7 +121,6 @@ static int hmi_getpoint( lua_State *L )
 
   bool found;
   TPonto &pt = BL.GetRefPonto( nponto, found );
-  // bool found = BL.GetPonto( nponto, valor, qual, tagtempo );
 
   // valor , falha? , analógico? , substituído
   if ( found )
@@ -89,6 +133,16 @@ static int hmi_getpoint( lua_State *L )
     lua_pushinteger( L, QualEhFalhado(pt.Qual.Byte) );
     lua_pushinteger( L, QualEhAnalogico(pt.Qual.Byte) );
     lua_pushinteger( L, QualEhSubstituido(pt.Qual.Byte) );
+    if ( pt.EhComando() ) // se for comando, procura anotação no supervisionado
+      {
+      TPonto &ptc = BL.GetRefPonto( pt.GetSupCmd(), found );
+      if ( found )
+        lua_pushinteger( L, ptc.TemAnotacao() );
+      else
+        lua_pushinteger( L, 0 );
+      }
+    else
+      lua_pushinteger( L, pt.TemAnotacao() );
     }
   else
     {
@@ -96,9 +150,10 @@ static int hmi_getpoint( lua_State *L )
     lua_pushnil( L );
     lua_pushnil( L );
     lua_pushnil( L );
+    lua_pushnil( L );
     }
 
-  return 4;
+  return 5;
 }
 
 // bloqueia o comando do ponto supervisionado através de anotação
@@ -217,7 +272,7 @@ static hmi_sendcmd( lua_State *L )
          return 1;
          }
 
-       // trata caso de simulação  
+       // trata caso de simulação
        if ( ( BL.GetSimulacao() == SIMULMOD_MESTRE ) || ( BL.GetSimulacao() == SIMULMOD_LOCAL ) )
          {
          int ret=fmSimul->SimulaComando( nponto, valor );
@@ -288,6 +343,8 @@ static int hmi_writepoint( lua_State *L )
     if ( pt.TipoAD == 'A' )
       {
       qual.Tipo = 1;
+      if ( BL.HaSimulacao() )
+        BL.SetValorTipico( nponto, valor ); // guarda como valor típico para simulação
       }
     else
       {
@@ -321,6 +378,7 @@ __fastcall TfmLua::TfmLua(TComponent* Owner)
  lua_register( L, "hmi_unblkpoint", hmi_unblkpoint );
  lua_register( L, "hmi_blkpoint", hmi_blkpoint );
  lua_register( L, "hmi_sendcmd", hmi_sendcmd );
+ lua_register( L, "hmi_getnpt", hmi_getnpt );
 
  if ( FileExists( LUASCRIPTFILE ) )
    {
@@ -397,3 +455,26 @@ void __fastcall TfmLua::mmSrcDblClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+// Procura uma função InterceptCommands no escopo Lua e executa se existir
+// Indica se deve continuar ou não a execução do comando no protocolo (1=para, 0=continua)
+int TfmLua::luaInterceptCommands( int nponto, float val )
+{
+int ret = 0;
+
+// load the function from global
+lua_getglobal( L, "InterceptCommands" );
+if( lua_isfunction( L, -1 ) )
+   {
+   // push function arguments into stack
+   lua_pushnumber( L, nponto );
+   lua_pushnumber( L, val );
+   lua_pcall( L, 2, 1, 0 );
+   if ( ! lua_isnil( L, -1 ))
+     {
+     ret = lua_tonumber( L, -1 );
+     lua_pop( L, 1 );
+     }
+   }
+
+return ret;
+}

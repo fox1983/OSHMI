@@ -133,8 +133,21 @@ void QIec104::slot_tcpdisconnect()
 
 void QIec104::slot_keep_alive()
 {
+    static unsigned int cnts = 1;
+
     if ( !mEnding )
-      onTimerSecond();
+      {
+        cnts++;
+
+        if ( ! (cnts % 5) )
+            if ( tcps->state() != QAbstractSocket::ConnectedState && mAllowConnect )
+            {
+                mLog.pushMsg("!!!!!TRY TO CONNECT!");
+                connectTCP();
+            }
+
+        onTimerSecond();
+      }
 }
 
 void  QIec104::interrogationActConfIndication()

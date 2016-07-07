@@ -1,10 +1,10 @@
 //---------------------------------------------------------------------------
-// WEBSERVER.CPP
+// WEBSERVER_U.CPP
 // Implementa servidor WEB para dados de tempo real.
 //---------------------------------------------------------------------------
 /*
 OSHMI - Open Substation HMI
-	Copyright 2008-2014 - Ricardo L. Olsen
+	Copyright 2008-2016 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ OSHMI - Open Substation HMI
 #pragma hdrstop
 #include <list>
 #include <winsock2.h>
+#include <ctype.h>
 #include "config.h"
 #include "webserver_u.h"
 #include "bcolocal.h"
@@ -35,6 +36,7 @@ OSHMI - Open Substation HMI
 #include "bdtr_com.h"
 #include "simul.h"
 #include "i104m_u.h"
+#include "lua_u.h"
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -772,11 +774,11 @@ switch ( ARequestInfo->UnparsedParams[1] )
      {
      unsigned int ListaPontos[2000];
      // transforma a lista de pontos (string) em vetor de pontos (terminado em zero)
-     int ival = -1;
+     int inponto = -1;
      if ( ARequestInfo->UnparsedParams[2] == '=' )
        {
        int p2 = 2;
-       String val;
+       String nponto_ou_tag;
        String lstpts = ARequestInfo->Params->Strings[0];
        bool reqinfo = false;
 
@@ -788,19 +790,30 @@ switch ( ARequestInfo->UnparsedParams[1] )
            reqinfo = true;
          }
 
-       for ( int i = 0; ival != 0; )
+       for ( int i = 0; inponto != 0; )
          {
          lstpts = lstpts.SubString(p2+1,lstpts.Length());
          p2 = lstpts.Pos(",");
          if ( p2== 0 )
            p2 = lstpts.Length() + 1;
 
-         val = lstpts.SubString(1, p2-1);
-
-         if ( val != "0" )
+         nponto_ou_tag = lstpts.SubString(1, p2-1);
+         if ( nponto_ou_tag!="" && isalpha(nponto_ou_tag[1]) ) // se é identificador (começa por caractere) traduz para nponto
            {
-           ival = val.ToIntDef(0);
-           ListaPontos[i] = ival;
+           bool found;
+           TPonto &pt = BL.GetRefPontoByTag(nponto_ou_tag, found);
+           if (found)
+             {
+             ListaPontos[i] = pt.NPonto;
+             if ( ListaPontos[i] != 0 )
+               i++;
+             }  
+           }
+         else
+         if ( nponto_ou_tag != "0" )
+           {
+           inponto = nponto_ou_tag.ToIntDef(0);
+           ListaPontos[i] = inponto;
            i++;
            }
          }
@@ -848,6 +861,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
              if ( reqinfo )
                {
                ResponseAna = ResponseAna + (String)"TAGS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetNome() + "';\n";
+               ResponseAna = ResponseAna + (String)"NPTS['" + (String)pt.GetNome() + (String)"']=" + (String)ListaPontos[i] + ";\n";
                ResponseAna = ResponseAna + (String)"BAYS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetModulo() + "';\n";
                ResponseAna = ResponseAna + (String)"SUBS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetEstacao() + "';\n";
                ResponseAna = ResponseAna + (String)"DCRS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetDescricao() + "';\n";
@@ -869,6 +883,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
              if ( reqinfo )
                {
                ResponseDig = ResponseDig + (String)"TAGS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetNome() + "';\n";
+               ResponseDig = ResponseDig + (String)"NPTS['" + (String)pt.GetNome() + (String)"']=" + (String)ListaPontos[i] + ";\n";
                ResponseDig = ResponseDig + (String)"BAYS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetModulo() + "';\n";
                ResponseDig = ResponseDig + (String)"SUBS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetEstacao() + "';\n";
                ResponseDig = ResponseDig + (String)"DCRS[" + ListaPontos[i] + (String)"]='" + (String)pt.GetDescricao() + "';\n";
@@ -1331,32 +1346,36 @@ switch ( ARequestInfo->UnparsedParams[1] )
      TPonto &pt = BL.GetRefPonto( cnponto, found );
      if ( found && !BL.ComandoIntertravado( cnponto ) ) // testa se o ponto existe e não está intertravado
        {
-       if ( ( BL.GetSimulacao() == SIMULMOD_MESTRE ) || ( BL.GetSimulacao() == SIMULMOD_LOCAL ) )
+       // intercepta comando em script lua, se retorna 0 continua ao protocolo/simul
+       if ( fmLua->luaInterceptCommands( cnponto, val ) == 0 )
          {
-         ret = fmSimul->SimulaComando( cnponto, val );
-         confCmdSimul = ret;
-         }
-       else
-         {
-         if ( IP_BDTR1 == "" ) // se não tem bdtr, manda pelo 104
+         if ( ( BL.GetSimulacao() == SIMULMOD_MESTRE ) || ( BL.GetSimulacao() == SIMULMOD_LOCAL ) )
            {
-           // manda o comando para o protocolo (varredor iec104m)
-           ret = fmIEC104M->ComandoIEC( cnponto, val&0x01?0:1 );
-
-           // sendo pelo iec104m, manda para a outra ihm também, pois a pode ser a outra que está com o 104 conectado.
-           // se tem outro ihm e não veio dele vou encaminhar a mensagem
-           // if ( IHMRED_IP_OUTRO_IHM != "" )
-           // if ( ARequestInfo->RemoteIP != IHMRED_IP_OUTRO_IHM )
-           //   {
-           //   lstHTTPReq_OutroIHM.push_back( ARequestInfo->Document + "?" + ARequestInfo->UnparsedParams );
-           //   }
-           
-           Loga( (String)"Command Sent(IEC): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+           ret = fmSimul->SimulaComando( cnponto, val );
+           confCmdSimul = ret;
            }
          else
            {
-           ret = fmBDTR->bdtr.MandaComando( cnponto, val, tipo );
-           Loga( (String)"Command Sent(BDTR): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", type=" + (String)tipo + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+           if ( IP_BDTR1 == "" ) // se não tem bdtr, manda pelo 104
+             {
+             // manda o comando para o protocolo (varredor iec104m)
+             ret = fmIEC104M->ComandoIEC( cnponto, val&0x01?0:1 );
+
+             // sendo pelo iec104m, manda para a outra ihm também, pois a pode ser a outra que está com o 104 conectado.
+             // se tem outro ihm e não veio dele vou encaminhar a mensagem
+             // if ( IHMRED_IP_OUTRO_IHM != "" )
+             // if ( ARequestInfo->RemoteIP != IHMRED_IP_OUTRO_IHM )
+             //   {
+             //   lstHTTPReq_OutroIHM.push_back( ARequestInfo->Document + "?" + ARequestInfo->UnparsedParams );
+             //   }
+
+             Loga( (String)"Command Sent(IEC): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+             }
+           else
+             {
+             ret = fmBDTR->bdtr.MandaComando( cnponto, val, tipo );
+             Loga( (String)"Command Sent(BDTR): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", type=" + (String)tipo + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+             }
            }
          }
 

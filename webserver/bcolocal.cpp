@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------------
 /*
 OSHMI - Open Substation HMI
-	Copyright 2008-2014 - Ricardo L. Olsen
+	Copyright 2008-2016 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -766,7 +766,9 @@ if (fp)
     Pontos[nponto].CodOrigem = origem;
     Pontos[nponto].CodTpEq = tpeq;
     Pontos[nponto].CodInfo = info;
-    strcpy( Pontos[nponto].Tag, tag );
+    strncpy( Pontos[nponto].Tag, tag, sizeof(Pontos[nponto].Tag) );
+    Pontos[nponto].Tag[sizeof(Pontos[nponto].Tag)] = '\0';
+    MapNPontoPorTag[Pontos[nponto].Tag] = nponto;
 
     Pontos[nponto].UTR = utr;
 
@@ -787,6 +789,8 @@ if (fp)
          }
       Pontos[nponto_sup].PontoCmdSup = nponto;
       }
+
+    Pontos[nponto].NPonto = nponto;
     }
   fclose(fp);
   }
@@ -1059,6 +1063,19 @@ else
 return found;
 }
 
+TPonto & TBancoLocal::GetRefPontoByTag(String tag, bool &found)
+{
+map <String, int>::iterator it;
+it=MapNPontoPorTag.find(tag);
+
+if (it==MapNPontoPorTag.end())
+  {
+  return GetRefPonto(-1, found);
+  }
+
+return GetRefPonto((*it).second, found);
+}
+
 TPonto & TBancoLocal::GetRefPonto(int nponto, bool &found)
 {
 map <int, TPonto>::iterator it;
@@ -1166,8 +1183,9 @@ if ( it == Pontos.end() )
       pt.NPonto = nponto;
       Pontos[nponto] = pt;
       it = Pontos.find(nponto);
-      Pontos[nponto].PontoSupCmd = 0;
-      Pontos[nponto].PontoCmdSup = 0;
+      ((*it).second).NPonto = nponto;
+      ((*it).second).PontoSupCmd = 0;
+      ((*it).second).PontoCmdSup = 0;
   }
 
 // não atualiza ponto calculado
@@ -1275,8 +1293,11 @@ if ( ((*it).second).Qual.Falha || ((*it).second).TimeoutCongel == 0 ) // se está
         if  ( ((*it).second).TemCadastro() ) // só bipa se tiver tag cadastrado
           {
           NumVariacoes++;
-          AtivaBeep( BEEP_NORMAL );
-          LastBeepPnt = nponto;
+          if ( ((*it).second).GetPriority() <= LAST_PRIORITY_THAT_BEEPS )
+            { // beep only for priorities from 0 up to LAST_PRIORITY_THAT_BEEPS
+            AtivaBeep( BEEP_NORMAL );
+            LastBeepPnt = nponto;
+            }
 
           // se for disjuntor abrindo, sem falha, faz com que bipe numa frequência maior
           if ( ((*it).second).CodTpEq == CODTPEQ_DJ &&

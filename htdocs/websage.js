@@ -12,7 +12,7 @@
 // Com os valores obtidos dos pontos são atualizados os objetos (DJ, SC e medidas) no SVG.
 // DEPENDENCIAS : util.js, jquery.js, jquery.ui, core.js, shortcut.js, messages.js, config_viewers.js  (todas devem estar incluidas antes deste script)  
 
-// OSHMI/Open Substation HMI - Copyright 2008-2014 - Ricardo L. Olsen
+// OSHMI/Open Substation HMI - Copyright 2008-2016 - Ricardo L. Olsen
 
 /*jslint browser: true, bitwise: true, devel: true */
 /*jslint white: true */
@@ -22,7 +22,7 @@
 /*jslint continue: true */
 /*global opener: false, self: false */
 /*global $: false, Core: false, Titles: false, Imgs: false, Msg: false, LoadFavicon: false, shortcut: false */
-/*global L: true, V: true, F: true, T: true, TAGS: true, SUBS:true, BAYS:true, DCRS: true, BAYS: true, STONS: true, STOFS: true, Data: true, NUM_VAR: true, NUM_VAR_ANT: true, HA_ALARMES: true, HA_ALARMES_ANT: true  */
+/*global L: true, V: true, F: true, T: true, TAGS: true, NPTS: true, SUBS:true, BAYS:true, DCRS: true, BAYS: true, STONS: true, STOFS: true, Data: true, NUM_VAR: true, NUM_VAR_ANT: true, HA_ALARMES: true, HA_ALARMES_ANT: true  */
 /*global Sha1Ana: true, Sha1Dig: true, T: true, Data: true, SVGDoc: true, SVGSnap: true, NPTO: true, ID: true, ESTACAO: true  */
 /*global DESC: true, ST_ON: true, ST_OFF: true, CNPTO: true, CID: true, CDESC: true, CST_ON: true, CST_OFF: true  */
 /*global LIMSUPS: true, LIMINFS: true, LIMS: true, LIMI: true, HISTER: true, ALRIN: true, ANOT: true, VLNOR: true, ESTALM: true, UNIDADE: true  */
@@ -40,9 +40,11 @@ var V = []; // valores dos pontos | Point values
 var F = []; // flags dos pontos | Point quality flags
 var T = []; // tags de tempo de alarme dos pontos | Alarm time tags 
 var TAGS = []; // tags (ids) dos pontos | point tag names
-var SUBS = []; // módulo do pontos | bay of point
+var NPTS = []; // número de ponto pelo tag | point numbers by tags names
+var SUBS = []; // subestações | subtations
 var BAYS = []; // módulo do pontos | bay of point
 var DCRS = []; // descrição dos pontos | point description
+var ANOTS = []; // anotações dos pontos | point annotation
 var STONS = []; // textos de estado on | on status texts
 var STOFS = []; // textos de estado off | off status texts
 var Data = ''; // hora da atualização | Time of the last real time data obtained from the server 
@@ -98,7 +100,7 @@ var i, t, elOptNew, elSel, titu, pos, nohs, textolink, tmp, idtela;
           else
             {
             elOptNew.filtroalmbox = "";
-            }  
+            }
         
           try
           {
@@ -215,7 +217,7 @@ var i, t, elOptNew, elSel, titu, pos, nohs, textolink, tmp, idtela;
             }
           tmp = SVGDoc.getElementsByTagName("g");
           for ( i = 0; i < tmp.length; i++ ) 
-            { 
+            {
             nohs.push( tmp.item(i) ); 
             }
 
@@ -269,14 +271,14 @@ function RemoveAnimate( elem )
     { 
       return; 
     }
-  i = 0;  
+  i = 0;
   while ( i < elem.childNodes.length )
     {
     if ( elem.childNodes[i].nodeName == "animate" || elem.childNodes.nodeName == "animateTransform" || elem.childNodes.nodeName == "animateMotion" )  
       {
       elem.removeChild( elem.childNodes[i] );
       i = 0;
-      }      
+      }
     else
       {
         i++;
@@ -315,43 +317,43 @@ var obj, embed, svgdoc;
 embed = document.getElementById('svgid');
 svgdoc = embed.getSVGDocument();
 if ( svgdoc === null )
-   { 
+   {
      return; 
    }
 
 obj = svgdoc.getElementById( id ); 
 if ( obj === null )
-   { 
+   {
      return; 
    }
- 
+
 if ( obj.style.display === 'none' ) 
-  { 
+  {
     obj.style.display = 'block'; 
   }
 else 
-  { 
+  {
     obj.style.display = 'none'; 
   }
 
 if ( typeof( obj.inittransform ) === 'undefined' )
-  { 
+  {
     obj.inittransform = obj.getAttributeNS( null, 'transform' );  
   }
-  
-if ( obj.inittransform === null )  
-  { 
+
+if ( obj.inittransform === null )
+  {
     obj.inittransform = ""; 
   }
-  
+
 obj.setAttributeNS( null, 'transform', obj.inittransform + ' translate(' + parseFloat(xd) + ',' + parseFloat(yd) + ')' );  
 }
 
 function histdata( i, pnt ) 
-{ 
+{
   var idc, dt;
   dt = new Date();
-  
+
   if ( typeof(i) === "undefined" )
     {
     return;
@@ -364,15 +366,15 @@ function histdata( i, pnt )
     }
   WebSAGE.InkSage[i].valores[pnt] = [];
   WebSAGE.InkSage[i].datas[pnt] = [];
-  WebSAGE.InkSage[i].valores[pnt].length = 0;              
-  WebSAGE.InkSage[i].datas[pnt].length = 0;              
-  for ( idc in hvalues ) 
-    { 
-    if ( hvalues.hasOwnProperty( idc ) ) 
-      { 
+  WebSAGE.InkSage[i].valores[pnt].length = 0;
+  WebSAGE.InkSage[i].datas[pnt].length = 0;
+  for ( idc in hvalues )
+    {
+    if ( hvalues.hasOwnProperty( idc ) )
+      {
          WebSAGE.InkSage[i].valores[pnt].push( hvalues[idc].valor );
          WebSAGE.InkSage[i].datas[pnt].push( hvalues[idc].unxtime );
-      } 
+      }
     }
 }
 
@@ -381,7 +383,7 @@ var WebSAGE =
 g_remoteServer : PNTServer,
 g_timePntServer : TimePNTServer,
 g_isInkscape : false,
-g_DirTelas : "./", 
+g_DirTelas : "./",
 g_nponto_sup : 0,
 g_win_cmd : {},
 g_win_1stdraw : 0,
@@ -427,7 +429,7 @@ g_zpY: 0,
 g_zpW: 0,
 g_zpH: 0,
 
-g_obj_onclick: "{ /*CLICK_POSX=evt.clientX;CLICK_POSY=evt.clientY;*/ if( evt.ctrlKey || evt.which == 2 ) { top.WebSAGE.reconhece(PONTO); } else { top.WebSAGE.janelaInfo(PONTO); } }",
+g_obj_onclick: "{ /*CLICK_POSX=evt.clientX;CLICK_POSY=evt.clientY;*/ var pt=parseInt('PONTO'); if (isNaN(pt)) pt=top.NPTS['PONTO']; if( evt.ctrlKey || evt.which == 2 ) { top.WebSAGE.reconhece(pt); } else { top.WebSAGE.janelaInfo(pt); } }",
 
 g_titulo_janela: "",
 
@@ -481,6 +483,27 @@ InkSage: [],
 SetIniExtended : function() {},
 SetExeExtended : function() {},
 
+doNothing: function ()
+{},
+
+// Return value from tag or number
+getValue: function ( tagornumber )
+{
+return V[tagornumber] || V[NPTS[tagornumber]] || 0;
+},
+
+// Return flags from tag or number
+getFlags: function ( tagornumber )
+{ 
+return F[tagornumber] || F[NPTS[tagornumber]] || 0xA0;
+},
+
+// Return alarm time from tag or number
+getTime: function ( tagornumber )
+{
+return T[tagornumber] || T[NPTS[tagornumber]] || 0;
+},
+
 // busca e executa script de um servidor
 getScript: function ( srvurl )
 {
@@ -490,6 +513,29 @@ $.ajax( { // crossDomain: true,
           dataType: "text",
           success: WebSAGE.onSuccess
          } );
+},
+
+tooltipRelac: function(item, pnt)
+{
+if ( pnt == 0 || pnt == 99999 || pnt == 99989 || item.hasTooltip )	
+  return;
+
+// dá um tempo para receber as descrições, etc. do ponto
+setTimeout( function(){
+  if ( item.hasTooltip )
+    return;
+
+  var p = pnt;
+  if ( isNaN(parseInt(pnt)) )
+    p = NPTS[pnt];
+
+  var tooltip = document.createElementNS( 'http://www.w3.org/2000/svg', 'title' );
+  tooltip.textContent = BAYS[p] + "-" + DCRS[p]  + "\n" +	
+                        "Id: " + TAGS[p]  + "\n" +
+                        "Pnt: " + p; 
+  item.appendChild( tooltip );
+  item.hasTooltip = 1;
+  }, 5000 );
 },
 
 onSuccess: function ( data )
@@ -506,7 +552,7 @@ var i, pos;
 for ( i = 0; i < WebSAGE.g_seltela.length; i++ )
   {
   pos = WebSAGE.g_seltela.options[i].text.indexOf("{");
-  if ( pos != -1 )  
+  if ( pos != -1 )
     {
     shortcut.add( "",
                   function( e ) 
@@ -538,36 +584,56 @@ acrescentaPontoLista : function( tag )
 {
 tag = tag.trim();
 
+/*
 if ( tag.indexOf('ALM') === 0 || 
      tag.indexOf('TMP') === 0 )
   { 
-    tag = tag.substr( 3 );  
+    tag = tag.substr( 3 );
   }
 else  
+*/  
 if ( tag.indexOf('!ALM') === 0 || 
      tag.indexOf('!TMP') === 0 || 
      tag.indexOf('!ALR') === 0 ||
      tag.indexOf('!ALR') === 0 ||
      tag.indexOf('!TAG') === 0 ||
      tag.indexOf('!DCR') === 0 )
-  { 
+  {
     tag = tag.substr( 4 );  
   }
 else
 if ( tag.indexOf('!SLIM') === 0 ||
      tag.indexOf('!ILIM') === 0 ||
      tag.indexOf('!STON') === 0 )  
-  { 
-    tag = tag.substr( 5 );  
+  {
+    tag = tag.substr( 5 );
   }
 else
 if ( tag.indexOf('!STOFF') === 0 ||
      tag.indexOf('!STVAL') === 0 )   
-  { 
+  {
     tag = tag.substr( 6 );  
   }
-  
-if ( isInt( tag ) )
+
+if ( isNaN( parseInt(tag) )  )
+  {
+  if ( typeof(NPTS[tag]) !== "undefined" )
+    {
+    tag = NPTS[tag];    
+    }
+  else
+    {
+    var code = tag.charCodeAt(0);
+    if ( ((code >= 65) && (code <= 90)) || ((code >= 97) && (code <= 122)) ) 
+      {
+      // it is a letter: ok it can be a id
+      }
+    else
+      return 0; // it can't be an id
+    }
+  }
+
+// if ( isInt( tag ) )
 if ( WebSAGE.lstpnt.indexOf( "," + tag + "," ) < 0 ) // se não tem, acrescenta | append if not already in the list
   { 
     WebSAGE.lstpnt = WebSAGE.lstpnt + tag + ','; 
@@ -581,7 +647,7 @@ janelaInfo : function( nponto )
 {
   // faz um bloqueio de 1,5s
   if ( WebSAGE.g_travaInfo )
-    { 
+    {
       return; 
     }
   WebSAGE.g_travaInfo = 1;
@@ -598,7 +664,7 @@ janelaInfo : function( nponto )
     }
   
   if ( WebSAGE.g_cntTentativaInfo <= 0 )
-    { 
+    {
       return; 
     }
 
@@ -607,40 +673,40 @@ janelaInfo : function( nponto )
   HISTER = 0;
   ALRIN = 0;
   ANOT = "";
-  
+
   if ( NPTO != 0 )
     { 
       WebSAGE.escondeDestaqPonto(NPTO); 
     }
-  
+
   NPTO = 0;
   CNPTO = 0;
   ID = "";
   DESC = "";
-  
+
   // reconhece alarmes que houverem neste ponto
-  if ( F[WebSAGE.g_nponto_sup] & 0x100 )
+  if ( WebSAGE.getFlags(WebSAGE.g_nponto_sup) & 0x100 )
     {
     WebSAGE.getScript( WebSAGE.g_remoteServer +
                        '?R=' + WebSAGE.g_nponto_sup + '&D=00/00/0000&H=00:00:00&M=000&A=0&' +
                        'PS=' + WebSAGE.g_pass++ 
                      );  
     }
-  
+
   if ( BrowserDetect.browser != 'Explorer' )
     if ( typeof(WebSAGE.g_win_cmd.window) == 'object' ) // fecha janela info
       if ( WebSAGE.g_win_cmd.window ) 
         { 
           WebSAGE.g_win_cmd.window.close();
         }
-  
+
   setTimeout( WebSAGE.showValsInfo0, 200 );
 },
 
 // busca dado do ponto tempo real  
 showValsInfo0 : function()
 {
-  WebSAGE.getScript( WebSAGE.g_remoteServer + '?I=' + WebSAGE.g_nponto_sup + '&B=WebSAGE.showValsInfo1' );
+  WebSAGE.getScript( WebSAGE.g_remoteServer + '?I=' + WebSAGE.g_nponto_sup + '&B=ANOTS[' + WebSAGE.g_nponto_sup + ']=ANOT;WebSAGE.showValsInfo1' );
 },
 
 // Abre uma janela popup com dados sobre o ponto   
@@ -648,9 +714,9 @@ showValsInfo1 : function()
 {
   // esconde o destaque anterior, imediatamente
   WebSAGE.escondeDestaqPonto( WebSAGE.g_destaqList[WebSAGE.g_indSelPonto] );
- 
+
   // abre nova janela, dá um tempo e vai  preencher os dados da nova janela em outra funcao
-  // (para dar tempo de abrir a janela) 
+  // (para dar tempo de abrir a janela)
   WebSAGE.g_win_1stdraw = 1;
   WebSAGE.g_win_cmd = window.open( 'dlginfo.html','wsinfo','dependent=yes,height=480,width=450,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,modal=yes' );
   WebSAGE.g_tminfoID = setTimeout( 'WebSAGE.g_win_cmd.close()', 3000 );
@@ -686,7 +752,7 @@ try
        typeof(WebSAGE.g_win_cmd.window) != 'object' ||
        WebSAGE.g_win_cmd.window === null ||
        typeof(WebSAGE.g_win_cmd.window.closed) == 'undefined' ||
-       WebSAGE.g_win_cmd.window.closed || 
+       WebSAGE.g_win_cmd.window.closed ||
        typeof(WebSAGE.g_win_cmd.window.$) === 'undefined' 
      ) 
      {
@@ -713,13 +779,13 @@ try
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'VALOR_SUP', V[NPTO] + " " + UNIDADE + " (" + Msg.QValor + ")" );
 
   var SQ = '';
-  var Q = F[NPTO];
+  var Q = WebSAGE.getFlags(NPTO);
 
   if ( (Q & 0x03) == 0x00 )
     { 
       WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'ESTADO_SUP', Msg.QDPIntermed + " (" + Msg.EstadoAtual + ")"  ); 
     }
-  else    
+  else
   if ( (Q & 0x03) == 0x03 )
     { 
       WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'ESTADO_SUP', Msg.QDPInvalido + " (" + Msg.EstadoAtual + ")" ); 
@@ -747,12 +813,12 @@ try
     {
       SQ += Msg.QCalculado + ' ';
     }
-  else  
+  else
   if ( (Q & 0x0C) == 0x0C )
     {
       SQ += Msg.QManual + ' ';
     }
-  else  
+  else
   if ( (Q & 0x0C) == 0x08 )
     {
       SQ += Msg.QNuncaAtu + ' ';
@@ -787,7 +853,7 @@ try
     }
   
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'QUALIF', Msg.Qualific + ': ' + SQ );
-            
+
   if ( WebSAGE.g_win_1stdraw ) // escreve parâmetros só na primeira vez que abriu a janela
     {
     clearTimeout( WebSAGE.g_tminfoID );
@@ -798,12 +864,12 @@ try
     WebSAGE.g_win_cmd.document.getElementById("TABULAR").style.display = "";
     //WebSAGE.g_win_cmd.document.getElementById("TABULAR").href="tabular.html?SELMODULO="+ID.substring(0,9);
     Core.addEventListener( WebSAGE.g_win_cmd.document.getElementById("TABULAR"), "click", WebSAGE.tabular );
-    
+
     if ( ID.charAt(21) == 'M' ) // Manual não apresenta opção de inibir
       { 
         WebSAGE.g_win_cmd.document.getElementById('DIVINIB').style.display = 'none'; 
       }
-    
+
     if ( Q & 0x20 )
       { // mostra parâmetros de limites só para pontos analógicos
       WebSAGE.g_win_cmd.document.getElementById("TENDENCIAS").style.display = "";
@@ -853,14 +919,14 @@ try
                          WebSAGE.g_win_cmd.document.getElementById('DIVALTVALORDIG').style.display = ''; 
                        } 
           );
-        
+
         WebSAGE.g_win_cmd.document.getElementById("rbNovoValor").nextSibling.data = ST_ON;
         WebSAGE.g_win_cmd.document.getElementById("rbNovoValorOff").nextSibling.data = ST_OFF;
         Core.addEventListener( WebSAGE.g_win_cmd.document.getElementById("rbNovoValor"), "click", WebSAGE.writeValor );
         Core.addEventListener( WebSAGE.g_win_cmd.document.getElementById("rbNovoValorOff"), "click", WebSAGE.writeValor );
         }
       }
-  
+
     // torna visível botão de comandar, caso haja comando associado
     if ( CNPTO != 0 )
       {
@@ -899,7 +965,7 @@ try
       { 
         WebSAGE.g_win_cmd.document.getElementById("COMANDAR").title = Msg.AcessCmd; 
       }
-      
+
     if ( Q & 0x2000 )
       {
       WebSAGE.g_win_cmd.document.getElementById("DIVCMDBLKBUT").style.display = 'none';
@@ -911,15 +977,15 @@ try
       WebSAGE.g_win_cmd.document.getElementById("SPCMDINTERTRAV").style.display = 'none';
       }
     }
-    
+
   WebSAGE.g_timerID = setTimeout( 'WebSAGE.showValsInfo2(1)', 2000 );    
   }
 catch ( err ) 
   {
     $('#SP_STATUS').text( err.name + ": " + err.message + " [2]" ); 
-    document.getElementById("SP_STATUS").title = err.stack;      
+    document.getElementById("SP_STATUS").title = err.stack;
   }  
-      
+
 }, 
 
 prejanelaComando : function( nponto ) 
@@ -949,20 +1015,20 @@ showValsCmd1 : function()
     { 
       return; 
     }
-    
+
   WebSAGE.g_win_cmd = NPTO; // mark window to be opened for point NPTO  
-    
+
   // abre nova janela, dá um tempo e vai  preencher os dados da nova janela em outra funcao
   setTimeout( "WebSAGE.g_win_cmd=window.open('dlgcomando.html','wscomando','dependent=yes,height=450,width=450,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,modal=yes');", 500 );
-  
+
   // será chamado pela própria janela
-}, 
+},
 
 // Mostra os dados sobre o ponto de comando em janela popup 
 showValsCmd2 : function()
 {
   var se;
-  if ( F[NPTO] & 0x2000 ) // Comando intertravado?
+  if ( WebSAGE.getFlags(NPTO) & 0x2000 ) // Comando intertravado?
     { 
       WebSAGE.g_win_cmd.close(); 
     }
@@ -977,7 +1043,7 @@ showValsCmd2 : function()
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'NPONTO_SUP', NPTO + '-' + ID );
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'DESCR_SUP', se + DESC );
 
-  if ( ! ( F[NPTO] & 0x20 ) )
+  if ( ! ( WebSAGE.getFlags(NPTO) & 0x20 ) )
     { // digital
     if ( V[NPTO] > 0 )
       { 
@@ -987,19 +1053,19 @@ showValsCmd2 : function()
       if ( CST_OFF.toUpperCase().substring( 0, 2 ) === ST_OFF.toUpperCase().substring( 0, 2 ) && 
            CST_ON.toUpperCase().substring( 0, 2 ) !== ST_OFF.toUpperCase().substring( 0, 2 )  
          )
-        { 
+        {
           WebSAGE.g_win_cmd.document.getElementById('CMD_OFF').style.color = "darkgray"; 
         }
       }
     else  
       {
       WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'ESTADO_SUP', ST_ON + " (" + Msg.EstadoAtual + ")" ); // zero é on
-      // se o estado atual (on) bate com o valor do comando on (3 primeiras letras do texto), 
+      // se o estado atual (on) bate com o valor do comando on (3 primeiras letras do texto),
       // assume que deve a intenção é comandar OFF, portanto sombreia a opção ON
       if ( CST_ON.toUpperCase().substring( 0, 2 ) === ST_ON.toUpperCase().substring( 0, 2 ) &&
            CST_OFF.toUpperCase().substring( 0, 2 ) !== ST_ON.toUpperCase().substring( 0, 2 ) 
          )
-        { 
+        {
           WebSAGE.g_win_cmd.document.getElementById('CMD_ON').style.color = "darkgray"; 
         }
       }
@@ -1009,7 +1075,7 @@ showValsCmd2 : function()
     { // analógico
     WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'VALOR_SUP', V[NPTO] + " " + UNIDADE + " (" + Msg.QValor + ")" );
     WebSAGE.g_win_cmd.document.getElementById("VALOR_HID").style.display = "";
-    }    
+    }
   
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'CNPONTO_SUP', CNPTO + '-' + CID );
   WebSAGE.cmdWriteById( WebSAGE.g_win_cmd, 'CDESCR_SUP', se + CDESC );
@@ -1066,7 +1132,7 @@ writeParams : function()
     li = -999999.0;
     WebSAGE.g_win_cmd.document.getElementById("LIMINF").value = li;
     }
-              
+
   var ls = parseFloat( WebSAGE.g_win_cmd.document.getElementById("LIMSUP").value );
   if ( isNaN( ls ) )
     {
@@ -1083,10 +1149,12 @@ writeParams : function()
 
   LIMINFS[NPTO] = li;
   LIMSUPS[NPTO] = ls;
-  
+
   WebSAGE.g_win_cmd.document.getElementById("LIMINF").value = li;
   WebSAGE.g_win_cmd.document.getElementById("LIMSUP").value = ls;
   WebSAGE.g_win_cmd.document.getElementById("HISTER").value = hs;
+  
+  ANOTS[NPTO] = WebSAGE.g_win_cmd.document.getElementById("ANOTACAO").value.replace(/^\s\s*/, '').replace(/\s\s*$/, '').replace(/\n/g, "|^").replace(/'/g, "").replace(/\&/g, "");
 
   WebSAGE.getScript( 
                WebSAGE.g_remoteServer + 
@@ -1095,7 +1163,8 @@ writeParams : function()
                "&LS=" + ls + 
                "&HI=" + hs + 
                "&AI=" + (WebSAGE.g_win_cmd.document.getElementById("CBALRIN").checked ? 1 : 0 ) + 
-               "&AN=" + WebSAGE.g_win_cmd.document.getElementById("ANOTACAO").value.replace(/^\s\s*/, '').replace(/\s\s*$/, '').replace(/\n/g, "|^").replace(/'/g, "") + // troca os \n por |^ e tira as aspas que dão problema no javascript 
+               // troca os \n por |^ e tira as aspas e & que dão problema no javascript 
+               "&AN=" + ANOTS[NPTO] +
                "&VN=" + 0
              );  
 },
@@ -1110,11 +1179,11 @@ tendencias : function()
 vis_trend : function( npt )
 {
   if ( location.host == "127.0.0.1" || location.host == "localhost" ) // se está acessando máquina local      
-     { 
+     {
        WebSAGE.getScript( WebSAGE.g_remoteServer + "?x=7&P=" + npt ); 
      }
   else // na máquina remota abre uma janela nova tipo popup
-     { 
+     {
        window.open( 'trend.html?NPONTO=' + npt, 'Tendencias ' + npt, 'dependent=no,height=400,width=700,location=no,toolbar=no,directories=no,status=no,menubar=no,resizable=yes,modal=no' ); 
      }
   setTimeout( 'WebSAGE.g_win_cmd.close()', 500 );
@@ -1143,35 +1212,35 @@ writeValor : function()
   var val;  
 
   if ( !WebSAGE.g_win_cmd )
-     { 
+     {
        return; 
      }
   if ( typeof(WebSAGE.g_win_cmd.window) != 'object' )
-     { 
+     {
        return; 
      }
   if ( typeof(WebSAGE.g_win_cmd.window.closed) === 'undefined' )
-     { 
+     {
        return; 
      }
   if ( WebSAGE.g_win_cmd.window.closed )
-     { 
+     {
        return; 
      }
   if ( WebSAGE.g_win_cmd.document === undefined )
-     { 
+     {
        return; 
      }
-    
-  if ( F[NPTO] & 0x20 )
+
+  if ( WebSAGE.getFlags(NPTO) & 0x20 )
     { 
       val =  WebSAGE.g_win_cmd.document.getElementById("NOVOVALOR").value; 
     }
-  else      
+  else
     { 
       val = WebSAGE.g_win_cmd.document.getElementById("rbNovoValor").checked ? 0 : 1; 
     }
-  
+
   WebSAGE.getScript( WebSAGE.g_remoteServer + '?X=' + NPTO + "&V=" + val );
 },
 
@@ -1242,41 +1311,59 @@ timerBlink : function()
 
 doResize : function ()
 {
-	var svgdiv = document.getElementById("svgdiv");
-    svgdiv.style.width = document.body.offsetWidth; 
-	svgdiv = null;  
+  var svgdiv = document.getElementById("svgdiv");
+  svgdiv.style.width = document.body.offsetWidth; 
+  svgdiv = null;  
 },
 
 // retorna o valor do ponto, se houver, interpreta tags tipo !ALMnnnnn e !TMPnnnnn
 valorTagueado: function ( tag )
 { 
   var retnok = "????";
-  var t;
-  
+  var t,n,f;
+
   if ( tag == "" || typeof( tag ) === 'undefined' )
     { 
       return retnok; 
     }
-  
+
   t = parseInt( tag ); 
 
   if ( ! isNaN( t ) )
-    {
+    { // tag is a number
       if ( typeof( V[t] ) === 'undefined' )
-        { 
+        {
           return retnok; 
         }
       else 
-        { 
+        {
           return V[t]; 
         }
     }
+
+  // tag is not a number
+
+  // test if tag corresponds to a number
+  if ( typeof( NPTS[tag] ) !== 'undefined' )
+    { // yes: convert to number and return
+      return V[ NPTS[tag] ];
+    }  
+
+  // try to use alphab. tag directly
+  if ( typeof( V[tag] ) !== 'undefined' )
+    { // yes: return it
+      return V[ tag ];
+    }  
     
+  f = WebSAGE.getFlags(t);  
+
   if ( tag.indexOf("!SLIM") === 0 ) 
     {
-      t = tag.substr(5);
+      t = tag.substr(5).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( LIMSUPS[t] ) === 'undefined' )
-        { 
+        {
           return 999999; 
         }
       return LIMSUPS[t];      
@@ -1284,9 +1371,11 @@ valorTagueado: function ( tag )
 
   if ( tag.indexOf("!ILIM") === 0 ) 
     {
-      t = tag.substr(5);
+      t = tag.substr(5).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( LIMINFS[t] ) === 'undefined' )
-        { 
+        {
           return -999999; 
         }
       return LIMINFS[t];      
@@ -1294,9 +1383,11 @@ valorTagueado: function ( tag )
 
   if ( tag.indexOf("!TAG") === 0 ) 
     {
-      t = tag.substr(4);
+      t = tag.substr(4).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( TAGS[t] ) === 'undefined' )
-        { 
+        {
           return 0; 
         }
       return TAGS[t];      
@@ -1304,9 +1395,11 @@ valorTagueado: function ( tag )
 
   if ( tag.indexOf("!DCR") === 0 ) 
     {
-      t = tag.substr(4);
+      t = tag.substr(4).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( DCRS[t] ) === 'undefined' )
-        { 
+        {
           return 0; 
         }
       return DCRS[t];      
@@ -1314,57 +1407,65 @@ valorTagueado: function ( tag )
 
   if ( tag.indexOf("!STON") === 0 ) 
     {
-      t = tag.substr(5);
+      t = tag.substr(5).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( STONS[t] ) === 'undefined' )
-        { 
+        {
           return ""; 
         }
-      
+
       return STONS[t];      
     }
 
   if ( tag.indexOf("!STOFF") === 0 ) 
     {
-      t = tag.substr(6);
+      t = tag.substr(6).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
       if ( typeof( STOFS[t] ) === 'undefined' )
-        { 
+        {
           return ""; 
         }
-      
+
       return STOFS[t];      
     }
 
   if ( tag.indexOf("!STVAL") === 0 ) 
     {
-      t = tag.substr(6);
-      if ( (F[t] & 0x03) === 0x02 )
-        { 
+      t = tag.substr(6).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
+      if ( (f & 0x03) === 0x02 )
+        {
         return STONS[t];   
         }
-      if ( (F[t] & 0x03) === 0x01)
-        { 
+      if ( (f & 0x03) === 0x01)
+        {
         return STOFS[t];   
         }
-      if ( (F[t] & 0x03) === 0x00 )
-        { 
+      if ( (f & 0x03) === 0x00 )
+        {
         return retnok;   
         }
-      if ( (F[t] & 0x03) === 0x03 )
+      if ( (f & 0x03) === 0x03 )
         { 
         return retnok;
-        }           
+        }
     }
 
   if ( tag.indexOf("!ALR") === 0 ) 
     {
-      t = tag.substr(4);
-      if ( typeof( F[t] ) === 'undefined' )
-        { 
+      t = tag.substr(4).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
+      if ( typeof( f ) === 'undefined' )
+        {
           return 0; 
         }
-      
-      if ( (F[t] & 0x100) )      
-        { 
+
+      if ( (f & 0x100) )      
+        {
           return 1; 
         }
       else
@@ -1375,31 +1476,35 @@ valorTagueado: function ( tag )
 
   if ( tag.indexOf("!ALM") === 0 ) 
     {
-      t = tag.substr(3);
-      if ( typeof( F[t] ) === 'undefined' )
-        { 
+      t = tag.substr(3).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
+      if ( typeof( f ) === 'undefined' )
+        {
           return 0; 
         }
-      
-      if ( (F[t] & 0x800) || (F[t] & 0x100) )      
-        { 
+
+      if ( (f & 0x800) || (f & 0x100) )      
+        {
           return 1; 
         }
       else
-        { 
+        {
           return 0; 
         }
     }
-
+/*
   if ( tag.indexOf("ALM") === 0 ) 
     {
-      t = tag.substr(3);
-      if ( typeof( F[t] ) === 'undefined' )
+      t = tag.substr(3).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
+      if ( typeof( f ) === 'undefined' )
         { 
           return 0; 
         }
-      
-      if ( (F[t] & 0x800) || (F[t] & 0x100) )      
+
+      if ( (f & 0x800) || (f & 0x100) )      
         { 
           return 1; 
         }
@@ -1408,36 +1513,27 @@ valorTagueado: function ( tag )
           return 0; 
         }
     }
-
+*/
   if ( tag.indexOf("!TMP") === 0 ) 
     {
-      t = tag.substr(3);
-      if ( typeof( T[t] ) === 'undefined' )
-        { 
-          return retnok; 
-        }
-      else
-        { 
-          return T[ tag.substr(3) ]; 
-        }
-    }
+      t = tag.substr(3).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
 
+      return getTime(t);
+    }
+/*
   if ( tag.indexOf("TMP") === 0 ) 
     {
-      t = tag.substr(3);
-      if ( typeof( T[t] ) === 'undefined' )
-        { 
-          return retnok; 
-        }
-      else
-        { 
-          return T[ tag.substr(3) ]; 
-        }
+      t = tag.substr(3).trim();
+      if ( isNaN( parseInt(t) ) ) // if not a number, converts it to a number
+         t = NPTS[t];
+      return getTime(t);
     }
-  
+*/
   if ( tag.indexOf("!EVAL") === 0 ) 
     {
-      t = tag.substr(5);
+      t = tag.substr(5).trim();
       try 
         {
         return eval(t);
@@ -1453,7 +1549,7 @@ valorTagueado: function ( tag )
           }
         }
     }
-  
+
   return retnok;
 },
 
@@ -1484,45 +1580,46 @@ if ( typeof( fmt ) == 'undefined' || fmt.indexOf("%") < 0 )
   }
 
 var v = "";
+var Flg = WebSAGE.getFlags(tag);
 
-if ( typeof( F[tag] ) != 'undefined' )
-if ( F[tag] & 0x20 )      
+if ( typeof( Flg ) != 'undefined' )
+if ( Flg & 0x20 )      
   {
   if ( WebSAGE.g_MostraQualAna )
     {
-    // if ( F[tag] & 0x08 )
+    // if ( Flg & 0x08 )
     //   { v=v+"F"; }
-    if ( F[tag] & 0x100 )
+    if ( Flg & 0x100 )
       {
         v = v + "L"; 
       }
-    if ( F[tag] & 0x200 )
+    if ( Flg & 0x200 )
       { 
         v = v + "A"; 
       }
-    if ( (F[tag] & 0x0C) === 0x0C )
+    if ( (Flg & 0x0C) === 0x0C )
       { 
         v = v + "M"; 
       }
-    if ( (F[tag] & 0x0C) === 0x08 )
+    if ( (Flg & 0x0C) === 0x08 )
       { 
         v = v + "X"; 
       }
-    //if ( (F[tag] & 0x0C) == 0x04 )
+    //if ( (Flg & 0x0C) == 0x04 )
     //  { v=v+"C"; }
-    if ( F[tag] & 0x10 )
+    if ( Flg & 0x10 )
       { 
         v = v + "S"; 
       }
-    if ( F[tag] & 0x800 )
+    if ( Flg & 0x800 )
       { 
         v = v + "N"; 
       }
-    if ( F[tag] & 0x400 )
+    if ( Flg & 0x400 )
       { 
         v = v + "I"; 
       }
-    if ( F[tag] & 0x1000 )
+    if ( Flg & 0x1000 )
       {
         v = v + "U"; 
       }
@@ -1840,10 +1937,11 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
     if ( typeof( inksage_labelvec[lbv].tag ) != 'undefined' ) // tem tag de ponto
       {
          pnt = WebSAGE.acrescentaPontoLista( inksage_labelvec[lbv].tag );
-         if ( isInt( pnt ) )
          if ( pnt != 99999 ) // dummy point   
+         if ( typeof(item.blockPopup) == "undefined" )
          if ( item.pontoPopup == undefined ) // se já não tem popup definido
            {
+           WebSAGE.tooltipRelac(item, pnt);
            item.setAttributeNS( null, "onclick", WebSAGE.g_obj_onclick.replace(/PONTO/g, pnt) );         
            if ( item.style !== null )
              {
@@ -1936,6 +2034,7 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
                                         " translate(" + item.getAttributeNS( null, "x" ) + "," + 
                                         item.getAttributeNS( null, "y" ) + ") " ); 
                break;
+            case "#exec_once": // exec a script one time
             case "#exec": // exec a script one time
                try 
                  {
@@ -2016,41 +2115,51 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
            {
            WebSAGE.setPreview( item, inksage_labelvec[lbv].src.substr(8),  inksage_labelvec[lbv].width, inksage_labelvec[lbv].height );
            }
-         else  
+         else
          if ( inksage_labelvec[lbv].src === "block" )
            { // do not open point access on click
            item.setAttributeNS( null, "onclick", null );  
-           if ( item.style != null)
+           if ( item.style != null )
              {
                item.style.cursor = "";
              }
            item.blockPopup = 1;
            item.noTrace = 1;
            }
-         else  
+         else
          if ( inksage_labelvec[lbv].src === "notrace" )
            { // allows to open point access tracing other object on click
            item.noTrace = 1;
            }
-         else  
-         if ( isInt( inksage_labelvec[lbv].src ) )
-           { // links other point to access on click  
+         else
+           { // links point to access on click  
            pnt = WebSAGE.acrescentaPontoLista( inksage_labelvec[lbv].src ); 
+           WebSAGE.tooltipRelac(item, pnt);
            item.setAttributeNS( null, "onclick", WebSAGE.g_obj_onclick.replace(/PONTO/g, pnt) );
            if ( item.style !== null || typeof( item.style ) === 'undefined' )
              {
                item.style.cursor = "pointer";
-             }  
+             }
            item.pontoPopup = pnt;
-           }           
+           }
          break;
       case "get":
-         if ( inksage_labelvec[lbv].parent.textContent.indexOf("%") >= 0 ) // guarda formato C, se houver
+         if ( inksage_labelvec[lbv].parent.childNodes[0].textContent.indexOf("%") >= 0 ) // guarda formato C, se houver
            { 
-           inksage_labelvec[lbv].formatoC = inksage_labelvec[lbv].parent.textContent; 
-		   
-		   // show the plot preview on mouseover
-           WebSAGE.setPreview( item, "trend.html?NPONTO=" + inksage_labelvec[lbv].tag + "&HIDECTRLS=1", 610, 340 );
+           inksage_labelvec[lbv].formatoC = inksage_labelvec[lbv].parent.childNodes[0].textContent; 
+
+           pnt = inksage_labelvec[lbv].tag;
+           if ( isNaN(parseInt(pnt)) )
+             {
+             setTimeout( function(){
+               var p = NPTS[pnt];
+               // show the plot preview on mouseover, after a time to get point definitions
+               WebSAGE.setPreview( item, "trend.html?NPONTO=" + p + "&HIDECTRLS=1", 610, 340 );
+               }, 6000 );
+             }
+           else
+             // show the plot preview on mouseover
+             WebSAGE.setPreview( item, "trend.html?NPONTO=" + pnt + "&HIDECTRLS=1", 610, 340 );
 
            var animation = document.createElementNS( 'http://www.w3.org/2000/svg', 'animate' );
            animation.setAttributeNS( null, 'attributeName', 'text-decoration' ); 
@@ -2112,11 +2221,12 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
                  }
                }
 
-             if ( isInt( pnt ) ) 
              if ( pnt != 99999 ) // dummy point     
+             if ( typeof(item.blockPopup) == "undefined" )
              if ( item.pontoPopup === undefined ) // se já não tem popup definido
              if ( j === 0 ) // linka o clic no primeiro ponto (tag) de cor, ignora as demais
                {
+               WebSAGE.tooltipRelac(item, pnt);
                item.setAttributeNS( null, "onclick", WebSAGE.g_obj_onclick.replace(/PONTO/g, pnt) );                  
                if ( item.style !== null )
                  {
@@ -2221,8 +2331,10 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
              inksage_labelvec[lbv].bb.top = inksage_labelvec[lbv].bb.y;
              inksage_labelvec[lbv].bb.bottom = inksage_labelvec[lbv].bb.y + inksage_labelvec[lbv].bb.height;             
              pnt = WebSAGE.acrescentaPontoLista( inksage_labelvec[lbv].tag );
+             if ( typeof(item.blockPopup) == "undefined" )
              if ( item.pontoPopup == undefined ) // se já não tem popup definido
                {
+               WebSAGE.tooltipRelac(item, pnt);
                item.setAttributeNS( null, "onclick", WebSAGE.g_obj_onclick.replace(/PONTO/g, pnt) );
                if ( item.style != null )
                  {
@@ -2280,6 +2392,7 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
          textNode = document.createTextNode( tooltiptext );
          tooltip.appendChild( textNode );
          item.appendChild( tooltip );
+		 item.hasTooltip = 1;
          if ( tooltiptext.indexOf("!EVAL") !== -1  )
            {
            inksage_labelvec[lbv].hasActiveTooltip = 1;
@@ -2575,6 +2688,21 @@ preprocessaTela: function()
     tmp = SVGDoc.getElementsByTagName( "g" );
     for ( i = 0; i < tmp.length; i++ ) 
       { nohs.push( tmp.item(i) ); }
+    tmp = SVGDoc.getElementsByTagName( "circle" );
+    for ( i = 0; i < tmp.length; i++ ) 
+      { nohs.push( tmp.item(i) ); }
+    tmp = SVGDoc.getElementsByTagName( "line" );
+    for ( i = 0; i < tmp.length; i++ ) 
+      { nohs.push( tmp.item(i) ); }
+    tmp = SVGDoc.getElementsByTagName( "polyline" );
+    for ( i = 0; i < tmp.length; i++ ) 
+      { nohs.push( tmp.item(i) ); }
+    tmp = SVGDoc.getElementsByTagName( "polygon" );
+    for ( i = 0; i < tmp.length; i++ ) 
+      { nohs.push( tmp.item(i) ); }
+    tmp = SVGDoc.getElementsByTagName( "use" );
+    for ( i = 0; i < tmp.length; i++ ) 
+      { nohs.push( tmp.item(i) ); }
 
     var cntshst = 0;
     var rtdashcoronoff, rtdashvis, rtdashvisonoff;
@@ -2844,15 +2972,17 @@ cbf_Status: function()
 
 blinkSeAlarmado: function(tag, item)
 {
+var f;	
 if ( typeof ( item.allowblink ) != 'undefined' )  
 if ( !item.allowblink )  
   { 
     return; 
   }
   
-if ( F[tag] & 0x100 ) // alarme
+f = WebSAGE.getFlags(tag);  
+if ( f & 0x100 ) // alarme
   {
-  if ( (F[tag] & 0x20) == 0 ) // testa o tipo 
+  if ( (f & 0x20) == 0 ) // testa o tipo 
       { 
         if ( WebSAGE.g_blinkList.indexOf(item) === -1 )
           WebSAGE.g_blinkList.push( item ); 
@@ -2868,6 +2998,7 @@ if ( F[tag] & 0x100 ) // alarme
 // Substitui os conteudos objeto com ID=PNTnumero no SVG, ex: ID=PNT8056
 showValsSVG: function()
 {
+var attr, cor, fill, stroke, attrib, attribval, vis, x, flind, bb, ft, f, t;
 var i, j;
 var mudou_ana = WebSAGE.g_sha1ant_ana=='' || WebSAGE.g_sha1ant_ana!=Sha1Ana;
 var mudou_dig = WebSAGE.g_sha1ant_dig=='' || WebSAGE.g_sha1ant_dig!=Sha1Dig;
@@ -2923,17 +3054,6 @@ for ( i = 0; i < WebSAGE.RTDA_JSItems.length; i++ )
 
 // MEDIDAS
 // para cada elemento "text" contendo a tag RTDA.
-var attr;
-var cor;
-var fill;
-var stroke;
-var attrib;
-var attribval;
-var vis; 
-var x;
-var flind;
-var bb;
-var ft;
 
 if ( mudou_ana ) // se tem não tem hash ou mudou, atualiza
   {
@@ -2948,7 +3068,8 @@ if ( mudou_ana ) // se tem não tem hash ou mudou, atualiza
   for ( i = 0; i < WebSAGE.RTDA_MedsItems.length; i++ )
     {
     x = WebSAGE.RTDA_MedsNptos[i];
-      
+    f = WebSAGE.getFlags(x);
+	
     attr = WebSAGE.interpretaFormatoC( WebSAGE.RTDA_MedsFmt[i], x );
     if ( attr != WebSAGE.RTDA_MedsItems[i].textContent )  
       { 
@@ -2956,7 +3077,7 @@ if ( mudou_ana ) // se tem não tem hash ou mudou, atualiza
       }
     
     // cor
-    if ( F[x] & 0x80 ) // falha?
+    if ( f & 0x80 ) // falha?
       { 
         attr = WebSAGE.RTDA_MedsFillInv[i]; 
       }
@@ -2987,10 +3108,11 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
     {
     x = WebSAGE.RTDA_TxtStNptos[i];
     flind = 0;
+	f = WebSAGE.getFlags(x);
   
     if ( WebSAGE.RTDA_TxtStTipos[i] === 'ALM')
       { // testa nao normal ou alarmado 
-      if ( (F[x] & 0x800) || (F[x] & 0x100) )
+      if ( (f & 0x800) || (f & 0x100) )
         {
         attr = WebSAGE.RTDA_TxtStOn[i];
         cor = WebSAGE.RTDA_TxtStFillEstOn[i];
@@ -3009,24 +3131,24 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
       }
     else
       {
-      if ( (F[x] & 0x03) === 0x02 )
+      if ( (f & 0x03) === 0x02 )
         { 
           attr = WebSAGE.RTDA_TxtStOn[i]; 
         }
-      if ( (F[x] & 0x03) === 0x01)
+      if ( (f & 0x03) === 0x01)
         { 
           attr = WebSAGE.RTDA_TxtStOff[i]; 
         }
-      if ( (F[x] & 0x03) === 0x00 )
+      if ( (f & 0x03) === 0x00 )
         { 
           attr = Msg.QDPIntermed;flind=1; 
         }
-      if ( (F[x] & 0x03) === 0x03 )
+      if ( (f & 0x03) === 0x03 )
         { 
           attr = Msg.QDPInvalido;flind=1; 
         }
         
-      if ( (F[x] & 0x02) === 0x02 )
+      if ( (f & 0x02) === 0x02 )
         { 
           cor = WebSAGE.RTDA_TxtStFillEstOn[i]; 
         }
@@ -3036,7 +3158,7 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
         }
       }      
   
-    if ( F[x] & 0x80 )    
+    if ( f & 0x80 )    
     if ( WebSAGE.RTDA_TxtStInv[i] !=  "" )
       { 
         attr = WebSAGE.RTDA_TxtStInv[i]; 
@@ -3050,7 +3172,7 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
     WebSAGE.visibEtiq( x );
 
     // cor
-    if ( (F[x] & 0x80) || flind === 1 ) // cor de falha?
+    if ( (f & 0x80) || flind === 1 ) // cor de falha?
        { 
          cor = WebSAGE.RTDA_TxtStFillInv[i]; 
        }
@@ -3060,7 +3182,7 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
         WebSAGE.RTDA_TxtStItems[i].style.setProperty("fill",cor,""); 
       }
       
-    if ( F[x] & 0x100 ) // alarme
+    if ( f & 0x100 ) // alarme
       { 
         if ( WebSAGE.g_blinkList.indexOf( WebSAGE.RTDA_TxtStItems[i] ) === -1 )
           WebSAGE.g_blinkList.push( WebSAGE.RTDA_TxtStItems[i] ); 
@@ -3071,12 +3193,13 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
   for ( i = 0; i < WebSAGE.RTDA_ShpItems.length; i++ )
     { 
     x = WebSAGE.RTDA_ShpNptos[i];
-  
+  	f = WebSAGE.getFlags(x);
+
     if ( WebSAGE.RTDA_ShpTipos[i] === 'ALM')
     {
     // cor
     // testa nao normal ou alarmado 
-       if ( (F[x] & 0x800) || (F[x] & 0x100) )
+       if ( (f & 0x800) || (f & 0x100) )
          {
          fill = WebSAGE.RTDA_ShpFillEstOn[i];
          stroke = WebSAGE.RTDA_ShpStrokeEstOn[i];
@@ -3090,7 +3213,7 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
     else
     {
     // cor
-       if ( (F[x] & 0x03) === 0x02)
+       if ( (f & 0x03) === 0x02)
          {
          fill = WebSAGE.RTDA_ShpFillEstOn[i];
          stroke = WebSAGE.RTDA_ShpStrokeEstOn[i];
@@ -3102,7 +3225,7 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
          }
     }        
   
-    if ( (F[x] & 0x80) || (F[x] & 0x03) === 0x00 || (F[x] & 0x03) === 0x03 ) // falha?
+    if ( (f & 0x80) || (f & 0x03) === 0x00 || (f & 0x03) === 0x03 ) // falha?
        {
        if ( WebSAGE.RTDA_ShpFillInv[i] != "" )
          { 
@@ -3124,14 +3247,14 @@ if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
         WebSAGE.RTDA_ShpItems[i].style.setProperty("stroke",stroke,""); 
       }
   
-    if ( (F[x] & 0x02) === 0x02 )
+    if ( (f & 0x02) === 0x02 )
       { 
         vis = WebSAGE.RTDA_ShpVisEstOn[i]; 
       }
     else  
       { vis = WebSAGE.RTDA_ShpVisEstOff[i]; }
   
-    if ( F[x] & 0x100 ) // alarme
+    if ( f & 0x100 ) // alarme
       { 
         if ( WebSAGE.g_blinkList.indexOf( WebSAGE.RTDA_ShpItems[i] ) === -1 )
           WebSAGE.g_blinkList.push(WebSAGE.RTDA_ShpItems[i]); 
@@ -3150,8 +3273,9 @@ var borda, preen;
 
 for ( x in V )
   {
+  f = WebSAGE.getFlags(x);
 
-  if ( (F[x] & 0x20) === 0 ) // testa o tipo 
+  if ( (f & 0x20) === 0 ) // testa o tipo 
     { // digital
 
     if ( !mudou_dig ) // se tem não tem hash ou mudou, atualiza
@@ -3168,7 +3292,7 @@ for ( x in V )
     // testa se é seccionadora
     if  ( elem.tagName === "g" )
       {  // seccionadora
-      if ( F[x] & 0x01 ) 
+      if ( f & 0x01 ) 
         {
         elem = elem.childNodes.item(3); // seccionadora aberta
         SVGDoc.getElementById( 'PNT' + x ).childNodes.item(5).setAttributeNS(null,"style","fill-opacity:0;stroke-opacity:0"); // seccionadora fechada
@@ -3183,55 +3307,55 @@ for ( x in V )
       
       WebSAGE.visibEtiq( x );
        
-      if ( (F[x] & 0x80) || (F[x] & 0x03) === 0x00 || (F[x] & 0x03) === 0x03 ) // é falhado, inválido ou indeterminado
+      if ( (f & 0x80) || (f & 0x03) === 0x00 || (f & 0x03) === 0x03 ) // é falhado, inválido ou indeterminado
         { 
           elem.setAttributeNS( null, "style", VisorTelas_SC_Falha ); 
         }
 
-      if ( F[x] & 0x100 ) // alarme
+      if ( f & 0x100 ) // alarme
         { 
           if ( WebSAGE.g_blinkList.indexOf( elem ) === -1 )
             WebSAGE.g_blinkList.push( elem ); 
         }
 
-      if ( (F[x] & 0x10) || (F[x] & 0x0C) === 0x0C ) // é manual ou substituído
+      if ( (f & 0x10) || (f & 0x0C) === 0x0C ) // é manual ou substituído
         { 
           elem.setAttributeNS( null, "style", VisorTelas_SC_Manual); 
         }
         
-      // if ( (F[x] & 0x400) ) // se está inibido, fica amarelo
+      // if ( (f & 0x400) ) // se está inibido, fica amarelo
       //  { elem.style.stroke=VisorTelas_CorAlarmeInibido; }
       }
     else
     if  ( elem.tagName === "rect" ) // disjuntor tem que ser retângulo
       {  // disjuntor
       // normal                                        (aberto:fechado)
-      borda = (F[x] & 0x01)? VisorTelas_DJ_Normal_Aberto_Borda  : VisorTelas_DJ_Normal_Fechado_Borda; 
-      preen = (F[x] & 0x01)? VisorTelas_DJ_Normal_Aberto_Preen  : VisorTelas_DJ_Normal_Fechado_Preen;
+      borda = (f & 0x01)? VisorTelas_DJ_Normal_Aberto_Borda  : VisorTelas_DJ_Normal_Fechado_Borda; 
+      preen = (f & 0x01)? VisorTelas_DJ_Normal_Aberto_Preen  : VisorTelas_DJ_Normal_Fechado_Preen;
       
-      if ( (F[x] & 0x80) || (F[x] & 0x03) === 0x00 || (F[x] & 0x03) === 0x03 ) // é falhado, inválido ou indeterminado 
+      if ( (f & 0x80) || (f & 0x03) === 0x00 || (f & 0x03) === 0x03 ) // é falhado, inválido ou indeterminado 
         {
-        borda = (F[x] & 0x01)? VisorTelas_DJ_Falha_Aberto_Borda : VisorTelas_DJ_Falha_Fechado_Borda; 
-        preen = (F[x] & 0x01)? VisorTelas_DJ_Falha_Aberto_Preen : VisorTelas_DJ_Falha_Fechado_Preen;
+        borda = (f & 0x01)? VisorTelas_DJ_Falha_Aberto_Borda : VisorTelas_DJ_Falha_Fechado_Borda; 
+        preen = (f & 0x01)? VisorTelas_DJ_Falha_Aberto_Preen : VisorTelas_DJ_Falha_Fechado_Preen;
         } 
 
-      if ( (F[x] & 0x100) ) // com alarme ?
+      if ( (f & 0x100) ) // com alarme ?
         { 
           if ( WebSAGE.g_blinkList.indexOf( elem ) === -1 )
             WebSAGE.g_blinkList.push( elem ); 
         }
       
-      if ( (F[x] & 0x10) || (F[x] & 0x0C) === 0x0C ) // é manual ou substituído 
+      if ( (f & 0x10) || (f & 0x0C) === 0x0C ) // é manual ou substituído 
         {
-        borda = (F[x] & 0x01)? VisorTelas_DJ_Manual_Aberto_Borda : VisorTelas_DJ_Manual_Fechado_Borda; 
-        preen = (F[x] & 0x01)? VisorTelas_DJ_Manual_Aberto_Preen : VisorTelas_DJ_Manual_Fechado_Preen;
+        borda = (f & 0x01)? VisorTelas_DJ_Manual_Aberto_Borda : VisorTelas_DJ_Manual_Fechado_Borda; 
+        preen = (f & 0x01)? VisorTelas_DJ_Manual_Aberto_Preen : VisorTelas_DJ_Manual_Fechado_Preen;
         } 
       
       WebSAGE.visibEtiq( x );
         
       elem.setAttributeNS( null, "style", borda + preen );
 
-      //if ( (F[x] & 0x400) ) // se está inibido
+      //if ( (f & 0x400) ) // se está inibido
       //  elem.style.stroke=VisorTelas_CorAlarmeInibido;
         
       elem.style.cursor = "pointer";  
@@ -3261,7 +3385,7 @@ for ( x in V )
           elem.textContent = val; 
         }
 
-      if ( F[x] & 0x80 ) 
+      if ( f & 0x80 ) 
         {
         if ( elem.style.getPropertyValue( 'fill' ) !=  VisorTelas_Medidas_Cor_Falha )
           { 
@@ -3276,7 +3400,7 @@ for ( x in V )
           }
         }
     
-      if ( F[x] & 0x100 ) // alarme
+      if ( f & 0x100 ) // alarme
         { 
           if ( WebSAGE.g_blinkListAna.indexOf( elem ) === -1 )
             WebSAGE.g_blinkListAna.push( elem ); 
@@ -3301,8 +3425,7 @@ for ( x in V )
       {
       tag = WebSAGE.InkSage[i].tag;
       vt = WebSAGE.valorTagueado( tag );
-      if ( isInt( tag ) )    
-        WebSAGE.visibEtiq( tag );      
+      WebSAGE.visibEtiq( tag );      
       } 
 
     if ( vt != "????" || WebSAGE.InkSage[i].attr === "color" || WebSAGE.InkSage[i].attr === "set" )
@@ -3312,6 +3435,17 @@ for ( x in V )
          case "set":
             switch ( WebSAGE.InkSage[i].tag )
                { 
+               case "#exec_on_update": // exec a script every time data changed
+                 try 
+                   {
+                   eval( 'var thisobj=window.SVGDoc.getElementById("' + WebSAGE.InkSage[i].parent.id + '"); ' + WebSAGE.InkSage[i].src );
+                   }
+                 catch( err )
+                   {
+                   $('#SP_STATUS').text( err.name + ": " + err.message + " [8]" ); 
+                   document.getElementById("SP_STATUS").title = err.stack;
+                   }
+                 break;
                case "#radar": // radar chart animation
                  for ( j = 0; j < WebSAGE.InkSage[i].parent.pnts.length; j++ )
                    {
@@ -3333,6 +3467,12 @@ for ( x in V )
               var indv, xx, yy, sep;
               var dotlist = "";
               var d = new Date();
+
+              if ( $('#timemachinecontrols').css('display') != "none" ) // if TimeMachine active, don't show plots
+                {
+                WebSAGE.InkSage[i].grafico.setAttributeNS( null, 'points', "" )
+                break;
+                }
               
               // verify value not changing, so abort unnecessary replot. Passed 30 seconds plot it anyway.
               if ( WebSAGE.InkSage[i].hasOwnProperty('valores') )
@@ -3416,13 +3556,13 @@ for ( x in V )
             break;
          case "get" :  // coloca o valor no texto
             val = WebSAGE.interpretaFormatoC( WebSAGE.InkSage[i].formatoC, tag );
-            if ( val != WebSAGE.InkSage[i].parent.textContent ) // value changed?
+            if ( val != WebSAGE.InkSage[i].parent.childNodes[0].textContent ) // value changed?
               { 
                 if ( WebSAGE.InkSage[i].parent.changeAnim != undefined )
                 if ( WebSAGE.InkSage[i].lastVal != undefined )
                   {
                   // is the value raising or lowering? (animate differently, over or undeline)
-                  if ( Math.abs( V[tag] ) > Math.abs( WebSAGE.InkSage[i].lastVal ) )
+                  if ( Math.abs( WebSAGE.getValue(tag)) > Math.abs( WebSAGE.InkSage[i].lastVal ) )
                     {
                     WebSAGE.InkSage[i].parent.changeAnim.setAttributeNS( null, 'values', 'line-through;overline;overline;line-through;overline;overline' );
                     }
@@ -3444,7 +3584,7 @@ for ( x in V )
                   WebSAGE.setGroupDistrib( WebSAGE.InkSage[i].parent.parentNode );
                   }
                    
-                WebSAGE.InkSage[i].lastVal = V[tag];    
+                WebSAGE.InkSage[i].lastVal = WebSAGE.getValue(tag);
               }
             WebSAGE.blinkSeAlarmado( tag, WebSAGE.InkSage[i].parent );
             break;
@@ -3465,7 +3605,7 @@ for ( x in V )
                 vt = WebSAGE.valorTagueado( tag );
                 }
 
-              if ( typeof(F[tag]) === 'undefined' )
+              if ( typeof(WebSAGE.getFlags(tag)) === 'undefined' )
                 { 
                   if ( vt === "????" )
                     {
@@ -3478,7 +3618,7 @@ for ( x in V )
                 }
               else
                 { 
-                  ft = F[tag]; 
+                  ft = WebSAGE.getFlags(tag); 
                 }
               digital = ( ft & 0x20 ) === 0;
              
@@ -3646,12 +3786,12 @@ for ( x in V )
             WebSAGE.InkSage[i].parent.style.opacity = ( vt - WebSAGE.InkSage[i].min) / ( WebSAGE.InkSage[i].max - WebSAGE.InkSage[i].min ) ;            
 
             // somente se o ponto for digital e a opacidade for 1, permite piscar 
-            if ( typeof(F[tag]) == 'undefined' )
+            if ( typeof(WebSAGE.getFlags(tag)) == 'undefined' )
               { 
                 WebSAGE.InkSage[i].parent.allowblink = false; 
               }
             else
-            if ( (F[tag] & 0x20) == 0 && WebSAGE.InkSage[i].parent.style.opacity == 1 )    
+            if ( (WebSAGE.getFlags(tag) & 0x20) == 0 && WebSAGE.InkSage[i].parent.style.opacity == 1 )    
               { 
                 WebSAGE.InkSage[i].parent.allowblink = true; 
               }
@@ -3728,13 +3868,13 @@ for ( x in V )
             WebSAGE.blinkSeAlarmado( tag, WebSAGE.InkSage[i].parent );
             break;        
          case "text":
-            if ( typeof( F[tag] ) == 'undefined' )
+            if ( typeof( WebSAGE.getFlags(tag) ) == 'undefined' )
               { 
                 ft = vt; 
               }
             else
               { 
-                ft = F[tag]; 
+                ft = WebSAGE.getFlags(tag); 
               }
             digital = ( ft & 0x20 ) == 0;
             var txt = "";
@@ -3948,11 +4088,9 @@ produzEtiq : function ( obj , ponto )
 {
  var animation, svg_ns, block, bb, x, y, id, eletq, aux, xfm;
  
- if ( ! isInt(ponto) )
-   {
-   return;
-   }
-
+ if (isNaN(parseInt(ponto)))
+	id=id;	 
+ 
  if ( ponto == 99999 )
    {
    return;
@@ -4013,6 +4151,10 @@ produzEtiq : function ( obj , ponto )
  
  // SVGDoc.documentElement.appendChild( block );
  obj.parentNode.appendChild( block );
+ 
+ var tooltip = document.createElementNS( 'http://www.w3.org/2000/svg', 'title' );
+ tooltip.textContent = "";
+ block.appendChild( tooltip );
 
  if ( ANIMA & 0x02 )
    {
@@ -4040,35 +4182,49 @@ produzEtiq : function ( obj , ponto )
 // Existem dois tipos de etiquetas com cores diferentes, para anotação e alarme inibido 
 visibEtiq : function ( ponto )
 { 
-  var eid = 'ANOT' + ponto;
-  var eletq = SVGDoc.getElementById( eid );
+  var eid, eletq, Fl;
+  
+  eid = 'ANOT' + ponto;
+  eletq = SVGDoc.getElementById( eid );
+  
+  Fl = WebSAGE.getFlags( ponto );
   
   if ( eletq !== null ) // existe a etiqueta?
   {
-    if ( F[ ponto ] & 0x400 ) // alarme inibido
+    if ( Fl & 0x400 ) // alarme inibido
     {
       if ( eletq.getAttributeNS(null, 'display') !== 'block' )
         {
         eletq.setAttributeNS( null, 'stroke', ScreenViewer_TagInhAlmStrokeColor );
         eletq.setAttributeNS( null, 'fill', ScreenViewer_TagInhAlmFillColor );
         eletq.setAttributeNS( null, 'display', 'block');  // mostra etiqueta
+		eletq.childNodes[0].textContent = "";
         }
     }
     else
-    if ( F[ponto] & 0x200 ) // anotação
+    if ( Fl & 0x200 ) // anotação
     {
       if ( eletq.getAttributeNS(null, 'display') !== 'inline' )
         {
         eletq.setAttributeNS( null, 'stroke', ScreenViewer_TagStrokeColor );
         eletq.setAttributeNS( null, 'fill', ScreenViewer_TagFillColor );
-        eletq.setAttributeNS (null, 'display', 'inline');  // mostra etiqueta
+        eletq.setAttributeNS( null, 'display', 'inline');  // mostra etiqueta
         }
-    }
+		
+		// tooltip de anotação, para funcionar há que se resolver problemas de sincronização entre as IHM's
+		// var p = ponto;
+		// if ( isNaN(parseInt(ponto)) )
+		//   p = NPTS[ponto];
+	    // setTimeout( 
+		//   'SVGDoc.getElementById(\"' + eid + '").childNodes[0].textContent=ANOTS[' + p + '].replace(/\\|\\^/g, "\\n");',
+		//   5000);
+    }   
     else
     { 
       if ( eletq.getAttributeNS( null, 'display') !== 'none' )
         { 
         eletq.setAttributeNS( null, 'display', 'none' );  // esconde etiqueta
+		eletq.childNodes[0].textContent = "";
         }
     }
   }  
@@ -4079,7 +4235,7 @@ produzRelac : function ( obj , ponto )
 {
  var svg_ns, block, bb, x, y, id, aux, xfm;
 
- if ( ponto == 99999 )
+ if ( ponto == 99999 || ponto == 0 )
    return;
 
  if ( typeof( obj.getAttributeNS ) === 'undefined' )
@@ -4326,7 +4482,7 @@ reload: function( whattodo )
 // envia ao servidor pedido reconhece alarmes do ponto
 reconhece: function( nponto )
 {
-  if ( F[nponto] & 0x100 )
+  if ( WebSAGE.getFlags(nponto) & 0x100 )
     { 
       WebSAGE.getScript( WebSAGE.g_remoteServer +
                       '?R=' + nponto + '&D=00/00/0000&H=00:00:00&M=000&A=0&' +
@@ -4374,28 +4530,32 @@ setaCorFundo: function( cor )
 
 mostraDestaqPonto: function( nponto )
 {
-    var id = SVGDoc.getElementById( 'DESTAQ' + nponto );
-    if ( id != null )
+    var elem = SVGDoc.getElementById( 'DESTAQ' + nponto );
+    if ( elem == null )
+		elem = SVGDoc.getElementById( 'DESTAQ' + TAGS[nponto] );
+    if ( elem != null )
       {
-        id.setAttributeNS( null, 'display', 'inline' );
-        if ( typeof( id.anim.beginElement ) != "undefined" )
+        elem.setAttributeNS( null, 'display', 'inline' );
+        if ( typeof( elem.anim.beginElement ) != "undefined" )
          {
-           id.anim.endElement();
-           id.anim.beginElement();
+           elem.anim.endElement();
+           elem.anim.beginElement();
          }
       }
 },
 
 escondeDestaqPonto: function( nponto )
 {
-    var id = SVGDoc.getElementById( 'DESTAQ' + nponto );
-    if ( id !== null )
+    var elem = SVGDoc.getElementById( 'DESTAQ' + nponto );
+    if ( elem == null )
+		elem = SVGDoc.getElementById( 'DESTAQ' + TAGS[nponto] );
+    if ( elem !== null )
       {
-        id.setAttributeNS( null, 'display', 'none' );
-        if ( typeof( id.anim ) !== 'undefined' )
-        if ( id.anim.endElement )
+        elem.setAttributeNS( null, 'display', 'none' );
+        if ( typeof( elem.anim ) !== 'undefined' )
+        if ( elem.anim.endElement )
           { 
-            id.anim.endElement(); 
+            elem.anim.endElement(); 
           }
       }
 },
@@ -4444,7 +4604,7 @@ mostraDestaqSel: function( direction, cmd )
       var loc = -1;
       for ( var i = ind ; ( i < WebSAGE.g_destaqList.length ) && ( i >= 0 ) ; i = i + direction )
         {
-            if ( F[ WebSAGE.g_destaqList[ i ] ] & 0x4000 )
+            if ( WebSAGE.getFlags( WebSAGE.g_destaqList[ i ] ) & 0x4000 )
               {
               loc = i;
               break;

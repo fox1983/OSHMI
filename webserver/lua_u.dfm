@@ -1,6 +1,6 @@
 object fmLua: TfmLua
-  Left = 179
-  Top = 227
+  Left = 142
+  Top = 351
   Width = 686
   Height = 560
   Caption = 'Lua Script'

@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------------
 /*
 OSHMI - Open Substation HMI
-	Copyright 2008-2014 - Ricardo L. Olsen
+	Copyright 2008-2016 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -283,8 +283,11 @@ while ( sqlite3_step( res ) == SQLITE_ROW )
     tm *tmdt = localtime( &idt );
     try
       {
-      pto.TagTempoAlarme = EncodeDate( tmdt->tm_year + 1900, tmdt->tm_mon + 1, tmdt->tm_mday ) +
-                           EncodeTime( tmdt->tm_hour, tmdt->tm_min, tmdt->tm_sec, 0 ) ;
+      if ( tmdt == NULL )
+        pto.TagTempoAlarme = 0;
+      else
+        pto.TagTempoAlarme = EncodeDate( tmdt->tm_year + 1900, tmdt->tm_mon + 1, tmdt->tm_mday ) +
+                             EncodeTime( tmdt->tm_hour, tmdt->tm_min, tmdt->tm_sec, 0 ) ;
       if ( pto.TagTempoAlarme < 100 ) // puxa data do alarme para zero se for muito antiga
         pto.TagTempoAlarme = 0;
       }

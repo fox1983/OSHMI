@@ -797,7 +797,9 @@ showVals: function()
         WebSAGE.g_tbl.addRow( i, L[i] );
         // WebSAGE.EstiloLinha( i, 0 );
         qualif=WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_FLAGS);
-        if ( WebSAGE.g_tbl.cellsx( i, WebSAGE.g_COL_QUALIF ).indexOf("J")!=-1 ) // comando
+        if ( (WebSAGE.g_tbl.cellsx(i, WebSAGE.g_COL_QUALIF).indexOf("I")!=-1) || // alarme inibido
+             (WebSAGE.g_tbl.cellsx(i, WebSAGE.g_COL_QUALIF).indexOf("J")!=-1) // comando
+           ) 
           WebSAGE.g_tbl.setRowHidden(i,true);
         else
           {
@@ -825,9 +827,10 @@ showVals: function()
             
             qualif=WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_FLAGS);
                
-            if (  (WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_QUALIF).indexOf("J")!=-1) || // comando
-                  (WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_SUPCMD)==0 && chkcmd ) ||
-                  (!( parseInt(WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_FLAGS)) & 0x800 ) && chknor) 
+            if ( (WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_QUALIF).indexOf("I")!=-1) || // alarme inibido
+                 (WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_QUALIF).indexOf("J")!=-1) || // comando
+                 (WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_SUPCMD)==0 && chkcmd ) ||
+                 (!( parseInt(WebSAGE.g_tbl.cellsx(i,WebSAGE.g_COL_FLAGS)) & 0x800 ) && chknor) 
                )    
               WebSAGE.g_tbl.setRowHidden(i,true);
             else
@@ -847,8 +850,10 @@ showVals: function()
            }
         }
         
-     // account alarms by priority and substation, leave out commands
-     if ( WebSAGE.g_tbl.cellsx( i, WebSAGE.g_COL_QUALIF ).indexOf("J") == -1 )
+     // account alarms by priority and substation, leave out commands and inhibited alarms
+     if ( WebSAGE.g_tbl.cellsx( i, WebSAGE.g_COL_QUALIF ).indexOf("J") == -1 &&
+          WebSAGE.g_tbl.cellsx( i, WebSAGE.g_COL_QUALIF ).indexOf("I") == -1 
+        )
        {      
        var pri = WebSAGE.g_tbl.cellsx( i, WebSAGE.g_COL_QUALIF ).charAt(0);
        // count alarms by priority

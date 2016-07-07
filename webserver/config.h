@@ -3,7 +3,7 @@
 
 // Parâmetros e constantes de configuração do sistema
 
-#define VERSAO "3.9"
+#define VERSAO "3.13"
 
 extern int IEC104_PORT;
 extern int IEC104_1_SEC; // endereço secundário da utr 1
@@ -31,6 +31,7 @@ extern int IHMRED_PERIODO_ENVIO_ACERTO_HORA ;
 
 extern int PRIORIDADE_PANICO; // Valor da prioridade para mostrar eventos no modo pânico (agrega=2)
 extern int NUMMAX_ALARMES;
+extern int LAST_PRIORITY_THAT_BEEPS; // alarms up to and including this priority beeeps 
 // extern int WEBSERVER_NOCACHE; // Permite desabilitar os headers de cache do servidor web
 // extern int MOSTRA_EVENTOS_FALHADOS; // contrala se mostra (1) ou não (0) eventos com falha de valor no visor de eventos
 extern int ALARMA_DUPLA_TRANSICAO; // alarma ou não quando recebe evento com estado igual ao atual

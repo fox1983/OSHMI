@@ -33,7 +33,7 @@
 
 // Este script coloca em uma tabela os eventos do sistema supervisionado. 
 
-// OSHMI/Open Substation HMI - Copyright 2008-2014 - Ricardo L. Olsen
+// OSHMI/Open Substation HMI - Copyright 2008-2016 - Ricardo L. Olsen
 
 var L = []; // aqui o servidor colocará a lista de eventos
 var V = []; // aqui o servidor colocará os valores dos pontos
@@ -105,13 +105,16 @@ g_infomodnpt: {},
 g_subst_list: [],
 
 // busca e executa script de um servidor
-getScript: function( srvurl )
+getScript: function( srvurl, tout )
 {
+tout = tout || null;
+
 // substitui a chamada $.getScript que causava memory leaks
 $.ajax( { // crossDomain: true,
           url: srvurl,
           dataType: "text",
-          success: WebSAGE.onSuccess
+          success: WebSAGE.onSuccess,
+		  timeout: tout
          } );
 },
 
@@ -561,7 +564,6 @@ callServer : function()
   {
       clearTimeout( WebSAGE.g_toutID );
       clearTimeout( WebSAGE.g_ServerStatusID );
-      clearTimeout( WebSAGE.g_timeOutFalha );
 
       if ( WebSAGE.g_waitingServer ) // se ainda está esperando pelo servidor
          { // dá mais um tempo para rechamar-se e cai fora
@@ -589,6 +591,7 @@ callServer : function()
         Ventoinha.pulse();
 
         // prepara uma função para o caso de dar timeout na chamada do servidor
+		clearTimeout( WebSAGE.g_timeOutFalha );
         WebSAGE.g_timeoutFalhaID = setTimeout( WebSAGE.falhaTudo, WebSAGE.g_timeOutFalha );
 
         cbf_F = function() { setTimeout( WebSAGE.showVals, 100 ); WebSAGE.g_waitingServer = 0; };
@@ -630,7 +633,9 @@ callServer : function()
                      '&A=' + agregar +
                      '&G=' + WebSAGE.g_gpstime + 
                      "&F=" + filtro + 
-                     "&B=cbf_F" );
+                     "&B=cbf_F",
+                     WebSAGE.g_timeOutFalha
+					 );
         WebSAGE.g_pass++;
         
         // vou testar o status do webserver para ver se houve alguma mudança 
@@ -675,7 +680,6 @@ cbf_Status: function()
   // se mudou estado de alarme, vou atualizar lista logo
   if ( NUM_VAR_ANT != NUM_VAR )
     {
-    clearTimeout( WebSAGE.g_timeoutFalhaID ); 
     clearTimeout( WebSAGE.g_toutID );
     // refresh events after some time (~2s) enough to let the event(s) be recorded in the sqlite database file
     WebSAGE.g_toutID = setTimeout( WebSAGE.callServer, WebSAGE.g_timeOutServerStatus );
@@ -823,84 +827,85 @@ var cria = {};
   for ( i = L.length - 1; i >= 0 ; i-- )  
     {
     rw = L[i].split(',');
-	
+
     semod = rw[ WebSAGE.g_COL_SUBEST ] + " - " + (rw[ WebSAGE.g_COL_DESCR ].split('~'))[0]; 
   
     if (  rw[WebSAGE.g_COL_ID].indexOf( Viewers_IDTxtHighlight2 ) != -1  &&
           rw[WebSAGE.g_COL_DESCR].indexOf( Viewers_DescrTxtHighlight2 ) != -1 &&
-		  rw[WebSAGE.g_COL_QUALIF].indexOf( "K" ) == -1 )
-		estdj = 1;
+          rw[WebSAGE.g_COL_QUALIF].indexOf( "K" ) == -1 )
+      estdj = 1;
     else
-        estdj = 0;
-	
+      estdj = 0;
+
     // se encontrou um disj ligou, resseta notificação
     if ( estdj && rw[WebSAGE.g_COL_FLAGS] == 2 )
        {
-	   delete WebSAGE.g_infomod[semod];
-	   delete WebSAGE.g_infomodtm[semod];
-	   delete WebSAGE.g_infomodnpt[semod];
-	   delete cria[semod];
-	   }
+       delete WebSAGE.g_infomod[semod];
+       delete WebSAGE.g_infomodtm[semod];
+       delete WebSAGE.g_infomodnpt[semod];
+       delete cria[semod];
+       }
 
-	// se não encontrou qualificado alarmado L, vai para o próximo
-	if ( rw[WebSAGE.g_COL_QUALIF].indexOf( "L" ) == -1 )
-	  continue;	   
+    // se não encontrou qualificado alarmado L, vai para o próximo
+    if ( rw[WebSAGE.g_COL_QUALIF].indexOf( "L" ) == -1 )
+       continue;
    
     if ( ( estdj && ( rw[WebSAGE.g_COL_FLAGS] & 0x03 ) == 1 ) ||
-		  rw[WebSAGE.g_COL_EVENTO] == Viewers_AlmTxtHighlight1 )  
-		{
-	    if ( typeof( WebSAGE.g_infomod[ semod ] ) == "undefined" ) 
-		  {
-	      aux = "";
-  	      }
-		else
+           rw[WebSAGE.g_COL_EVENTO] == Viewers_AlmTxtHighlight1 )  
+      {
+        if ( typeof( WebSAGE.g_infomod[ semod ] ) == "undefined" ) 
           {
-	      aux = WebSAGE.g_infomod[ semod ];
-          }		  
-		  
+          aux = "";
+          }
+        else
+          {
+          aux = WebSAGE.g_infomod[ semod ];
+          }
+
         acr = rw[WebSAGE.g_COL_DESCR].substring( rw[WebSAGE.g_COL_DESCR].indexOf('~') + 1 );
         acr = acr + " : " + rw[WebSAGE.g_COL_EVENTO];
-		
-		if ( aux.indexOf(acr) == -1 )
+
+        if ( aux.indexOf(acr) == -1 )
           {
-		  info = aux + ( aux == "" ? "" : "\n") + acr;
-		  }
-		else
-		  {
-		  info = aux;
-		  }
+          info = aux + ( aux == "" ? "" : "\n") + acr;
+          }
+        else
+          {
+          info = aux;
+          }
 
         if ( info !== WebSAGE.g_infomod[semod] )  
-	      { //  vai atualizar ou criar nova notificação
-		  cria[semod] = [ semod, info,  semod ];
-	      WebSAGE.g_infomod[ semod ] = info;
-		  if ( estdj )
-		    { // a estampa de tempo será a da abertura do DJ
-			WebSAGE.g_infomodtm[ semod ] = rw[ WebSAGE.g_COL_DATA ] + " " + rw[ WebSAGE.g_COL_HORA ]; 
-			WebSAGE.g_infomodnpt[ semod ] = rw[ WebSAGE.g_COL_NPONTO ];
-			}
-	      }
+          { //  vai atualizar ou criar nova notificação
+          cria[semod] = [ semod, info,  semod ];
+          WebSAGE.g_infomod[ semod ] = info;
+          if ( estdj )
+            { // a estampa de tempo será a da abertura do DJ
+            WebSAGE.g_infomodtm[ semod ] = /* rw[ WebSAGE.g_COL_DATA ] + " " + */ rw[ WebSAGE.g_COL_HORA ]; 
+            WebSAGE.g_infomodnpt[ semod ] = rw[ WebSAGE.g_COL_NPONTO ];
+            }
+          }
        }
     }
-	
+
 for ( var c in cria )
   {
   // se tem ao menos o estado do disjuntor e uma operação de proteção, mostra notificação
   if (  // cria[c][1].indexOf( Viewers_IDTxtHighlight2 ) != -1 &&
        cria[c][1].indexOf( Viewers_AlmTxtHighlight1 ) != -1 &&
        cria[c][1].indexOf( Viewers_DescrTxtHighlight2 ) != -1 )
-	{   
-    var nf = new Notification( cria[c][0] + "\n" + WebSAGE.g_infomodtm[ cria[c][0] ], 
-	                           {
+    {   
+    var nf = new Notification( cria[c][0] + " - " + WebSAGE.g_infomodtm[ cria[c][0] ], 
+                               {
                                body: cria[c][1],
                                tag: cria[c][0] + "-" + WebSAGE.g_infomodtm[ cria[c][0] ],
+                               requireInteraction: true,
                                icon: Imgs.imgNotific
                                } ); 
-										
-    // quando fechada ou clicada a notificação, reconhece o alarme
-	nf.onclick = nf.onclose = function() { WebSAGE.ackAlarm( 0, 1, WebSAGE.g_infomodnpt[ cria[c][0] ] ); };
-	setTimeout( function() { nf.close(); }, 10 * 60 * 1000 ); // timeout de 10 minutos para a notificação
-	}
+
+    // quando clicada a notificação, fecha e reconhece o alarme, fecha também por timeout
+    nf.onclick = function() { nf.close(); WebSAGE.ackAlarm( 0, 1, WebSAGE.g_infomodnpt[ cria[c][0] ] ); };
+    setTimeout( function() { nf.close(); }, 10 * 60 * 1000 ); // timeout de 10 minutos para a notificação
+    }
   }  
 },
 

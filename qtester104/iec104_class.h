@@ -150,6 +150,7 @@ class iec104_class
     bool sendCommand( iec_obj *obj ); // Command, return false if not send
     int getPortTCP();
     void setPortTCP( unsigned port );
+    void setGIPeriod( unsigned period );
 
     private:
     unsigned short VS;  // sender packet control counter
@@ -171,6 +172,8 @@ class iec104_class
     static const int t3_testfr = 10;
     static const int t2_supervisory = 8;
     static const int t1_startdtact = 6;
+    int gi_period; // minimum time for request between GI's
+    static const int gi_retry_time = 45; // wait time to retry when requested a GI and not responded
 
     protected:
     void parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond = true); // parse APDU, ( accountandrespond == false : process the apdu out of the normal handshake )

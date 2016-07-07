@@ -57,10 +57,11 @@ MainWindow::MainWindow(QWidget *parent)
     IPEscravo = settings.value( "RTU1/IP_ADDRESS", "" ).toString();
     i104.setSecondaryIP( (char *)IPEscravo.toStdString().c_str() );
     i104.setPortTCP( settings.value( "RTU1/TCP_PORT", i104.getPortTCP() ).toInt() );
+    i104.setGIPeriod( settings.value( "RTU1/GI_PERIOD", 330 ).toInt() );
 
     // this is for using with the OSHMI HMI in a dual architecture
     QSettings settings_bdtr( "../conf/hmi.ini", QSettings::IniFormat );
-    BDTR_host_dual = settings_bdtr.value( "REDUNDANCY/OTHER_HMI_IP", "" ).toString();
+    BDTR_host_dual = settings_bdtr.value( "REDUNDANCY/OTHER_HMI_IP", "0.0.0.0" ).toString();
     BDTR_host = "127.0.0.1";
     BDTR_CntDnToBePrimary = BDTR_CntToBePrimary;
 
@@ -250,9 +251,10 @@ void MainWindow::slot_BDTR_pronto_para_ler()
         // if BDTRForcePrimary==0 become secondary when received keep alive messages from other machine
         if ( address == BDTR_host_dual && i104.BDTRForcePrimary == 0 )
           {
+          BDTR_Loga( "--> BDTR: KEEPALIVE RECEIVED FROM DUAL MACHINE(TIME)");
           if ( isPrimary )
             {
-              BDTR_Loga( "--> BDTR: KEEPALIVE RECEIVED FROM DUAL MACHINE(TIME), BECOMING SECONDARY" );
+              BDTR_Loga( " BECOMING SECONDARY" );
               ui->lbMode->setText( "<font color='red'>Secondary</font>" );
             }
           isPrimary = false;
@@ -761,7 +763,9 @@ void MainWindow::slot_tcpdisconnect()
 {
     if ( BDTR_HaveDualHost() && isPrimary == true )
     {
+       BDTR_CntDnToBePrimary = BDTR_CntToBePrimary + 1; // wait a little more time to be primary again to allow for the secondary to assume
        isPrimary = false;
+       i104.disable_connect();
        BDTR_Loga( "--- BDTR: BECOMING SECONDARY BY DISCONNECTION" );
        ui->lbMode->setText( "<font color='red'>Secondary</font>" );
     }
@@ -864,6 +868,7 @@ void MainWindow::slot_timer_BDTR_kamsg()
           {
           isPrimary = true;
           i104.enable_connect();
+          i104.tmKeepAlive->start();
           BDTR_CntDnToBePrimary = BDTR_CntToBePrimary;
           BDTR_Loga( "--- BDTR: BECOMING PRIMARY BY TIMEOUT" );
           ui->lbMode->setText( "<font color='green'>Primary</font>" );

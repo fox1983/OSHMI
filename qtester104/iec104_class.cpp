@@ -57,6 +57,7 @@ iec104_class::iec104_class()
     masterAddress = 0;
     slaveAddress = 0;
     GIObjectCnt = 0;
+    gi_period = 5 * 60 +30;
 }
 
 void iec104_class::disableSequenceOrderCheck()
@@ -67,6 +68,11 @@ void iec104_class::disableSequenceOrderCheck()
 int iec104_class::getPortTCP()
 {
     return Port;
+}
+
+void iec104_class::setGIPeriod( unsigned period )
+{
+    gi_period = period;
 }
 
 void iec104_class::setPortTCP( unsigned port )
@@ -137,13 +143,6 @@ void iec104_class::onDisconnectTCP()
 void iec104_class::onTimerSecond()
 {
     iec_apdu apdu;
-    static unsigned int cnts = 1;
-
-    cnts++;
-
-    if ( ! (cnts % 5) )
-        if ( !connectedTCP )
-            connectTCP();
 
     if (connectedTCP)
     {
@@ -156,9 +155,10 @@ void iec104_class::onTimerSecond()
           {
             tout_gi--;
             if ( tout_gi == 0 )
-              solicitGI();
+              {
+                solicitGI();
+              }
           }
-
 
         if (msg_supervisory)
         {
@@ -173,7 +173,6 @@ void iec104_class::onTimerSecond()
            sendSupervisory();
           }
         }
-
     }
 
     // if connected and no data received, send TESTFRACT
@@ -219,6 +218,7 @@ void iec104_class::solicitGI()
     sendTCP((char *)&wapdu, 16);
     VS += 2;
     mLog.pushMsg( "<-- INTERROGATION " );
+    tout_gi = gi_retry_time;
 }
 
 void iec104_class::confTestCommand()
@@ -394,7 +394,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             break;
             
         case TESTFRACT:
-            mLog.pushMsg("    TESTFRAACT");
+            mLog.pushMsg("    TESTFRACT");
             wapdu.start=START;
             wapdu.length=4;
             wapdu.NS=TESTFRCON;
@@ -407,7 +407,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             mLog.pushMsg("    STARTDTCON");
             tout_startdtact=-1; // flag confirmation of STARTDT, not to timeout
             TxOk=true;
-            tout_gi=10;
+            tout_gi=15; // request GI when communication starts
             break;
             
         case STOPDTACT:
@@ -1258,10 +1258,10 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             mLog.pushMsg("--> END OF INITIALIZATION");
             break;
         case INTERROGATION: // GI
+            tout_gi = gi_period; // restart count to next GI
             if (papdu->asduh.cause==ACTCONFIRM)
             {
                 GIObjectCnt=0;
-                tout_gi=0;
                 mLog.pushMsg("    INTERROGATION ACT CON ------------------------------------------------------------------------");
                 interrogationActConfIndication();
             }

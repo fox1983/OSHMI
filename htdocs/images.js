@@ -49,7 +49,7 @@ FAVICONEVENTOS:   'images/chrono.ico',
 imgGpsOn:   'images/gps-on.svg',
 imgGpsOff:  'images/gps-off.svg',
 imgFilter:  'images/filter.svg',
-imgNotific: 'images/oshmi.ico',
+imgNotific: 'images/oshmi-red.ico',
 
 // Tabular.html
 FAVICONTABULAR:   'images/tabular.ico',

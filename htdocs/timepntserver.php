@@ -56,7 +56,7 @@ else
     {
     $DATAF = str_replace ("/", "-", $DATAINI);
     }  
-  $FILTDH = $DATAINI;   
+  $FILTDH = strtotime($DATAF." ".$HORA);
   }
 
 if ( $FUNCAO == "F" )
@@ -182,7 +182,7 @@ if ( $FUNCAO == "F" )
   echo "HA_ALARMES=0;\n";
   echo "Sha1Dig='" . $FILTDH . "';\n";
   echo "Sha1Ana='" . $FILTDH . "';\n";
-  echo "NUM_VAR=" . $FILTDH . ";\n";
+  echo "NUM_VAR=" . time() . ";\n";
   }
   
 if ( $CALLBACK != "" )

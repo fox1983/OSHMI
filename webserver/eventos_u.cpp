@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------------
 /*
 OSHMI - Open Substation HMI
-	Copyright 2008-2014 - Ricardo L. Olsen
+	Copyright 2008-2016 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -271,9 +271,9 @@ else
     Ano += 2000;
 
   // verifica se tem horário de verão agora
-  TIME_ZONE_INFORMATION tzi;
-  DWORD wintz = GetTimeZoneInformation( &tzi );
-  int isdst = ( wintz == 2 ) ? 1 : 0;
+  //TIME_ZONE_INFORMATION tzi;
+  //DWORD wintz = GetTimeZoneInformation( &tzi );
+  //int isdst = ( wintz == 2 ) ? 1 : 0;
 
   tm unxtm;
   unxtm.tm_year = Ano - 1900;

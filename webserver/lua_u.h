@@ -33,6 +33,7 @@ private:	// User declarations
         String ScriptCycle;
 public:		// User declarations
         __fastcall TfmLua(TComponent* Owner);
+        int luaInterceptCommands( int nponto, float val );
 };
 
 //---------------------------------------------------------------------------

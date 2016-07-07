@@ -6,18 +6,18 @@
 -- hmi_print : imprime valores no diálogo de scripts
 --             argumentos: valores separados por vírgula
 --             print values on script dialog
---	           args: comma separated strings
+--             args: comma separated strings
 --
 -- hmi_isprimary : retorna true se o ihm está no estado primário, false se secundário
 --                 returns true if hmi is in primary state
 --
 -- hmi_settimer: ajuste o tempo de execução da função ScriptCycle
 --               argumento: tempo em ms
---			     adjust cycle time for function ScriptCycle
+--               adjust cycle time for function ScriptCycle
 --               args: time in ms
 --
 -- hmi_activatebeep: liga o beep de alarme sonoro
---	                 beeps the alarm sound
+--                   beeps the alarm sound
 --
 -- hmi_getpoint: busca informações do ponto
 --               argumento: número do ponto
@@ -25,12 +25,14 @@
 --                        estado de falha (1=falhado, 0=normal)
 --                        tipo do ponto (1=analógico, 0=digital) 
 --                        substituído? (1=sim, 0=não)
+--                        comando bloqueado? (1=sim, 0=não)
 --               obtains point info
 --               args: point number
 --               returns: analog value (float) or digital double (0,1=OFF,2=ON,3)
 --                        fail state (1=failed, 0=normal) 
 --                        point type (1=analog, 0=digital) 
 --                        substituted? (1=yes, 0=no)
+--                        command blocked? (1=yes, 0=no)
 --
 -- hmi_writepoint: escreve no ponto
 --                 argumentos: número do ponto, valor e estado de falha
@@ -59,6 +61,13 @@
 --              sends command
 --              args: command point number, value
 --              returns: 0 if ok, 3 if point not found, 4 if blocked, nil if wrong arg number
+--
+-- hmi_getnpt:  consulta número do ponto
+--              argumento: tag do ponto
+--              retorna: 0 se não encontrou, ou número do ponto 
+--              query point number by tag
+--              argument: point tag
+--              retorna: 0 if not found, or point number
 
 
 -- Exemplo de script Lua para fazer bloqueio de comando das seccionadoras 
@@ -128,4 +137,13 @@ function ScriptCycle()
   
 end
 
+-- Intercepta comandos da IHM (callback), argumentos número do ponto e valor (1=ON, 0=OFF para digitais ou valor analógico), retornar 0 para continuar a execução do comando e 1 para não continuar ao protocolo
+-- Callback to intercept HMI commands, args: point number and value (1=ON, 0=OFF or analog value), must return 0 to continue command execution or 1 to stop (will not proceed to protocol level)
+function InterceptCommands( pointnumber, commandvalue ) 
 
+  -- if ( pointnumber == 12345 and commandvalue == 1 ) then
+  -- do something
+  -- end
+  
+  return 0
+end

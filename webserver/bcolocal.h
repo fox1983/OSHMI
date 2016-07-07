@@ -124,6 +124,7 @@ using namespace std;
 #define CODORIGEM_CALCULADO  1
 #define CODORIGEM_MANUAL     6
 #define CODORIGEM_COMANDO    7
+#define CODORIGEM_LUA       23
 
 inline bool QualEstado(unsigned char qual)
   {
@@ -348,7 +349,7 @@ int CodOCR;              // código da OCR
 int CasaDecimal;         // número de casas para o histórico
 int Parcelas[MAX_PARCELAS];  // parcelas de cálculo
 char Anotacao[1000];      // Anotação
-char Tag[23];            // Tag do ponto, ID do SAGE
+char Tag[30];            // Tag do ponto, ID do SAGE
 char Unidade[10];        // Unidade de medida
 char Estacao[30];        // Estação, instalação, localidade ou subestação
 char Modulo[30];         // Módulo, vão, ou bay. subdivisão de estação para agrupamento de pontos
@@ -416,6 +417,7 @@ int ModoSimulacao; // indica modo simulação
 
 map <int, TPonto> Pontos; // mapa para os pontos a escutar, chave de nponto
 map <int, int> MapNPontoPorEndUTR; // mapa para achar nponto pelo endereço físico e utr
+map <String, int> MapNPontoPorTag; // mapa para encontrar nponto pelo tag
 
 set <String> ListaSEs; // lista das subestações
 
@@ -437,6 +439,7 @@ bool GetPonto(int nponto, float &valor, TFA_Qual &qual, double &tagtempo);
 // retorna referência para estrutura ponto
 TPonto & GetRefPonto(int nponto);
 TPonto & GetRefPonto(int nponto, bool &found);
+TPonto & GetRefPontoByTag(String tag, bool &found);
 
 bool PontoExiste( int nponto );
 

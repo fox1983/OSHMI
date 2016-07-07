@@ -40,19 +40,19 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="999"
+     inkscape:window-width="900"
      inkscape:window-height="783"
      id="namedview30"
      showgrid="false"
      inkscape:zoom="0.56835938"
      inkscape:cx="-18.474227"
      inkscape:cy="256"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-x="-4"
+     inkscape:window-y="29"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg26" />
   <path
      d="M 256.00,0.00C 114.624,0.00,0.00,114.624,0.00,256.00s 114.624,256.00, 256.00,256.00s 256.00-114.624, 256.00-256.00S 397.376,0.00, 256.00,0.00z M 216.32,374.128   L 98.528,256.32l 45.248-45.248l 72.528,72.56l 153.872-153.872l 45.248,45.248L 216.32,374.128z"
      id="path28"
-     style="fill:#005600;fill-opacity:1" />
+     style="fill:#000000;fill-opacity:1" />
 </svg>

@@ -98,7 +98,7 @@ private:
     void BDTR_processPoints( iec_obj *obj, int numpoints ); // BDTR: process points
     inline bool BDTR_HaveDualHost() { return ( BDTR_host_dual != (QHostAddress)"0.0.0.0"); };
     bool isPrimary; // define se modo prim�rio ou secund�rio (o secund�rio permanece desconectado pelo IEC104)
-    static const int BDTR_CntToBePrimary = 2; // counts necessary to be primary when not receiving keepalive messages
+    static const int BDTR_CntToBePrimary = 3; // counts necessary to be primary when not receiving keepalive messages
     int BDTR_CntDnToBePrimary; // countdown to be primary when not receiving keepalive messages
     int BDTR_Logar; // controla log das mensagens BDTR
     QTimer *tmBDTR_kamsg; // timer to send keep alive messages to the dual host

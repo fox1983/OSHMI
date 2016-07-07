@@ -32,6 +32,7 @@ Acknowledgements:
   Snap SVG: http://snapsvg.io
   Pergola: http://www.dotuscomus.com/pergola/
   X3DOM: http://www.x3dom.org
+  Chroma.js: https://github.com/gka/chroma.js/
   TabSystem: http://www.developer-x.com
   CCS Animation Cheat Sheet: http://www.justinaguilar.com/animations/
   D3JS: http://d3js.org
@@ -97,7 +98,58 @@ QTester104:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.11:
+Notes for version 3.13:
+
+Webserver.exe:
+  - Tag link suppport for screens.
+  - By default beeps only for alarms up to priority 2 (0, 1, and 2).
+  - Interception of commands and tag addressing in Lua scripts.
+  - Corrected bug related to tag to point number conversion.
+
+Screen Viewer:
+  - Support for tag linking (in addition to number linking).
+  - Tooltips with point details on mouseover objects.
+  - Restored broken Time Machine function.
+  - Do not show inhibited alarms on alarm box.
+  - Included chroma.js library.
+
+QTester104 Updated to version 1.14:
+  - Better redundancy control.
+  - Configurable periodic General Interrogation.
+
+Browser:
+  - Modified configuration to allow desktop notifications.
+  
+Events Viewer:
+  - Modified for restoring broken Desktop Notifications.
+  - Avoid feezing when the events database becomes unresponsive.
+  
+Tabular Viewer:
+  - Shows points with inhibited alarm in a distinct color (brightened) text.
+  
+SQLite:
+  - Updated to version 3.13.
+  
+NGINX:
+  - Configured to allow access and auto listing files to "docs" folder. 
+    Links to documents in this folder can now be created in screens.
+    
+HMIShell:
+  - Button of "Help" now shows list of PDF documents from "docs" folder.
+  
+Installer:
+  - Removed install of pdf viewer, now it's only used the internal Chromium PDF Viewer.
+
+-------------------------------------------------------------------
+
+Notes for version 3.12:
+
+Screen Viewer:
+  - Expanded the processing of SVG tags to include circle, use, line, polyline, polygon.
+
+-------------------------------------------------------------------
+
+Notes for version 3.11:
 
 HMIShell:
   - Corrected problem when starting HMIShell.
@@ -107,14 +159,14 @@ MonProc:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.10:
+Notes for version 3.10:
 
 QTester104:
   - Updated to version 1.13. Added copy of log to clipboard.
 
 -------------------------------------------------------------------
 
-Notes for the version 3.9:
+Notes for version 3.9:
 
 Webserver:
   - Removed limit of the number of synchonized alarms for redundant HMI's.
@@ -131,19 +183,20 @@ Alarms and Events Viewers:
 
 Chromium:
   - Updated to version 50.0.2628.0.
+  
 SQLite:
   - Updated to version 3.10.2
 
 -------------------------------------------------------------------
 
-Notes for the version 3.8:
+Notes for version 3.8:
 
 ICCP Client:
   - Corrected bug related to redundancy control.
 
 -------------------------------------------------------------------
 
-Notes for the version 3.7:
+Notes for version 3.7:
 
 QTester104:
   - Updated to version 1.12. Added the possibility to stay simultaneously connected to 2 redundant RTU's.
@@ -154,7 +207,7 @@ Tabular Viewer:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.6:
+Notes for version 3.6:
 
 QTester104:
   - Updated to version 1.11. Added the possibility of scannig a redundant RTU.
@@ -170,7 +223,7 @@ Installer:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.5:
+Notes for version 3.5:
 
 HMIShell:
   - Can now be configured to beep. Useful for running webserver as a service
@@ -178,21 +231,21 @@ HMIShell:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.4:
+Notes for version 3.4:
 
 QTester104:
   - Updated to version 1.10.
 
 -------------------------------------------------------------------
 
-Notes for the version 3.3:
+Notes for version 3.3:
 
 QTester104:
   - Updated to version 1.08.
 
 -------------------------------------------------------------------
 
-Notes for the version 3.2:
+Notes for version 3.2:
 
 QTester104:
   - Updated to version 1.07.
@@ -215,7 +268,7 @@ SQLite:
 
 -------------------------------------------------------------------
 
-Notes for the version 3.0 (first public release):
+Notes for version 3.0 (first public release):
 
 Includes:
  - Chromium 42.0.2309.0.

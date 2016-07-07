@@ -1,6 +1,6 @@
 ; oshmi.nsi
 ; OSHMI installer script
-; Copyright 2008-2015 - Ricardo L. Olsen
+; Copyright 2008-2016 - Ricardo L. Olsen
 
 ; NSIS (Nullsoft Scriptable Install System) - http://nsis.sourceforge.net/Main_Page
 
@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.11"
+!define VERSION "v.3.13"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -93,7 +93,7 @@ ShowInstDetails show
 
 Section "" ; empty string makes it hidden, so would starting with -
 
-; Fecha processos que v�o ser sobrescritos
+; Fecha processos que vao ser sobrescritos
   nsExec::Exec 'taskkill /F /IM nginx.exe'
   nsExec::Exec 'taskkill /F /IM cmd.exe'
   nsExec::Exec 'taskkill /F /IM php-cgi.exe'
@@ -181,6 +181,8 @@ Section "" ; empty string makes it hidden, so would starting with -
   SetOutPath $INSTDIR\bin
   File /a "..\bin\*.exe"
   File /a "..\bin\*.dll"
+  File /a "..\bin\*.vbs"
+  File /a "..\bin\*.bat"
 
   SetOutPath $INSTDIR\bin\platforms
   File /a "..\bin\platforms\*.dll"
@@ -238,6 +240,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\htdocs\pntserver.js"
   File /a "..\htdocs\timepntserver.php"
   File /a "..\htdocs\legacy_options.js"
+  File /a "..\htdocs\listdocs.php"
   File /a "..\htdocs\eventserver.php"
   File /a "..\htdocs\eventsync.php"
   File /a "..\htdocs\config_viewers_default.js"
@@ -252,7 +255,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\htdocs\images\*.*"
 
   SetOutPath $INSTDIR\extprogs
-  File /a "..\extprogs\SumatraPDF-2.5.2-install.exe"
+  File /a "..\extprogs\SumatraPDF-3.1.1-install.exe"
   File /a "..\extprogs\vcredist_x86.exe"
   File /a "..\extprogs\vcredist_x86-2012.exe"
   File /a "..\extprogs\vcredist_x86-2013.exe"
@@ -264,6 +267,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a /r "..\browser-data\*.*"
 
   SetOutPath $INSTDIR\docs
+  File /a "..\docs\listdocs.php"
   File /a "..\docs\oshmi_operation_manual-pt_br.odt"
   File /a "..\docs\oshmi_operation_manual-pt_br.pdf"
   File /a "..\docs\oshmi_operation_manual-en_us.odt"
@@ -275,10 +279,6 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\docs\inkscape-shortcuts2.svg"
   
   SetOverwrite off
-
-  SetOutPath $INSTDIR\bin
-  File /a "..\bin\*.vbs"
-  File /a "..\bin\*.bat"
 
   SetOutPath $INSTDIR\etc
   File /a "..\etc\*.bat"
@@ -310,13 +310,14 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\svg\kor1.svg"
   File /a "..\conf_templates\screen_list.js"
 
-; Visual C redist: necess�rio para executar o PHP
+; Visual C redist: necessario para executar o PHP
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86.exe" /q'
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86-2012.exe" /q'
   nsExec::Exec '"$INSTDIR\extprogs\vcredist_x86-2013.exe" /q'
+
 ; Visualizador de PDF
-  nsExec::Exec '$INSTDIR\extprogs\SumatraPDF-2.5.2-install.exe /s /opt plugin'
-; CopyFiles "$INSTDIR\conf_templates\sumatrapdfrestrict.ini" "$PROGRAMFILES\SumatraPDF\"
+;  nsExec::Exec '$INSTDIR\extprogs\SumatraPDF-3.1.1-install.exe /s /opt plugin'
+;  CopyFiles "$INSTDIR\conf_templates\sumatrapdfrestrict.ini" "$PROGRAMFILES\SumatraPDF\"
 
 ;  MessageBox MB_YESNO "Wish to substitute Windows Shell by the HMIShell? \nWARNING: ANSWERING YES WILL BLOCK THE MACHINE FOR THE OPERATOR" IDNO InstFim 
 ; LabelShell:
@@ -465,7 +466,7 @@ lang_english:
 
   WriteUninstaller "bt-uninst.exe"
 
-  MessageBox MB_OK "OSHMI Installed! Go to $INSTDIR\extprogs\ and run download_external_progs.bat."
+  MessageBox MB_OK "OSHMI Installed! Optionally, go to $INSTDIR\extprogs\ and run download_external_progs.bat."
   
 SectionEnd
 

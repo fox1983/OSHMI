@@ -87,7 +87,7 @@ bool TfmSair::PasswdTest( char * pswd )
 __fastcall TfmSair::TfmSair(TComponent* Owner)
         : TForm(Owner)
 {
-DOC_AJUDA = "hidec.exe operation_manual.bat";
+DOC_AJUDA = "hidec.exe listdocs.bat";
 HIDEPASSWD = 0;
 
 TIniFile *pIni = new TIniFile( ARQ_CONFI18N );
