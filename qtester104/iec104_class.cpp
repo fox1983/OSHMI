@@ -188,7 +188,7 @@ void iec104_class::onTimerSecond()
                 apdu.NS = TESTFRACT;
                 apdu.NR = 0;
                 sendTCP((char *)&apdu, 6);
-                mLog.pushMsg("<-- TESTFRACT");
+                mLog.pushMsg("T<-- TESTFRACT");
             }
           }
     }
@@ -217,7 +217,7 @@ void iec104_class::solicitGI()
     wapdu.dados[3] = 0x14;
     sendTCP((char *)&wapdu, 16);
     VS += 2;
-    mLog.pushMsg( "<-- INTERROGATION " );
+    mLog.pushMsg( "T<-- INTERROGATION " );
     tout_gi = gi_retry_time;
 }
 
@@ -253,7 +253,7 @@ void iec104_class::confTestCommand()
     sendTCP( (char *)&wapdu, 22+2 );
     VS += 2;
 
-    mLog.pushMsg( "<-- TEST COMMAND CONF " );
+    mLog.pushMsg( "T<-- TEST COMMAND CONF " );
 }
 
 void iec104_class::sendStartDTACT()
@@ -265,7 +265,7 @@ void iec104_class::sendStartDTACT()
     apdu.NS=STARTDTACT;
     apdu.NR=0;
     sendTCP((char *)&apdu, 6);
-    mLog.pushMsg("<-- STARTDTACT");
+    mLog.pushMsg("T<-- STARTDTACT");
     tout_startdtact=t1_startdtact;
 }
 
@@ -298,14 +298,14 @@ void iec104_class::packetReadyTCP()
       if ( len < 4 ) // apdu length must be >= 4
         {
         broken_msg=false;
-        mLog.pushMsg("--> ERROR: INVALID FRAME");
+        mLog.pushMsg("R--> ERROR: INVALID FRAME");
         continue;
         }
 
       bytesrec=readTCP((char*)br+2, len); // read the remaining of the apdu
       if (bytesrec==0)
          {
-         mLog.pushMsg("--> Broken apdu");
+         mLog.pushMsg("R--> Broken apdu");
          broken_msg=true;
          return;
          }
@@ -313,7 +313,7 @@ void iec104_class::packetReadyTCP()
       if ( apdu.asduh.ca != slaveAddress && len>4 )
         {
         broken_msg=false;
-        mLog.pushMsg("--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
+        mLog.pushMsg("R--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
         // continue;
         }
 
@@ -323,7 +323,7 @@ void iec104_class::packetReadyTCP()
         {
         char buflog[5000];
 
-        sprintf (buflog, "--> %03d: ", (int)len+2);
+        sprintf (buflog, "R--> %03d: ", (int)len+2);
         for (int i=0; i< len+2 && i<25 ; i++) // log up to 25 caracteres
            sprintf (buflog+strlen(buflog), "%02x ", br[i]);
         mLog.pushMsg(buflog);
@@ -338,7 +338,7 @@ void iec104_class::packetReadyTCP()
     char buf[5000];
     buf[0]=0;
 
-    sprintf(buf+strlen(buf), "--> ");
+    sprintf(buf+strlen(buf), "R--> ");
     bytesrec=readTCP((char*)br,2); // start and length
     if ( br[0]== START) // valid frames must begin with START
     {
@@ -353,7 +353,7 @@ void iec104_class::packetReadyTCP()
     }
     else
     {
-        mLog.pushMsg("--> ERROR: INVALID FRAME");
+        mLog.pushMsg("R--> ERROR: INVALID FRAME");
         bytesrec=readTCP((char*)br,sizeof(apdu)); // consider garbage the remaining data from the frame
     }
 */
@@ -368,13 +368,13 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
     
     if ( papdu->start!=START )
     { // invalid frame
-        mLog.pushMsg("--> ERROR: NO START IN FRAME");
+        mLog.pushMsg("R--> ERROR: NO START IN FRAME");
         return;
     }
 
     if ( papdu->asduh.ca != slaveAddress && sz>6)
     { // invalid frame
-        mLog.pushMsg("--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
+        mLog.pushMsg("R--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
         return;
     }
 
@@ -384,54 +384,54 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
         switch ( papdu->NS )
         {
         case STARTDTACT:
-            mLog.pushMsg("    STARTDTACT");
+            mLog.pushMsg("     STARTDTACT");
             wapdu.start=START;
             wapdu.length=4;
             wapdu.NS=STARTDTCON;
             wapdu.NR=0;
             sendTCP((char *)&wapdu, 6);
-            mLog.pushMsg("<-- STARTDTCON");
+            mLog.pushMsg("T<-- STARTDTCON");
             break;
             
         case TESTFRACT:
-            mLog.pushMsg("    TESTFRACT");
+            mLog.pushMsg("     TESTFRACT");
             wapdu.start=START;
             wapdu.length=4;
             wapdu.NS=TESTFRCON;
             wapdu.NR=0;
             sendTCP((char *)&wapdu, 6);
-            mLog.pushMsg("<-- TESTFRCON");
+            mLog.pushMsg("T<-- TESTFRCON");
             break;
             
         case STARTDTCON:
-            mLog.pushMsg("    STARTDTCON");
+            mLog.pushMsg("     STARTDTCON");
             tout_startdtact=-1; // flag confirmation of STARTDT, not to timeout
             TxOk=true;
             tout_gi=15; // request GI when communication starts
             break;
             
         case STOPDTACT:
-            mLog.pushMsg("    STOPDTACT");
+            mLog.pushMsg("     STOPDTACT");
             // only slave responds
             break;
             
         case STOPDTCON:
-            mLog.pushMsg("    STOPDTCON");
+            mLog.pushMsg("     STOPDTCON");
             // do what?
             break;
             
         case TESTFRCON:
-            mLog.pushMsg("    TESTFRCON");
+            mLog.pushMsg("     TESTFRCON");
             // do what?
             break;
             
         case SUPERVISORY:
-            mLog.pushMsg("    SUPERVISORY");
+            mLog.pushMsg("     SUPERVISORY");
             // do what?
             break;
 
         default: // error
-            mLog.pushMsg("    ERROR: UNKNOWN CONTROL MESSAGE");
+            mLog.pushMsg("     ERROR: UNKNOWN CONTROL MESSAGE");
             break;
         }
         
@@ -458,7 +458,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
         }
 
         oss.str("");
-        oss << "    CA "
+        oss << "     CA "
                 << (unsigned)papdu->asduh.ca
                 << " TYPE "
                 << (unsigned)papdu->asduh.type
@@ -1008,7 +1008,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq45.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1050,7 +1050,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq46.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1092,7 +1092,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq47.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1134,7 +1134,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq58.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1176,7 +1176,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq59.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1218,7 +1218,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             pobj =  &papdu->nsq60.obj;
 
             oss.str("");
-            oss << "    ";
+            oss << "     ";
             if (papdu->asduh.cause==ACTCONFIRM)
                 oss << "ACTIVATION CONFIRMATION ";
             else
@@ -1254,21 +1254,279 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
             }
             break;
 
+        case C_SE_NA_1: // NORMALISED COMMAND
+            {
+            iec_type48 *pobj;
+            pobj =  &papdu->nsq48.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "NORMALISED COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq48.ioa16 + ((unsigned)papdu->nsq48.ioa8 << 16)
+                    << " VAL "
+                    << pobj->nva
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq48.ioa16 + ((unsigned)papdu->nsq48.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->nva;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
+        case C_SE_TA_1: // NORMALISED COMMAND WITH TIME
+            {
+            iec_type61 *pobj;
+            pobj =  &papdu->nsq61.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "NORMALISED COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq61.ioa16 + ((unsigned)papdu->nsq61.ioa8 << 16)
+                    << " VAL "
+                    << pobj->nva
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq61.ioa16 + ((unsigned)papdu->nsq61.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->nva;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
+        case C_SE_NB_1: // SCALED COMMAND
+            {
+            iec_type49 *pobj;
+            pobj =  &papdu->nsq49.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "SCALED COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq49.ioa16 + ((unsigned)papdu->nsq49.ioa8 << 16)
+                    << " VAL "
+                    << pobj->sva
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq49.ioa16 + ((unsigned)papdu->nsq49.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->sva;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
+        case C_SE_TB_1: // SCALED COMMAND WITH TIME
+            {
+            iec_type62 *pobj;
+            pobj =  &papdu->nsq62.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "SCALED COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq62.ioa16 + ((unsigned)papdu->nsq62.ioa8 << 16)
+                    << " VAL "
+                    << pobj->sva
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq62.ioa16 + ((unsigned)papdu->nsq62.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->sva;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
+        case C_SE_NC_1: // FLOAT COMMAND
+            {
+            iec_type50 *pobj;
+            pobj =  &papdu->nsq50.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "FLOAT COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq50.ioa16 + ((unsigned)papdu->nsq50.ioa8 << 16)
+                    << " VAL "
+                    << pobj->r32
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq50.ioa16 + ((unsigned)papdu->nsq50.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->r32;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
+        case C_SE_TC_1: // FLOAT COMMAND WITH TIME
+            {
+            iec_type63 *pobj;
+            pobj =  &papdu->nsq63.obj;
+
+            oss.str("");
+            oss << "     ";
+            if (papdu->asduh.cause==ACTCONFIRM)
+                oss << "ACTIVATION CONFIRMATION ";
+            else
+            if (papdu->asduh.cause==ACTTERM)
+                oss << "ACTIVATION TERMINATION ";
+            if (papdu->asduh.pn==POSITIVE)
+                oss << "POSITIVE ";
+            else
+                oss << "NEGATIVE ";
+            oss << "FLOAT COMMAND ADDRESS "
+                    << (unsigned)papdu->nsq63.ioa16 + ((unsigned)papdu->nsq63.ioa8 << 16)
+                    << " VAL "
+                    << pobj->r32
+                    << " QL "
+                    << (int) pobj->ql
+                    << " SE "
+                    << (unsigned)pobj->se;
+            mLog.pushMsg((char*)oss.str().c_str());
+
+            // send indication to user
+            iec_obj iobj;
+            iobj.address = papdu->nsq63.ioa16 + ((unsigned)papdu->nsq63.ioa8 << 16);
+            iobj.cause = papdu->asduh.cause;
+            iobj.pn = papdu->asduh.pn;
+            iobj.type = papdu->asduh.type;
+            iobj.qu = 0;
+            iobj.se = pobj->se;
+            iobj.value = pobj->r32;
+            if ( papdu->asduh.cause == ACTCONFIRM )
+              commandActConfIndication( &iobj );
+            else
+            if ( papdu->asduh.cause == ACTTERM )
+              commandActTermIndication( &iobj );
+            }
+            break;
+
         case M_EI_NA_1:	//70
-            mLog.pushMsg("--> END OF INITIALIZATION");
+            mLog.pushMsg("R--> END OF INITIALIZATION");
             break;
         case INTERROGATION: // GI
             tout_gi = gi_period; // restart count to next GI
             if (papdu->asduh.cause==ACTCONFIRM)
             {
                 GIObjectCnt=0;
-                mLog.pushMsg("    INTERROGATION ACT CON ------------------------------------------------------------------------");
+                mLog.pushMsg("     INTERROGATION ACT CON ------------------------------------------------------------------------");
                 interrogationActConfIndication();
             }
             else
                 if (papdu->asduh.cause==ACTTERM)
                 {
-                mLog.pushMsg("    INTERROGATION ACT TERM ------------------------------------------------------------------------");
+                mLog.pushMsg("     INTERROGATION ACT TERM ------------------------------------------------------------------------");
                 oss.str("");
                 oss << "    Total objects in GI: "
                         << GIObjectCnt;
@@ -1277,16 +1535,26 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
                 interrogationActTermIndication();
                 }
             else
-                mLog.pushMsg("    INTERROGATION");
+                mLog.pushMsg("     INTERROGATION");
             break;
         case C_TS_TA_1: // 107
+            oss.str("");
+            oss << "     TEST COMMAND COM TAG";
+            mLog.pushMsg((char*)oss.str().c_str());
+
             if (papdu->asduh.cause==ACTIVATION)
             {
-                mLog.pushMsg("    TEST COMMAND COM TAG");
                 // iec_type107 * ptype107;
                 // ptype107=(iec_type107 *)papdu->dados;
                 confTestCommand();
             }
+            break;
+        case C_CS_NA_1: // 103
+            oss.str("");
+            oss << "     CLOCK SYNC COMMAND";
+            mLog.pushMsg((char*)oss.str().c_str());
+            // iec_type103 * ptype103;
+            // ptype103=(iec_type103 *)papdu->dados;
             break;
         default:
             mLog.pushMsg("!!! TYPE NOT IMPLEMENTED");
@@ -1332,7 +1600,7 @@ sendTCP((char *)&apdu, 6);
 
 oss.str("");
 oss.setf ( ios::hex, ios::basefield );
-oss << "<-- SUPERVISORY " << VR;
+oss << "T<-- SUPERVISORY " << VR;
 mLog.pushMsg((char*)(oss.str().c_str()));
 }
 
@@ -1371,7 +1639,7 @@ switch (obj->type)
     VS+=2;
 
     oss.str("");
-    oss << "<-- SINGLE COMMAND ADDRESS "
+    oss << "T<-- SINGLE COMMAND ADDRESS "
             << (unsigned)obj->address
             << " SCS "
             << (unsigned)obj->scs
@@ -1404,7 +1672,7 @@ switch (obj->type)
     VS+=2;
 
     oss.str("");
-    oss << "<-- DOUBLE COMMAND ADDRESS "
+    oss << "T<-- DOUBLE COMMAND ADDRESS "
             << (unsigned)obj->address
             << " DCS "
             << (unsigned)obj->dcs
@@ -1435,7 +1703,7 @@ switch (obj->type)
     sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
     VS+=2;
     oss.str("");
-    oss << "<-- STEP REG. COMMAND ADDRESS "
+    oss << "T<-- STEP REG. COMMAND ADDRESS "
             << (unsigned)obj->address
             << " RCS "
             << (unsigned)obj->rcs
@@ -1482,7 +1750,7 @@ switch (obj->type)
     VS+=2;
 
     oss.str("");
-    oss << "<-- SINGLE COMMAND W/TIME ADDRESS "
+    oss << "T<-- SINGLE COMMAND W/TIME ADDRESS "
             << (unsigned)obj->address
             << " SCS "
             << (unsigned)obj->scs
@@ -1529,7 +1797,7 @@ switch (obj->type)
     VS+=2;
 
     oss.str("");
-    oss << "<-- DOUBLE COMMAND W/TIME ADDRESS "
+    oss << "T<-- DOUBLE COMMAND W/TIME ADDRESS "
             << (unsigned)obj->address
             << " DCS "
             << (unsigned)obj->dcs
@@ -1574,7 +1842,7 @@ switch (obj->type)
     sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
     VS+=2;
     oss.str("");
-    oss << "<-- STEP REG. COMMAND W/TIME ADDRESS "
+    oss << "T<-- STEP REG. COMMAND W/TIME ADDRESS "
             << (unsigned)obj->address
             << " RCS "
             << (unsigned)obj->rcs
@@ -1584,6 +1852,252 @@ switch (obj->type)
             << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
     break;
+  case C_SE_NA_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq48);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq48.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq48.ioa8 = obj->address >> 16;
+    apducmd.nsq48.obj.nva = (short)obj->value;
+    apducmd.nsq48.obj.ql = 0;
+    apducmd.nsq48.obj.se = obj->se;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- NORMALISED COMMAND ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << (short)obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_SE_TA_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq61);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq61.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq61.ioa8 = obj->address >> 16;
+    apducmd.nsq61.obj.nva = (short)obj->value;
+    apducmd.nsq61.obj.ql = 0;
+    apducmd.nsq61.obj.se = obj->se;
+    apducmd.nsq61.obj.time.year=agora->tm_year%100;
+    apducmd.nsq61.obj.time.month=agora->tm_mon;
+    apducmd.nsq61.obj.time.mday=agora->tm_mday;
+    apducmd.nsq61.obj.time.hour=agora->tm_hour;
+    apducmd.nsq61.obj.time.min=agora->tm_min;
+    apducmd.nsq61.obj.time.hour=agora->tm_hour;
+    apducmd.nsq61.obj.time.msec=agora->tm_sec*1000;
+    apducmd.nsq61.obj.time.iv=0;
+    apducmd.nsq61.obj.time.su=0;
+    apducmd.nsq61.obj.time.wday=agora->tm_wday;
+    apducmd.nsq61.obj.time.res1=0;
+    apducmd.nsq61.obj.time.res2=0;
+    apducmd.nsq61.obj.time.res3=0;
+    apducmd.nsq61.obj.time.res4=0;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- NORMALISED COMMAND W/TIME ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << (short)obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_SE_NB_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq49);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq49.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq49.ioa8 = obj->address >> 16;
+    apducmd.nsq49.obj.sva = (short)obj->value;
+    apducmd.nsq49.obj.ql = 0;
+    apducmd.nsq49.obj.se = obj->se;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- SCALED COMMAND ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << (short)obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_SE_TB_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq62);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq62.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq62.ioa8 = obj->address >> 16;
+    apducmd.nsq62.obj.sva = (short)obj->value;
+    apducmd.nsq62.obj.ql = 0;
+    apducmd.nsq62.obj.se = obj->se;
+    apducmd.nsq62.obj.time.year=agora->tm_year%100;
+    apducmd.nsq62.obj.time.month=agora->tm_mon;
+    apducmd.nsq62.obj.time.mday=agora->tm_mday;
+    apducmd.nsq62.obj.time.hour=agora->tm_hour;
+    apducmd.nsq62.obj.time.min=agora->tm_min;
+    apducmd.nsq62.obj.time.hour=agora->tm_hour;
+    apducmd.nsq62.obj.time.msec=agora->tm_sec*1000;
+    apducmd.nsq62.obj.time.iv=0;
+    apducmd.nsq62.obj.time.su=0;
+    apducmd.nsq62.obj.time.wday=agora->tm_wday;
+    apducmd.nsq62.obj.time.res1=0;
+    apducmd.nsq62.obj.time.res2=0;
+    apducmd.nsq62.obj.time.res3=0;
+    apducmd.nsq62.obj.time.res4=0;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- SCALED COMMAND W/TIME ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << (short)obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_SE_NC_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq50);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq50.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq50.ioa8 = obj->address >> 16;
+    apducmd.nsq50.obj.r32 = obj->value;
+    apducmd.nsq50.obj.ql = 0;
+    apducmd.nsq50.obj.se = obj->se;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- FLOAT COMMAND ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_SE_TC_1:
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.nsq63);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.nsq63.ioa16 = obj->address & 0x0000FFFF;
+    apducmd.nsq63.ioa8 = obj->address >> 16;
+    apducmd.nsq63.obj.r32 = obj->value;
+    apducmd.nsq63.obj.ql = 0;
+    apducmd.nsq63.obj.se = obj->se;
+    apducmd.nsq63.obj.time.year=agora->tm_year%100;
+    apducmd.nsq63.obj.time.month=agora->tm_mon;
+    apducmd.nsq63.obj.time.mday=agora->tm_mday;
+    apducmd.nsq63.obj.time.hour=agora->tm_hour;
+    apducmd.nsq63.obj.time.min=agora->tm_min;
+    apducmd.nsq63.obj.time.hour=agora->tm_hour;
+    apducmd.nsq63.obj.time.msec=agora->tm_sec*1000;
+    apducmd.nsq63.obj.time.iv=0;
+    apducmd.nsq63.obj.time.su=0;
+    apducmd.nsq63.obj.time.wday=agora->tm_wday;
+    apducmd.nsq63.obj.time.res1=0;
+    apducmd.nsq63.obj.time.res2=0;
+    apducmd.nsq63.obj.time.res3=0;
+    apducmd.nsq63.obj.time.res4=0;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- SCALED COMMAND W/TIME ADDRESS "
+        << (unsigned)obj->address
+        << " VAL "
+        << obj->value
+        << " SE "
+        << (unsigned)obj->se;
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+  case C_CS_NA_1: // Clock Sync
+    apducmd.start = START;
+    apducmd.length = sizeof(apducmd.NS)+sizeof(apducmd.NR)+sizeof(apducmd.asduh)+sizeof(apducmd.asdu103);
+    apducmd.NS = VS;
+    apducmd.NR = VR;
+    apducmd.asduh.type = obj->type;
+    apducmd.asduh.num = 1;
+    apducmd.asduh.sq = 0;
+    apducmd.asduh.cause = obj->cause;
+    apducmd.asduh.t = 0;
+    apducmd.asduh.pn = 0;
+    apducmd.asduh.oa = masterAddress;
+    apducmd.asduh.ca = obj->ca;
+    apducmd.asdu103.ioa8 = 0;
+    apducmd.asdu103.ioa16 = 0;
+    apducmd.asdu103.time = obj->timetag;
+    sendTCP( (char *)&apducmd, apducmd.length + sizeof(apducmd.start) + sizeof(apducmd.length) );
+    VS+=2;
+
+    oss.str("");
+    oss << "T<-- CLOCK SYNC COMMAND ";
+    mLog.pushMsg((char*)oss.str().c_str());
+    break;
+
   default:
     return false;
   }

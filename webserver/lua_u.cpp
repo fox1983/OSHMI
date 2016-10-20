@@ -461,8 +461,8 @@ int TfmLua::luaInterceptCommands( int nponto, float val )
 {
 int ret = 0;
 
-// load the function from global
-lua_getglobal( L, "InterceptCommands" );
+// load the function from global (push 1 item to stack)
+lua_getglobal( L, "InterceptCommands" ); 
 if( lua_isfunction( L, -1 ) )
    {
    // push function arguments into stack
@@ -475,6 +475,9 @@ if( lua_isfunction( L, -1 ) )
      lua_pop( L, 1 );
      }
    }
+else
+  lua_pop( L, 1 ); // pop from stack item pushed by lua_getglobal
 
+Label3->Caption = lua_gettop( L );
 return ret;
 }

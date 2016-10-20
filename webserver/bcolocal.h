@@ -100,6 +100,7 @@ using namespace std;
 #define COD_FORMULA_DIF         15
 #define COD_FORMULA_ESCOLHA_DIG 50
 #define COD_FORMULA_ESCOLHA_ANA 51
+#define COD_FORMULA_ESTCOMUNIC  52
 
 #define RGLIM_NORMAL 0
 #define RGLIM_ALMINF 1

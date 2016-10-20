@@ -23,6 +23,7 @@ __published:	// IDE-managed Components
         TTimer *Timer1;
         TLabel *Label1;
         TLabel *Label2;
+        TLabel *Label3;
         void __fastcall btExecClick(TObject *Sender);
         void __fastcall Timer1Timer(TObject *Sender);
         void __fastcall FormDestroy(TObject *Sender);

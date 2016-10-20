@@ -91,9 +91,15 @@ class iec104_class
     static const unsigned int C_SC_NA_1 = 45; // single command
     static const unsigned int C_DC_NA_1 = 46; // double command
     static const unsigned int C_RC_NA_1 = 47; // regulating step command
+    static const unsigned int C_SE_NA_1 = 48; // set-point normalised command
+    static const unsigned int C_SE_NB_1 = 49; // set-point scaled command
+    static const unsigned int C_SE_NC_1 = 50; // set-point short floating point command
     static const unsigned int C_SC_TA_1 = 58; // single command with time tag
     static const unsigned int C_DC_TA_1 = 59; // double command with time tag
     static const unsigned int C_RC_TA_1 = 60; // regulating step command with time tag
+    static const unsigned int C_SE_TA_1 = 61; // set-point normalised command with time tag
+    static const unsigned int C_SE_TB_1 = 62; // set-point scaled command with time tag
+    static const unsigned int C_SE_TC_1 = 63; // set-point short floating point command with time tag
     static const unsigned int M_EI_NA_1 = 70; // end of initialization
     static const unsigned int C_IC_NA_1 = 100; // general interrogation (GI)
     static const unsigned int C_CI_NA_1 = 101; // counter interrogation

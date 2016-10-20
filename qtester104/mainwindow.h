@@ -77,6 +77,8 @@ private slots:
 
     void on_pbCopyClipb_clicked();
 
+    void on_pbCopyVals_clicked();
+
 private:
     std::map <int, QTableWidgetItem *> mapPtItem_ColAddress; // map of points to cells of table
     std::map <int, QTableWidgetItem *> mapPtItem_ColValue;
@@ -84,6 +86,7 @@ private:
     std::map <int, QTableWidgetItem *> mapPtItem_ColCause;
     std::map <int, QTableWidgetItem *> mapPtItem_ColFlags;
     std::map <int, QTableWidgetItem *> mapPtItem_ColCount;
+    std::map <int, QTableWidgetItem *> mapPtItem_ColTimeTag;
 
     Ui::MainWindow *ui;
     QTimer *tmLogMsg; // timer to show log messages

@@ -2286,6 +2286,47 @@ try
            r = Pontos[(*it).second.Parcelas[1]].Valor;
            }
         break;
+    case COD_FORMULA_ESTCOMUNIC:
+         // estado de saúde da comunicação, se uma das parcelas estiver sem falha resultado é ON
+         q.Byte = 0;
+         q.Tipo = TIPO_DIGITAL;
+         if ( tmTimeout->Cnt > 120 )
+           q.Falha=0;
+         else
+           q.Falha=1;
+         q.Duplo = ESTDUP_OFF;
+         for (i=0; i<MAX_PARCELAS && (*it).second.Parcelas[i]!=0; i++)
+           {
+           if ( Pontos[(*it).second.Parcelas[i]].Qual.Falha == 0 )
+             q.Duplo = ESTDUP_ON;
+           }
+
+        // não gera evento quando inibido,
+        // não gera evento por um tempo na inicialização   
+        if ( !(*it).second.AlarmeInibido() && q.Falha == 0  )
+        {
+
+        // quando validar o cálculo após um tempo da inicialização
+        // se estiver falhado, gera evento da falha
+        // se mudou estado, gera evento
+        if ( ( (*it).second.Qual.Duplo != q.Duplo ) ||
+             ( (*it).second.Qual.Falha != q.Falha && q.Duplo == ESTDUP_OFF )
+           )
+          {
+            IncluiEvento( nponto,
+                          SDE_UTREVGERADO,
+                          q.Byte,
+                          0,
+                          SDE_GERAHORA,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0 );
+            temtagtmp = 1;
+            }
+        }
+        break;
     default:
         q.Tipo = TIPO_ANALOGICO;
         q.Byte|=QUAL_FALHA;

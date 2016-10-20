@@ -30,6 +30,8 @@
 #include <QClipboard>
 #include <QDir>
 #include <QCloseEvent>
+#include <QDateTime>
+#include <QItemSelectionModel>
 #include <string>
 #include <time.h>
 #include "mainwindow.h"
@@ -113,14 +115,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->twPontos->clear();
     ui->twPontos->setSortingEnabled ( false );
-    ui->twPontos->setColumnCount( 6 );
+    ui->twPontos->setColumnCount( 7 );
     ui->twPontos->sortByColumn( 0 );
 
     if ( IPEscravo != "" )
       on_pbConnect_clicked();
 
     QStringList colunas;
-    colunas << "Address" << "Value" << "Type" << "Cause" << "Flags" << "Count";
+    colunas << "Address" << "Value" << "Type" << "Cause" << "Flags" << "Count" << "TimeTag";
     ui->twPontos->setHorizontalHeaderLabels( colunas );
 
     tmLogMsg->start(1000);
@@ -187,6 +189,7 @@ void MainWindow::on_pbConnect_clicked()
         mapPtItem_ColCause.clear();
         mapPtItem_ColFlags.clear();
         mapPtItem_ColCount.clear();
+        mapPtItem_ColTimeTag.clear();
         ui->twPontos->clearContents();
         ui->twPontos->setRowCount ( 0 );
         ui->lwLog->clear();
@@ -228,7 +231,7 @@ void MainWindow::slot_BDTR_pronto_para_ler()
 
             if ( msg->TIPO == REQ_GRUPO && msg->ID == 0 ) // GI
             {
-                BDTR_Loga( "--> BDTR: REQ GI" );
+                BDTR_Loga( " --> BDTR: REQ GI" );
                 i104.solicitGI();
             }
             if ( msg->TIPO == REQ_GRUPO && msg->ID == 255 ) // request group 255: show form
@@ -240,9 +243,9 @@ void MainWindow::slot_BDTR_pronto_para_ler()
             else
             {
                 if ( msg->TIPO == REQ_HORA )
-                  BDTR_Loga( "--> BDTR: IGNORED (TIME REQ)" );
+                  BDTR_Loga( " --> BDTR: IGNORED (TIME REQ)" );
                 else
-                  BDTR_Loga( "--> BDTR: IGNORED (REQ ?)" );
+                  BDTR_Loga( " --> BDTR: IGNORED (REQ ?)" );
             }
         }
         break;
@@ -251,7 +254,7 @@ void MainWindow::slot_BDTR_pronto_para_ler()
         // if BDTRForcePrimary==0 become secondary when received keep alive messages from other machine
         if ( address == BDTR_host_dual && i104.BDTRForcePrimary == 0 )
           {
-          BDTR_Loga( "--> BDTR: KEEPALIVE RECEIVED FROM DUAL MACHINE(TIME)");
+          BDTR_Loga( " --> BDTR: KEEPALIVE RECEIVED FROM DUAL MACHINE(TIME)");
           if ( isPrimary )
             {
               BDTR_Loga( " BECOMING SECONDARY" );
@@ -262,7 +265,7 @@ void MainWindow::slot_BDTR_pronto_para_ler()
           BDTR_CntDnToBePrimary = BDTR_CntToBePrimary; // restart count to be primary
           }
         else
-          BDTR_Loga( "--> BDTR: IGNORED (TIME)" );
+          BDTR_Loga( " --> BDTR: IGNORED (TIME)" );
         break;
     case T_COM: // COMANDO
         {
@@ -335,17 +338,70 @@ void MainWindow::slot_BDTR_pronto_para_ler()
                     if ( BDTR_HaveDualHost() )
                       udps->writeDatagram ( (const char *) bufOut, sizeof( msg_ack ), BDTR_host_dual, BDTR_porta );
 
-                    BDTR_Loga( "<-- BDTR: COMMAND REJECTED, UNSUPPORTED ASDU" );
+                    BDTR_Loga( " <-- BDTR: COMMAND REJECTED, UNSUPPORTED ASDU" );
                     }
+                }
+            }
+            else
+            if ( msg->TVAL == T_FLT ) // ANALÓGICO FLOAT
+            {
+                msg_ack *ms;
+                ms = (msg_ack*)bufOut;
+                iec_obj obj;
+                obj.cause = iec104_class::ACTIVATION;
+                obj.address = msg->PONTO.ID;
+                obj.ca = msg->PONTO.VALOR.COM_SEMBANCOANA.UTR;
+                obj.qu = 0;
+                obj.se = msg->PONTO.VALOR.COM_SEMBANCOANA.COMIEC.se;
+
+                switch ( msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU )
+                  {
+                  case 0: // if ASDU not defined, use float
+                    msg->PONTO.VALOR.COM_SEMBANCO.ASDU = iec104_class::C_SE_NC_1;
+                  case iec104_class::C_SE_NA_1: // analógico normalizado
+                  case iec104_class::C_SE_TA_1: // analógico normalizado com time tag
+                  case iec104_class::C_SE_NB_1: // analógico escalado
+                  case iec104_class::C_SE_TB_1: // analógico escalado com time tag
+                  case iec104_class::C_SE_NC_1: // analógico float
+                  case iec104_class::C_SE_TC_1: // analógico float com time tag
+                    obj.type = msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU;
+                    obj.value = msg->PONTO.VALOR.COM_SEMBANCOANA.FLT;
+                    enviar=true;
+                    break;
+
+                  default:
+                    enviar=false;
+                    break;
+                  }
+
+             if (enviar)
+                {
+                // forward command to IEC104
+                i104.sendCommand( &obj );
+                LastCommandAddress = obj.address;
+                // Vai enviar ack pelo BDTR ao receber o activation em nível de 104
+                }
+            else
+                { // REJECT COMMAND (ASDU not supported)
+                ms->COD = T_ACK;
+                ms->TIPO = T_COM;
+                ms->ORIG = BDTR_orig;
+                ms->ID = 0x80 | msg->PONTO.VALOR.COM_SEMBANCOANA.COMIEC.dcs;
+                ms->COMP = msg->PONTO.ID;
+                udps->writeDatagram ( (const char *) bufOut, sizeof( msg_ack ), BDTR_host, BDTR_porta );
+                if ( BDTR_HaveDualHost() )
+                  udps->writeDatagram ( (const char *) bufOut, sizeof( msg_ack ), BDTR_host_dual, BDTR_porta );
+
+                BDTR_Loga( " <-- BDTR: COMMAND REJECTED, UNSUPPORTED ASDU" );
                 }
             }
         }
         break;
     case T_DIG:
-        BDTR_Loga( "--> BDTR: IGNORED MSG (DIGITAL)" );
+        BDTR_Loga( " --> BDTR: IGNORED MSG (DIGITAL)" );
         break;
     default:
-        BDTR_Loga( "--> BDTR: IGNORED MSG" );
+        BDTR_Loga( " --> BDTR: IGNORED MSG" );
         break;
     }
     }
@@ -537,7 +593,7 @@ void MainWindow::BDTR_processPoints( iec_obj *obj, int numpoints )
         break;
 
       default:
-         i104.mLog.pushMsg( "--> IEC104 UNSUPPORTED TYPE, NOT FORWARDED TO BDTR" );
+         i104.mLog.pushMsg( " --> IEC104 UNSUPPORTED TYPE, NOT FORWARDED TO BDTR" );
          break;
       }
 }
@@ -546,15 +602,20 @@ void MainWindow::BDTR_processPoints( iec_obj *obj, int numpoints )
 void MainWindow::on_pbSendCommandsButton_clicked()
 {
     iec_obj obj;
+    obj.type = ui->cbCmdAsdu->currentText().left(ui->cbCmdAsdu->currentText().indexOf(':')).toInt();
 
-    if ( ui->leCmdValue->text().trimmed() == "" || ui->leCmdAddress->text().trimmed() == "" )
-        return;
-    if ( ui->leCmdAddress->text().toInt() == 0 )
-        return;
+    // test command parameters if not sync command (that don't have parameters)
+    if (obj.type != iec104_class::C_CS_NA_1)
+    {
+        if ( ui->leCmdValue->text().trimmed() == "" || ui->leCmdAddress->text().trimmed() == "" )
+            return;
+        if ( ui->leCmdAddress->text().toInt() == 0 )
+            return;
 
-    obj.address = ui->leCmdAddress->text().toInt();
-    obj.type = ui->cbCmdAsdu->currentText().left(2).toInt();
-    obj.value = ui->leCmdValue->text().toInt();
+        obj.address = ui->leCmdAddress->text().toInt();
+        obj.value = ui->leCmdValue->text().toInt();
+    }
+
     switch ( obj.type )
     {
     case iec104_class::C_SC_NA_1:
@@ -568,6 +629,34 @@ void MainWindow::on_pbSendCommandsButton_clicked()
     case iec104_class::C_RC_NA_1:
     case iec104_class::C_RC_TA_1:
         obj.rcs = ui->leCmdValue->text().toInt();
+        break;
+    case iec104_class::C_SE_NA_1:
+    case iec104_class::C_SE_TA_1:
+        obj.value = ui->leCmdValue->text().toInt();
+        break;
+    case iec104_class::C_SE_NB_1:
+    case iec104_class::C_SE_TB_1:
+        obj.value = ui->leCmdValue->text().toInt();
+        break;
+    case iec104_class::C_SE_NC_1:
+    case iec104_class::C_SE_TC_1:
+        obj.value = ui->leCmdValue->text().toFloat();
+        break;
+    case iec104_class::C_CS_NA_1:
+        QDateTime current = QDateTime::currentDateTime();
+        obj.timetag.year = current.date().year()%100;
+        obj.timetag.month = current.date().month();
+        obj.timetag.mday = current.date().day();
+        obj.timetag.hour = current.time().hour();
+        obj.timetag.min = current.time().minute();
+        obj.timetag.msec = current.time().second()*1000 + current.time().msec();
+        obj.timetag.iv = 0;
+        obj.timetag.su = 0;
+        obj.timetag.wday = 0;
+        obj.timetag.res1 = 0;
+        obj.timetag.res2 = 0;
+        obj.timetag.res3 = 0;
+        obj.timetag.res4 = 0;
         break;
     }
     obj.qu = ui->cbCmdDuration->currentText().left(1).toInt();
@@ -590,6 +679,7 @@ void MainWindow::BDTR_Loga( QString str, int id )
 void MainWindow::slot_dataIndication( iec_obj *obj, int numpoints )
 {
     char buf[1000];
+    char buftt[1000];
     int rw = -1;
     bool inserted = false;
     QTableWidgetItem *pitem;
@@ -609,40 +699,52 @@ void MainWindow::slot_dataIndication( iec_obj *obj, int numpoints )
                 rw = ui->twPontos->rowCount();
                 ui->twPontos->insertRow( rw );
                 QTableWidgetItem *newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 0, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 mapPtItem_ColAddress[obj->address] = newItem;
 
                 newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 1, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 mapPtItem_ColValue[obj->address] = newItem;
 
                 newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 2, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 mapPtItem_ColType[obj->address] = newItem;
 
                 newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 3, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 mapPtItem_ColCause[obj->address] = newItem;
 
                 newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 4, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 mapPtItem_ColFlags[obj->address] = newItem;
 
                 newItem = new QTableWidgetItem( buf );
+                newItem->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter);
                 ui->twPontos->setItem( rw, 5, newItem );
                 newItem->setFlags( Qt::ItemIsSelectable );
                 newItem->setText( "0" );
                 mapPtItem_ColCount[obj->address] = newItem;
 
+                newItem = new QTableWidgetItem( buf );
+                ui->twPontos->setItem( rw, 6, newItem );
+                newItem->setFlags( Qt::ItemIsSelectable );
+                newItem->setText( "" );
+                mapPtItem_ColTimeTag[obj->address] = newItem;
+
                 inserted = true;
         }
 
-        sprintf( buf, "%f", obj->value );
+        sprintf( buf, "%9.3f", obj->value );
         mapPtItem_ColValue[obj->address]->setText( buf );
         sprintf( buf, "%d", obj->type );
         mapPtItem_ColType[obj->address]->setText( buf );
@@ -651,31 +753,42 @@ void MainWindow::slot_dataIndication( iec_obj *obj, int numpoints )
         sprintf( buf, "%d", 1+mapPtItem_ColCount[obj->address]->text().toInt() );
         mapPtItem_ColCount[obj->address]->setText( buf );
 
+        QDateTime current = QDateTime::currentDateTime();
+        sprintf(buftt, "Local: %s", current.toString("yyyy/MM/dd hh:mm:ss.zzz").toStdString().c_str());
+
         switch (obj->type)
           {
-          case iec104_class::M_SP_TB_1: // 1
-          case iec104_class::M_SP_NA_1: // 30
+          case iec104_class::M_SP_TB_1: // 30
+              sprintf( buftt, "Field: %02d/%02d/%02d %02d:%02d:%02d.%03d %s", obj->timetag.year, obj->timetag.month, obj->timetag.mday, obj->timetag.hour, obj->timetag.min, obj->timetag.msec/1000, obj->timetag.msec%1000, obj->timetag.iv?"iv":"ok" );
+          case iec104_class::M_SP_NA_1: // 1
               sprintf( buf, "%s%s%s%s%s", obj->scs?"on ":"off ", obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"" );
               break;
-          case iec104_class::M_DP_NA_1: // 3
+
           case iec104_class::M_DP_TB_1: // 31
+              sprintf( buftt, "Field: %02d/%02d/%02d %02d:%02d:%02d.%03d %s", obj->timetag.year, obj->timetag.month, obj->timetag.mday, obj->timetag.hour, obj->timetag.min, obj->timetag.msec/1000, obj->timetag.msec%1000, obj->timetag.iv?"iv":"ok" );
+          case iec104_class::M_DP_NA_1: // 3
               sprintf( buf, "%s%s%s%s%s", dblmsg[obj->dcs], obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"" );
               break;
-          case iec104_class::M_ST_NA_1: // 5
+
           case iec104_class::M_ST_TB_1: // 32
+            sprintf( buftt, "Field: %02d/%02d/%02d %02d:%02d:%02d.%03d %s", obj->timetag.year, obj->timetag.month, obj->timetag.mday, obj->timetag.hour, obj->timetag.min, obj->timetag.msec/1000, obj->timetag.msec%1000, obj->timetag.iv?"iv":"ok" );
+          case iec104_class::M_ST_NA_1: // 5
               sprintf( buf, "%s%s%s%s%s%s", obj->ov?"ov ":"", obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"", obj->t?"t ":"" );
               break;
-          case iec104_class::M_ME_NA_1: // 9
-          case iec104_class::M_ME_NB_1: // 11
-          case iec104_class::M_ME_NC_1: // 13
+
           case iec104_class::M_ME_TD_1: // 34
           case iec104_class::M_ME_TE_1: // 35
           case iec104_class::M_ME_TF_1: // 36
+            sprintf( buftt, "Field: %02d/%02d/%02d %02d:%02d:%02d.%03d %s", obj->timetag.year, obj->timetag.month, obj->timetag.mday, obj->timetag.hour, obj->timetag.min, obj->timetag.msec/1000, obj->timetag.msec%1000, obj->timetag.iv?"iv":"ok" );
+          case iec104_class::M_ME_NA_1: // 9
+          case iec104_class::M_ME_NB_1: // 11
+          case iec104_class::M_ME_NC_1: // 13
               sprintf( buf, "%s%s%s%s%s", obj->ov?"ov ":"", obj->iv?"iv ":"", obj->bl?"bl ":"", obj->sb?"sb ":"", obj->nt?"nt ":"" );
               break;
           }
 
         mapPtItem_ColFlags[obj->address]->setText( buf );
+        mapPtItem_ColTimeTag[obj->address]->setText( buftt );
     }
 
 if ( inserted )
@@ -732,7 +845,7 @@ m.PONTOS[0] = 0;
 udps->writeDatagram ( (const char *) &m, sizeof( msg_req ), BDTR_host, BDTR_porta );
 if ( BDTR_HaveDualHost() )
   udps->writeDatagram ( (const char *) &m, sizeof( msg_req ), BDTR_host_dual, BDTR_porta );
-BDTR_Loga( "<-- BDTR: INTERROGATION BEGIN" );
+BDTR_Loga( " <-- BDTR: INTERROGATION BEGIN" );
 }
 
 void  MainWindow::slot_interrogationActTermIndication()
@@ -747,7 +860,7 @@ m.PONTOS[0] = 0;
 udps->writeDatagram ( (const char *) &m, sizeof( msg_req ), BDTR_host, BDTR_porta );
 if ( BDTR_HaveDualHost() )
     udps->writeDatagram ( (const char *) &m, sizeof( msg_req ), BDTR_host_dual, BDTR_porta );
-BDTR_Loga( "<-- BDTR: INTERROGATION END" );
+BDTR_Loga( " <-- BDTR: INTERROGATION END" );
 }
 
 void MainWindow::slot_tcpconnect()
@@ -766,7 +879,7 @@ void MainWindow::slot_tcpdisconnect()
        BDTR_CntDnToBePrimary = BDTR_CntToBePrimary + 1; // wait a little more time to be primary again to allow for the secondary to assume
        isPrimary = false;
        i104.disable_connect();
-       BDTR_Loga( "--- BDTR: BECOMING SECONDARY BY DISCONNECTION" );
+       BDTR_Loga( " --- BDTR: BECOMING SECONDARY BY DISCONNECTION" );
        ui->lbMode->setText( "<font color='red'>Secondary</font>" );
     }
 
@@ -796,7 +909,7 @@ bool is_select = false;
 
     if ( LastCommandAddress == obj->address )
     {
-        i104.mLog.pushMsg("    COMMAND ACT CONF INDICATION");
+        i104.mLog.pushMsg("     COMMAND ACT CONF INDICATION");
         is_select = ( obj->se == iec104_class::SELECT );
 
         // if confirmed select, execute
@@ -813,6 +926,7 @@ bool is_select = false;
             msg_ack *ms;
             ms=(msg_ack*)bufOut;
             // ack msg for BDTR
+            ms->ID = 0;
             ms->COD = T_ACK;
             ms->TIPO = T_COM;
             ms->ORIG = BDTR_orig;
@@ -835,11 +949,11 @@ bool is_select = false;
             if ( obj->pn == iec104_class::NEGATIVE )
             {
                 ms->ID |= 0x80;
-                BDTR_Loga( "<-- BDTR: COMMAND REJECTED BY IEC104 SLAVE" );
+                BDTR_Loga( " <-- BDTR: COMMAND REJECTED BY IEC104 SLAVE" );
             }
             else
             {
-                BDTR_Loga( "<-- BDTR: COMMAND ACCEPTED BY IEC104 SLAVE" );
+                BDTR_Loga( " <-- BDTR: COMMAND ACCEPTED BY IEC104 SLAVE" );
             }
             udps->writeDatagram ( (const char *) bufOut, sizeof(msg_ack), BDTR_host, BDTR_porta );
             if ( BDTR_HaveDualHost() )
@@ -851,7 +965,7 @@ bool is_select = false;
 void MainWindow::slot_commandActTermIndication( iec_obj *obj )
 {
     if ( LastCommandAddress == obj->address )
-      i104.mLog.pushMsg("    COMMAND ACT TERM INDICATION");
+      i104.mLog.pushMsg("     COMMAND ACT TERM INDICATION");
 };
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -870,7 +984,7 @@ void MainWindow::slot_timer_BDTR_kamsg()
           i104.enable_connect();
           i104.tmKeepAlive->start();
           BDTR_CntDnToBePrimary = BDTR_CntToBePrimary;
-          BDTR_Loga( "--- BDTR: BECOMING PRIMARY BY TIMEOUT" );
+          BDTR_Loga( " --- BDTR: BECOMING PRIMARY BY TIMEOUT" );
           ui->lbMode->setText( "<font color='green'>Primary</font>" );
           }
        else
@@ -917,4 +1031,20 @@ void MainWindow::on_pbCopyClipb_clicked()
        strings << ui->lwLog->item(i)->text();
 
     QApplication::clipboard()->setText(strings.join("\n"));
+}
+
+void MainWindow::on_pbCopyVals_clicked()
+{
+    QString text = "Address\tValue\tType\tCause\tFlags\tCoubt\tTimeTag\n";
+
+    for (int i=0; i<ui->twPontos->rowCount();  i++)
+    {
+        for (int j=0; j<7; j++)
+          {
+            text = text + ui->twPontos->item(i, j)->text() + "\t" ;
+          }
+        text = text + "\n";
+    }
+
+    QApplication::clipboard()->setText(text);
 }

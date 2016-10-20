@@ -259,7 +259,7 @@ struct iec_type36 {
     cp56time2a time;
 };
 
-// M_IT_TB_1
+// M_IT_TB_1 - Integrated totals with time tag CP56Time2a
 struct iec_type37 {
     unsigned long int bcr;
     unsigned char sq :5;
@@ -269,6 +269,7 @@ struct iec_type37 {
     cp56time2a time;
 };
 
+// C_SC_NA_1 - Single command
 struct iec_type45 {
     unsigned char scs :1; // single command state
     unsigned char res :1; // must be zero
@@ -276,18 +277,66 @@ struct iec_type45 {
     unsigned char se :1; // select=1 / execute=0
 };
 
+// C_DC_NA_1 - Double command
 struct iec_type46 {
     unsigned char dcs :2; // double command state
     unsigned char qu :5;
     unsigned char se :1; // select=1 / execute=0
 };
 
+// C_RC_NA_1 - Regulating step command
 struct iec_type47 {
     unsigned char rcs :2; // regulating step command
     unsigned char qu :5;
     unsigned char se :1; // select=1 / execute=0
 };
 
+// C_SE_NA_1 - Set-point Command, normalised value
+struct iec_type48 {
+    short nva; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+};
+
+// C_SE_TA_1 - Normalised value command with time tag CP56Time2a
+struct iec_type61 {
+    short nva; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+    cp56time2a time;
+};
+
+// C_SE_NB_1 - Set-point Command, scaled value
+struct iec_type49 {
+    short sva; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+};
+
+// C_SE_TB_1 - Scaled value command with time tag CP56Time2a
+struct iec_type62 {
+    short sva; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+    cp56time2a time;
+};
+
+// C_SE_NC_1 - Set-point Command, short floating point value
+struct iec_type50 {
+    float r32; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+};
+
+// C_SE_TC_1 - Short floating point number command with time tag CP56Time2a
+struct iec_type63 {
+    float r32; // scaled value
+    unsigned char ql :7; // command qualifier
+    unsigned char se :1; // select=1 / execute=0
+    cp56time2a time;
+};
+
+// C_SC_TA_1 - Single command with time tag CP56Time2a
 struct iec_type58 {
     unsigned char scs :1; // single command state
     unsigned char res :1; // must be zero
@@ -296,6 +345,7 @@ struct iec_type58 {
     cp56time2a time;
 };
 
+// C_DC_TA_1 - Double command with time tag CP56Time2a
 struct iec_type59 {
     unsigned char dcs :2; // double command state
     unsigned char qu :5;
@@ -303,6 +353,7 @@ struct iec_type59 {
     cp56time2a time;
 };
 
+// C_RC_TA_1 - Regulating step command with time tag CP56Time2a
 struct iec_type60 {
     unsigned char rcs :2; // regulating step command
     unsigned char qu :5;
@@ -320,6 +371,8 @@ struct iec_type101 {
 };
 
 struct iec_type103 {
+    unsigned short ioa16; // object address bytes 1,2
+    unsigned char ioa8; // object address byte 3
     cp56time2a time;
 };
 
@@ -514,6 +567,42 @@ struct iec_apdu {
         struct {
             unsigned short ioa16;
             unsigned char ioa8;
+            iec_type48 obj;
+        } nsq48;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
+            iec_type49 obj;
+        } nsq49;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
+            iec_type50 obj;
+        } nsq50;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
+            iec_type61 obj;
+        } nsq61;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
+            iec_type62 obj;
+        } nsq62;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
+            iec_type63 obj;
+        } nsq63;
+
+        struct {
+            unsigned short ioa16;
+            unsigned char ioa8;
             iec_type58 obj;
         } nsq58;
 
@@ -530,6 +619,7 @@ struct iec_apdu {
         } nsq60;
 
         unsigned char dados[255];
+        iec_type103 asdu103;
         iec_type107 asdu107;
 
     };

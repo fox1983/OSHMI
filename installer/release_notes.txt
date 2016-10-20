@@ -63,8 +63,8 @@ To allow other IP addresses edit the "c:\oshmi\conf\nginx_access_control.conf" f
 -------------------------------------------------------------------
 
 Recommended utils (can be downloaded running the "download_external_progs.bat" script that is located inside the "extprogs" folder):
- - Inkscape 0.484 + SAGE 4.14. (To edit/create SVG screens)
-     http://sourceforge.net/projects/sage-scada/files/SAGE%20v4.14/inkscape0484_sage414.exe
+ - Inkscape 0.481 + SAGE 3.03. (To edit/create SVG screens) 
+     https://sourceforge.net/projects/sage-scada/files/SAGE%20v3.03/inkscape0481_sage303.exe/download
  - SysInternals (useful systems utilities)
      http://technet.microsoft.com/en-us/sysinternals/default
      http://live.sysinternals.com/
@@ -77,8 +77,8 @@ Recommended OS's:
  - Windows 7 Pro 32 or 64 bits
 
 Can also run on:
- - Windows Vista 32 bits (legacy system, not recommended)
- - Windows XP 32 bits (legacy system, not recommended)
+ - Windows Vista 32 bits (legacy system, not recommended, require an old version of Chromium not included)
+ - Windows XP 32 bits (legacy system, not recommended, require an old version of Chromium not included)
  - Ubuntu Linux 12.10 32 or 64 bits (under Wine, experimental)
  
 User interface can be used on:
@@ -90,11 +90,54 @@ User interface can be used on:
 To compile the source code on Windows you will need the folowing environments:
 
 Webserver, HMIShell, Mon_Proc and Sim_TR:
- - Borland C++ Builder 5, version 6 or later may also work
- - Indy 9 Components - http://www.indyproject.org/download/Files/Indy9.html
+ - Borland C++ Builder 5.
+ - Indy 9 Components - http://www.indyproject.org/download/Files/Indy9.html.
 
 QTester104:
- - QT 5.4
+ - QT 5.4 or newer.
+
+-------------------------------------------------------------------
+
+Notes for version 3.17:
+
+QTester104:
+  - Updated to version 1.16.
+  - Copy of values to clipboard.
+  - Better logs.
+  - Support for Clock Sync Command.
+  - Split bar for Log/Points Widgets.
+  - Show timetag values.
+
+SQLite:
+  - Updated to version 3.15.
+
+Chromium:
+  - Updated to version 56.0.2890.0.
+
+-------------------------------------------------------------------
+
+Notes for version 3.16:
+
+QTester104:
+  - Updated to version 1.15.
+  - Support for analog commands.
+
+SQLite:
+  - Updated to version 3.14.2.
+
+-------------------------------------------------------------------
+
+Notes for version 3.15:
+
+Webserver.exe:
+  - New formula for evaluating the communication state with a station using point statuses.
+
+-------------------------------------------------------------------
+
+Notes for version 3.14:
+
+Webserver.exe:
+  - Corrected bug affecting the lua stack that was causing problems after many commands issued.
 
 -------------------------------------------------------------------
 

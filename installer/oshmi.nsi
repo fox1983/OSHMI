@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.13"
+!define VERSION "v.3.17"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -255,7 +255,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\htdocs\images\*.*"
 
   SetOutPath $INSTDIR\extprogs
-  File /a "..\extprogs\SumatraPDF-3.1.1-install.exe"
+; File /a "..\extprogs\SumatraPDF-3.1.1-install.exe"
   File /a "..\extprogs\vcredist_x86.exe"
   File /a "..\extprogs\vcredist_x86-2012.exe"
   File /a "..\extprogs\vcredist_x86-2013.exe"

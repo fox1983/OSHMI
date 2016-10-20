@@ -42,6 +42,13 @@ object fmLua: TfmLua
     Height = 13
     Caption = 'Label2'
   end
+  object Label3: TLabel
+    Left = 392
+    Top = 200
+    Width = 32
+    Height = 13
+    Caption = 'Label3'
+  end
   object mmSrc: TMemo
     Left = 0
     Top = 224
