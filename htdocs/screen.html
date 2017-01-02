@@ -16,6 +16,8 @@
 <script src="lib/snap.svg.js"></script>
 <script src="lib/d3.min.js"></script>
 <script src="lib/radar-chart.js"></script>
+<script src="lib/vega.js" charset="utf-8"></script>
+<script src="lib/vega-lite.js" charset="utf-8"></script>
 <script src="lib/chroma.js"></script>
 <script src="legacy_options.js"></script>
 <script src="config_viewers_default.js"></script>
@@ -46,6 +48,7 @@ tela = tela.replace(/%2F/g,'/');
 </script>
 <script src="pntserver.js"></script>
 <script src="websage.js"></script>
+<script src="vega_websage.js"></script>
 </head>
 <body bgcolor="#dddddd" style="margin:0px;overflow:hidden;">
 <div id='bardiv' style='display:none;position:fixed;float:left;white-space:nowrap;z-index:1;left:0px;top:0px;;height:40px;width:110%;overflow:hidden;color:white;font-family:tahoma;font-size:12px;font-weight:bold;box-shadow: 2px 2px 2px #888888;'>
@@ -131,7 +134,7 @@ tela = tela.replace(/%2F/g,'/');
 <div id="previewdiv" style='display:none;position:absolute;left:5px;top:5px;z-index:3;opacity:.95;box-shadow: 2px 2px 2px #888888;' onclick='evt.stopPropagation();evt.preventDefault();';>
 <iframe id='previewframe' width='700' height='480' frameborder='2'></iframe>
 </div>
-
+<div id='VEGACHARTS' style='display:none'></div>
 <script>
 
 $('#svgdiv').css( 'background-color', VisorTelas_BackgroundSVG );   

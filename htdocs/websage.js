@@ -2484,8 +2484,8 @@ preprocessaTela: function()
          return; 
        }
     
+/*  NO MORE RTDA, GLIPS Graffiti SCREEN COMPATIBILITY
     // Para as telas editadas no GLIPS Graffiti (Scada) Editor (http://glipssvgeditor.sourceforge.net/)
-    
     // Obtem a Lista de pontos RTDA, objeto float
     nohs = SVGDoc.getElementsByTagNameNS("http://www.itris.fr/2003/animation","tag.float");
     for ( i = 0; i < nohs.length; i++ )
@@ -2510,7 +2510,7 @@ preprocessaTela: function()
         WebSAGE.acrescentaPontoLista( val );
         }
       }
-      
+*/
     // processa primeiro os grupos por causa dos clones nas tags do inkscape SAGE
     nohs = SVGDoc.getElementsByTagName("g");  
     for ( i = 0; i < nohs.length; i++ )
@@ -2531,13 +2531,14 @@ preprocessaTela: function()
       {
       WebSAGE.le_inkscapeSAGETags( nohs.item(i) );
       
+      /*  NO MORE RTDA, GLIPS Graffiti SCREEN COMPATIBILITY
       var rtdamed = nohs.item(i).getElementsByTagNameNS("http://www.itris.fr/2003/animation","measureText");
       var rtdacor = nohs.item(i).getElementsByTagNameNS("http://www.itris.fr/2003/animation","colorOnMeasure");
       var rtdatxtst = nohs.item(i).getElementsByTagNameNS("http://www.itris.fr/2003/animation","label");
       var rtdatxtstcor = nohs.item(i).getElementsByTagNameNS("http://www.itris.fr/2003/animation","colorOnState");      
 
       // evita que o duplo-clique selecione o texto, no IE apareceria com letra branca (como falhado) 
-      nohs.item(i).setAttributeNS( null,"poiter-events","none");
+      nohs.item(i).setAttributeNS( null,"pointer-events","none");
             
       rtdacmd = nohs.item(i).getElementsByTagNameNS("http://www.itris.fr/2003/animation","runApplication");
       for ( j = 0; j < rtdacmd.length; j++ )
@@ -2661,7 +2662,7 @@ preprocessaTela: function()
          // prepara evento para quando pressionado SHIFT+CLICK abrir janela de comando
          nohs.item(i).setAttributeNS( null,"onclick", WebSAGE.g_obj_onclick.replace(/PONTO/g, val) );
          }
-          
+      */
       }
     }
     catch ( err )
@@ -2714,6 +2715,7 @@ preprocessaTela: function()
           WebSAGE.le_inkscapeSAGETags( nohs[i] ); 
         }
 
+      /*  NO MORE RTDA, GLIPS Graffiti SCREEN COMPATIBILITY
       rtdashcor = nohs[i].getElementsByTagNameNS("http://www.itris.fr/2003/animation","colorOnState");
       
       rtdacmd=nohs[i].getElementsByTagNameNS("http://www.itris.fr/2003/animation","runApplication");
@@ -2778,10 +2780,13 @@ preprocessaTela: function()
          WebSAGE.RTDA_ShpTipos[cntshst] = tipo;
          cntshst++;
          }
+      */   
       }
 
+    /*  NO MORE RTDA, GLIPS Graffiti SCREEN COMPATIBILITY
+
     // Para as telas do conversor da Rosana para as telas do SAGE para o formato SVG        
-                   
+    
     // Medidas
     nohs = SVGDoc.getElementsByTagName("text");
         
@@ -2915,6 +2920,7 @@ preprocessaTela: function()
         }
       }
     }
+    */
 },
 
 callServer : function () 
@@ -2953,7 +2959,28 @@ callServer : function ()
 // pega status do servidor, variável HA_ALARMES
 getServerStatus: function()
 {
-  WebSAGE.getScript( WebSAGE.g_remoteServer + '?M=1&B=WebSAGE.cbf_Status' );  
+  if ( typeof(xPlain) === "undefined" )
+    {
+    WebSAGE.getScript( WebSAGE.g_remoteServer + '?M=1&B=WebSAGE.cbf_Status' );  
+    }
+
+  if ( BrowserDetect.browser == 'Safari' && typeof(WebSAGE.SafariRenderBugRedraw) == "undefined" )
+    {
+    WebSAGE.SafariRenderBugRedraw = 1;
+
+    // ugly solution to mobile safari not rendering SVG: simulate a mouse click
+    setTimeout(function(){ 
+      var evt = document.createEvent("MouseEvents");
+      evt.initMouseEvent("mousedown", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, SVGDoc);
+      SVGDoc.getElementsByTagName("svg").item(0).dispatchEvent(evt);
+      }, 100);
+    setTimeout(function(){ 
+      var evt = document.createEvent("MouseEvents");
+      evt.initMouseEvent("mouseup", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+      SVGDoc.getElementsByTagName("svg").item(0).dispatchEvent(evt);
+      }, 110);
+    }
+
 },
 
 cbf_Status: function()
@@ -3028,6 +3055,7 @@ var mudou_dig = WebSAGE.g_sha1ant_dig=='' || WebSAGE.g_sha1ant_dig!=Sha1Dig;
     return;
     }
 
+/*  NO MORE RTDA, GLIPS Graffiti SCREEN COMPATIBILITY
 // Para as telas editadas no GLIPS Graffiti (Scada) Editor (http://glipssvgeditor.sourceforge.net/)
 
 // Código embutido na tela
@@ -3410,12 +3438,33 @@ for ( x in V )
     elem = null;
     }   
   }
-
+*/
   // Processa as tags do Integraxor / XSAC
   var digital, val, tag, vt;
   
   if ( mudou_ana || mudou_dig) // se mudou algo
   {
+    if ( mudou_ana ) // se tem não tem hash ou mudou, atualiza
+      {
+      // coloca toda lista de objetos piscantes com opacidade 1
+      for ( i = 0; i < WebSAGE.g_blinkListAna.length; i++ )
+        {
+        WebSAGE.g_blinkListAna[i].setAttributeNS( null, "opacity", 1 );
+        }
+      WebSAGE.g_blinkListAna.length = 0; // esvazia blink list
+      WebSAGE.g_blinkcnt = 1;
+      }
+    if ( mudou_dig ) // se tem não tem hash ou mudou, atualiza
+      {
+      // coloca toda lista de objetos piscantes com opacidade 1
+      for ( i = 0; i < WebSAGE.g_blinkList.length; i++ )
+        {
+        WebSAGE.g_blinkList[i].setAttributeNS(null,"opacity",1);
+        }
+      WebSAGE.g_blinkList.length = 0; // esvazia blink list
+      WebSAGE.g_blinkcnt = 1;
+      }
+
   for ( i = 0; i < WebSAGE.InkSage.length; i++ )
   {
     if ( typeof(WebSAGE.InkSage[i].xdone) != 'undefined' )
@@ -5157,3 +5206,8 @@ if ( typeof(xPlain) == "undefined" )
   } // init
   
 }; // WebSAGE
+
+var $V = WebSAGE.getValue;
+var $F = WebSAGE.getFlags;
+var $T = WebSAGE.getTime;
+

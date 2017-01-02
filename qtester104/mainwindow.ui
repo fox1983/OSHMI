@@ -164,7 +164,11 @@
      </widget>
     </item>
     <item row="3" column="1">
-     <widget class="QLineEdit" name="leCmdAddress"/>
+     <widget class="QLineEdit" name="leCmdAddress">
+      <property name="toolTip">
+       <string/>
+      </property>
+     </widget>
     </item>
     <item row="3" column="2">
      <widget class="QLineEdit" name="leCmdValue"/>
@@ -291,7 +295,7 @@
        </font>
       </property>
       <property name="text">
-       <string>v1.16 © 2010-2016 Ricardo L. Olsen</string>
+       <string>v1.17 © 2010-2016 Ricardo L. Olsen</string>
       </property>
      </widget>
     </item>
@@ -313,6 +317,21 @@
      <widget class="QPushButton" name="pbCopyVals">
       <property name="text">
        <string>Copy Clip.Vals</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QLineEdit" name="leASDUAddr">
+      <property name="toolTip">
+       <string>Put here the ASDU address for commands.
+If empty will use remote link address.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>ASDU Addr.</string>
       </property>
      </widget>
     </item>

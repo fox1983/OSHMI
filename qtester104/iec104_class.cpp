@@ -56,6 +56,7 @@ iec104_class::iec104_class()
     TxOk = false;
     masterAddress = 0;
     slaveAddress = 0;
+    slaveASDUAddrCmd = 0;
     GIObjectCnt = 0;
     gi_period = 5 * 60 +30;
 }
@@ -103,6 +104,11 @@ char * iec104_class::getSecondaryIP_backup()
 void iec104_class::setSecondaryAddress( int addr )
 {
     slaveAddress = addr;
+}
+
+void iec104_class::setSecondaryASDUAddress( int addr )
+{
+    slaveASDUAddrCmd = addr;
 }
 
 int iec104_class::getSecondaryAddress()
@@ -310,7 +316,7 @@ void iec104_class::packetReadyTCP()
          return;
          }
 
-      if ( apdu.asduh.ca != slaveAddress && len>4 )
+      if ( apdu.asduh.ca != slaveAddress && apdu.asduh.ca != slaveASDUAddrCmd && len>4 )
         {
         broken_msg=false;
         mLog.pushMsg("R--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
@@ -372,7 +378,7 @@ void iec104_class::parseAPDU(iec_apdu * papdu, int sz, bool accountandrespond)
         return;
     }
 
-    if ( papdu->asduh.ca != slaveAddress && sz>6)
+    if ( papdu->asduh.ca != slaveAddress && papdu->asduh.ca != slaveASDUAddrCmd && sz>6)
     { // invalid frame
         mLog.pushMsg("R--> ASDU WITH UNEXPECTED ORIGIN! Ignoring...");
         return;
@@ -1612,7 +1618,9 @@ tm *agora=localtime(&tm1);
 stringstream oss;
 
 obj->cause = ACTIVATION;
-obj->ca = slaveAddress;
+
+if ( obj->ca == 0 )
+  obj->ca = slaveAddress;
 
 switch (obj->type)
   {
@@ -1643,6 +1651,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " SCS "
             << (unsigned)obj->scs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1676,6 +1686,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " DCS "
             << (unsigned)obj->dcs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1707,6 +1719,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " RCS "
             << (unsigned)obj->rcs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1754,6 +1768,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " SCS "
             << (unsigned)obj->scs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1801,6 +1817,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " DCS "
             << (unsigned)obj->dcs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1846,6 +1864,8 @@ switch (obj->type)
             << (unsigned)obj->address
             << " RCS "
             << (unsigned)obj->rcs
+            << " CA "
+            << obj->ca
             << " QU "
             << (int) obj->qu
             << " SE "
@@ -1878,6 +1898,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << (short)obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -1922,6 +1944,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << (short)obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -1952,6 +1976,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << (short)obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -1996,6 +2022,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << (short)obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -2026,6 +2054,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -2070,6 +2100,8 @@ switch (obj->type)
         << (unsigned)obj->address
         << " VAL "
         << obj->value
+        << " CA "
+        << obj->ca
         << " SE "
         << (unsigned)obj->se;
     mLog.pushMsg((char*)oss.str().c_str());
@@ -2094,7 +2126,9 @@ switch (obj->type)
     VS+=2;
 
     oss.str("");
-    oss << "T<-- CLOCK SYNC COMMAND ";
+    oss << "T<-- CLOCK SYNC COMMAND "
+        << " CA "
+        << obj->ca;
     mLog.pushMsg((char*)oss.str().c_str());
     break;
 

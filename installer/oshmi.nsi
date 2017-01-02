@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.3.17"
+!define VERSION "v.4.0"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -156,6 +156,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   CreateDirectory "$INSTDIR\bin\platforms"
   CreateDirectory "$INSTDIR\browser"
   CreateDirectory "$INSTDIR\browser-data"
+  CreateDirectory "$INSTDIR\charts"
   CreateDirectory "$INSTDIR\conf"
   CreateDirectory "$INSTDIR\conf_templates"
   CreateDirectory "$INSTDIR\db"
@@ -166,6 +167,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   CreateDirectory "$INSTDIR\htdocs"
   CreateDirectory "$INSTDIR\htdocs\images"
   CreateDirectory "$INSTDIR\i18n"
+  CreateDirectory "$INSTDIR\fonts"
   CreateDirectory "$INSTDIR\linux"
   CreateDirectory "$INSTDIR\logs"
   CreateDirectory "$INSTDIR\nginx_php"
@@ -240,10 +242,12 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\htdocs\pntserver.js"
   File /a "..\htdocs\timepntserver.php"
   File /a "..\htdocs\legacy_options.js"
-  File /a "..\htdocs\listdocs.php"
   File /a "..\htdocs\eventserver.php"
   File /a "..\htdocs\eventsync.php"
   File /a "..\htdocs\config_viewers_default.js"
+  File /a "..\htdocs\rss.php"
+  File /a "..\htdocs\proxy.php"
+  File /a "..\htdocs\vega_websage.js"  
   
   SetOutPath $INSTDIR\htdocs\histwebview
   File /a /r "..\htdocs\histwebview\*.*"
@@ -277,8 +281,14 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\docs\lua_reference_manual.pdf"
   File /a "..\docs\inkscape-shortcuts1.svg"
   File /a "..\docs\inkscape-shortcuts2.svg"
+
+  SetOutPath $INSTDIR\fonts
+  File /a "..\fonts\*.*"  
   
   SetOverwrite off
+
+  SetOutPath $INSTDIR\charts
+  File /a "..\charts\*.json"  
 
   SetOutPath $INSTDIR\etc
   File /a "..\etc\*.bat"
@@ -352,6 +362,7 @@ Section "" ; empty string makes it hidden, so would starting with -
 ; Cria atalhos para os aplicativos
   CreateShortCut "$DESKTOP\OSHMI\Stop_All.lnk"                    "$INSTDIR\bin\stop_all.bat"  
   CreateShortCut "$DESKTOP\OSHMI\HMIShell.lnk"                    "$INSTDIR\bin\hmishell.exe"  
+  CreateShortCut "$DESKTOP\OSHMI\QTester104.lnk"                  "$INSTDIR\bin\QTester104.exe"  
   CreateShortCut "$DESKTOP\OSHMI\WebServer.lnk"                   "$INSTDIR\bin\webserver.exe"  
   CreateShortCut "$DESKTOP\OSHMI\Recovery Menu.lnk"               "$INSTDIR\bin\menu.bat"  
   CreateShortCut "$DESKTOP\OSHMI\Clean Browser Cache.lnk"         "$INSTDIR\bin\cache_clean.bat"  
@@ -466,7 +477,7 @@ lang_english:
 
   WriteUninstaller "bt-uninst.exe"
 
-  MessageBox MB_OK "OSHMI Installed! Optionally, go to $INSTDIR\extprogs\ and run download_external_progs.bat."
+  MessageBox MB_OK "OSHMI Installed! Optionally, go to $INSTDIR\extprogs\ and run download_external_progs.bat. To quickly run the system after installed: Open the OSHMI desktop folder and Execute the 'Webserver' program. Next open the 'Screen Viewer' and the 'Events Viewer' Icons."
   
 SectionEnd
 
@@ -506,6 +517,7 @@ Section "Uninstall"
   Delete "$INSTDIR\*.*"
   Delete "$INSTDIR\bin\*.*"
   Delete "$INSTDIR\bin\platforms\*.*"
+  Delete "$INSTDIR\charts\*.*"
   Delete "$INSTDIR\conf_templates\*.*"
   Delete "$INSTDIR\conf\*.*"
   Delete "$INSTDIR\db\db_cold\*.*"
@@ -516,6 +528,7 @@ Section "Uninstall"
   Delete "$INSTDIR\htdocs\*.*"
   Delete "$INSTDIR\htdocs\images\*.*"
   Delete "$INSTDIR\i18n\*.*"
+  Delete "$INSTDIR\fonts\*.*"
   Delete "$INSTDIR\linux\*.*"
   Delete "$INSTDIR\logs\*.*"
   Delete "$INSTDIR\scripts\*.*"

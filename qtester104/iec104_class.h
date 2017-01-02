@@ -148,6 +148,7 @@ class iec104_class
     void setSecondaryIP_backup( char * ip );
     char * getSecondaryIP();
     char * getSecondaryIP_backup();
+    void setSecondaryASDUAddress( int addr );
     void setSecondaryAddress( int addr );
     int getSecondaryAddress();
     void setPrimaryAddress( int addr );
@@ -172,6 +173,7 @@ class iec104_class
     bool seq_order_check; // if set: test message order, disconnect if out of order
     unsigned char masterAddress; // master link address (primary address, originator address, oa)
     unsigned short slaveAddress; // slave link address (secondary address, common address of ASDU, ca)
+    unsigned short slaveASDUAddrCmd; // common address of ASDU, ca for commands
     unsigned Port; // iec104 tcp port (defaults to 2404)
     char slaveIP[20]; // slave (secondary, main RTU) IP address
     char slaveIP_backup[20]; // slave (secondary, backup RTU) IP address

@@ -616,6 +616,9 @@ void MainWindow::on_pbSendCommandsButton_clicked()
         obj.value = ui->leCmdValue->text().toInt();
     }
 
+    obj.ca = ui->leASDUAddr->text().toInt();
+    i104.setSecondaryASDUAddress( obj.ca );
+
     switch ( obj.type )
     {
     case iec104_class::C_SC_NA_1:
