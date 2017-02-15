@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>906</width>
+    <width>961</width>
     <height>465</height>
    </rect>
   </property>
@@ -262,7 +262,7 @@
     <item row="0" column="5">
      <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>Local Link Address</string>
+       <string>Local Link Address (OA)</string>
       </property>
      </widget>
     </item>
@@ -283,7 +283,7 @@
     <item row="0" column="4">
      <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Remote Link Address</string>
+       <string>Remote Link Address (CA)</string>
       </property>
      </widget>
     </item>
@@ -295,7 +295,7 @@
        </font>
       </property>
       <property name="text">
-       <string>v1.17 © 2010-2016 Ricardo L. Olsen</string>
+       <string>v1.19 © 2010-2017 Ricardo L. Olsen</string>
       </property>
      </widget>
     </item>
@@ -342,7 +342,7 @@ If empty will use remote link address.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>906</width>
+     <width>961</width>
      <height>21</height>
     </rect>
    </property>

@@ -1,5 +1,5 @@
 OSHMI - Open Substation HMI
-    Copyright 2008-2016 - Ricardo L. Olsen
+    Copyright 2008-2017 - Ricardo L. Olsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ Acknowledgements:
   X3DOM: http://www.x3dom.org
   Chroma.js: https://github.com/gka/chroma.js
   TabSystem: http://www.developer-x.com
-  CCS Animation Cheat Sheet: http://www.justinaguilar.com/animations
+  CSS Animation Cheat Sheet: http://www.justinaguilar.com/animations
   D3JS: http://d3js.org
   Radar-chart-d3: https://github.com/alangrafu/radar-chart-d3
   Vega A Visualization Grammar: https://vega.github.io/vega
@@ -49,6 +49,7 @@ Acknowledgements:
   WGet - http://www.gnu.org/software/wget
   SQLite - https://www.sqlite.org
   Some icons from: http://keyamoon.com/icomoon and http://raphaeljs.com/icons
+  CSS Loaders from Luke Haas - https://projects.lukehaas.me/css-loaders/
   
 -------------------------------------------------------------------
 
@@ -112,14 +113,48 @@ QTester104:
 
 -------------------------------------------------------------------
 
+Notes for version 4.2:
+
+QTester104:
+  - Updated to version 1.19.
+  - Corrected bug on select before operate commands present in OSHMI 4.0 and 4.1.
+  - Removed resctriction of slave address up to 255: now it can be up to 65535.
+
+SQLite:
+  - Updated to version 3.17.0.
+
+-------------------------------------------------------------------
+
+Notes for version 4.1:
+
+Events Viewer:
+  - New mechanism to configure a relationship between notificantions and screens.
+    When the user clicks a trip notification it can be opened the respective screen of the occurrence location.
+    It is necessary to configure a function in conf/config_viewers.js like EventsViewer_NotificationClick on config_viewers_default.js.
+
+Screen Viewer:
+  - Loading effect shown while loading and preprocessing SVG file.
+  - Some behind the scenes changes on window event processing.
+  - F10 shortcut to animated hide/show toolbar. 
+    Mouse-over small visible piece of hidden toolbar to show it again.
+
+Tabular Viewer:
+  - Analog values aligned to the right.
+
+SQLite:
+  - Updated to version 3.16.2 (better performance and some bugs corrected).
+
+-------------------------------------------------------------------
+
 Notes for version 4.0:
 
 Screen Viewer:
-  - Added the descritive charts library Vega (version 2.6.3) that opens unlimited real time charts capability.
+  - Added the descriptive charts library Vega (version 2.6.3) that opens unlimited real time charts capability.
   - Arc graphic.
   - D3JS Updated to version 3.5.17.
   - No more compatibility with old style screens, the only editor now supported is Inkscape+SAGE.
   - Faster screen loading and processing due to the previous item.
+  - Point faceplate annotation field with more space.
 
 QTester104:
   - Updated to version 1.17.

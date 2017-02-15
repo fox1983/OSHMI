@@ -24,9 +24,9 @@
 <script src="lib/chroma.js"></script>
 <script src="fan.js"></script>
 <script src="legacy_options.js"></script>
+<script src="../i18n/messages_i18n.js"></script>
 <script src="config_viewers_default.js"></script>
 <script src="../conf/config_viewers.js"></script>
-<script src="../i18n/messages_i18n.js"></script>
 <script src="pntserver.js"></script>
 <script src="images.js"></script>
 <script>
@@ -1030,8 +1030,14 @@ try
       id = parseInt(id);
       var pri = parseInt( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).charAt(0) );      
 
+      // alinha os analógicos à direita
+      if (  $.isNumeric(WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_EVENTO )) )
+          {
+            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_EVENTO].style.textAlign = "right";          
+            WebSAGE.g_tbl.rows[id+1].cells[WebSAGE.g_COL_EVENTO].style.paddingRight = "35px";
+          }
+
       // esconde os filtrados
-           
       if ( WebSAGE.g_filterOutList.indexOf( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_SUBEST ) ) != -1  ||
            WebSAGE.g_filterOutList.indexOf( WebSAGE.g_tbl.cellsx( id, WebSAGE.g_COL_QUALIF ).charAt(0) ) != -1
          )

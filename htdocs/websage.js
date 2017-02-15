@@ -178,7 +178,7 @@ var i, t, elOptNew, elSel, titu, pos, nohs, textolink, tmp, idtela;
                 {
                   if ( WebSAGE.g_seltela.options[t].value == ( "../svg/" + textolink ) )
                   {
-                      nohs.item(i).setAttributeNS( null, "onclick", "top.WebSAGE.g_seltela.selectedIndex=" + t + "; top.document.fmTELA.submit();" );
+                      nohs.item(i).setAttributeNS( null, "onclick", "window.parent.WebSAGE.g_seltela.selectedIndex=" + t + "; window.parent.document.fmTELA.submit();" );
                       if ( nohs.item(i).style != null )
                         {
                           nohs.item(i).style.cursor = "pointer";
@@ -239,8 +239,8 @@ var i, t, elOptNew, elSel, titu, pos, nohs, textolink, tmp, idtela;
                        WebSAGE.g_seltela.options[t].value == ( "../svg/" + idtela ) ||
                        WebSAGE.g_seltela.options[t].value == ( "../svg/" + idtela + ".svg" ) )
                   {
-                      nohs[i].setAttributeNS( null, "onclick", "top.WebSAGE.g_seltela.selectedIndex=" + t + "; top.document.fmTELA.submit();" );
-                      if ( nohs[i].style.style != null )
+                      nohs[i].setAttributeNS( null, "onclick", "window.parent.WebSAGE.g_seltela.selectedIndex=" + t + "; window.parent.document.fmTELA.submit();" );
+                      if ( nohs[i].style != null )
                         {
                           nohs[i].style.cursor = "pointer";
                         }
@@ -287,8 +287,8 @@ function RemoveAnimate( elem )
 }
 
 // Permite criar uma animação em SVG
-// top.Animate( thisobj, "animate", {'attributeName': 'ry', 'from': 0, 'to': 10, 'fill': 'freeze', 'repeatCount': 5, 'dur': 5 } );
-// top.Animate( thisobj, 'animate', {'attributeName': 'width', 'from': 45, 'to': 55, 'repeatCount':5,'dur': 1 });
+// window.parent.Animate( thisobj, "animate", {'attributeName': 'ry', 'from': 0, 'to': 10, 'fill': 'freeze', 'repeatCount': 5, 'dur': 5 } );
+// window.parent.Animate( thisobj, 'animate', {'attributeName': 'width', 'from': 45, 'to': 55, 'repeatCount':5,'dur': 1 });
 function Animate( elem, animtype, params )
 {
   var k, animation;
@@ -429,8 +429,7 @@ g_zpY: 0,
 g_zpW: 0,
 g_zpH: 0,
 
-g_obj_onclick: "{ /*CLICK_POSX=evt.clientX;CLICK_POSY=evt.clientY;*/ var pt=parseInt('PONTO'); if (isNaN(pt)) pt=top.NPTS['PONTO']; if( evt.ctrlKey || evt.which == 2 ) { top.WebSAGE.reconhece(pt); } else { top.WebSAGE.janelaInfo(pt); } }",
-
+g_obj_onclick: "{ /*CLICK_POSX=evt.clientX;CLICK_POSY=evt.clientY;*/ var pt=parseInt('PONTO'); if (isNaN(pt)) pt=window.parent.NPTS['PONTO']; if( evt.ctrlKey || evt.which == 2 ) { window.parent.WebSAGE.reconhece(pt); } else { window.parent.WebSAGE.janelaInfo(pt); } }",
 g_titulo_janela: "",
 
 // Vent: [],
@@ -1864,38 +1863,38 @@ setPreview : function ( item, url, width, height )
   var winsz= "";		
   if ( typeof( width ) != "undefined" )
     {
-	winsz = "top.document.getElementById('previewframe').width = " + width + ";";
+	winsz = "window.parent.document.getElementById('previewframe').width = " + width + ";";
 	}
   if ( typeof( height ) != "undefined" )
     {
-	winsz = winsz + "top.document.getElementById('previewframe').height = " + height + ";";
+	winsz = winsz + "window.parent.document.getElementById('previewframe').height = " + height + ";";
 	}
 
   // when mouse over the item, after a timeout, show the preview page
   item.setAttributeNS( 
      null, 
      "onmouseover", 
-	   "clearTimeout(top.WebSAGE.g_timerPreviewID); " + 
-       "if ( top.document.getElementById('timemachinecontrols').style.display != 'none') { return; } " + // don't show if timemichine mode activated
+	   "clearTimeout(window.parent.WebSAGE.g_timerPreviewID); " + 
+       "if ( window.parent.document.getElementById('timemachinecontrols').style.display != 'none') { return; } " + // don't show if timemichine mode activated
 	   winsz +
-       "if ( top.window.innerWidth < 100 + parseInt(top.document.getElementById('previewframe').width) ) { return; } " + // don't show if window not wide enough
-       "if ( top.window.innerHeight < 100 + parseInt(top.document.getElementById('previewframe').height) ) { return; } " + // don't show if window not high enough
-       "top.WebSAGE.g_timerPreviewID = setTimeout( \"top.document.getElementById('previewframe').src = '" + url +  "'; " + "top.document.getElementById('previewdiv').style.display = '';\" , " + 
-	                                                "top.WebSAGE.g_timeOutPreview); " );
+       "if ( window.parent.window.innerWidth < 100 + parseInt(window.parent.document.getElementById('previewframe').width) ) { return; } " + // don't show if window not wide enough
+       "if ( window.parent.window.innerHeight < 100 + parseInt(window.parent.document.getElementById('previewframe').height) ) { return; } " + // don't show if window not high enough
+       "window.parent.WebSAGE.g_timerPreviewID = setTimeout( \"window.parent.document.getElementById('previewframe').src = '" + url +  "'; " + "window.parent.document.getElementById('previewdiv').style.display = '';\" , " + 
+	                                                "window.parent.WebSAGE.g_timeOutPreview); " );
   // when mouse out of the preview, close it
   document.getElementById('previewdiv').setAttributeNS( 
       null, 
       "onmouseout",  
-	  "clearTimeout(top.WebSAGE.g_timerPreviewID); " + 
-	    "top.document.getElementById('previewdiv').style.display = 'none'; " + 
-		"top.document.getElementById('previewframe').src = '';" );
+	  "clearTimeout(window.parent.WebSAGE.g_timerPreviewID); " + 
+	    "window.parent.document.getElementById('previewdiv').style.display = 'none'; " + 
+		"window.parent.document.getElementById('previewframe').src = '';" );
   // when mouse out of the item that activated the preview, close the preview	
   item.setAttributeNS( 
       null, 
 	  "onmouseout", 
-	  "clearTimeout(top.WebSAGE.g_timerPreviewID); " + 
-	    "top.document.getElementById('previewdiv').style.display = 'none'; " +
-		"top.document.getElementById('previewframe').src = '';" );
+	  "clearTimeout(window.parent.WebSAGE.g_timerPreviewID); " + 
+	    "window.parent.document.getElementById('previewdiv').style.display = 'none'; " +
+		"window.parent.document.getElementById('previewframe').src = '';" );
 },
 
 le_inkscapeSAGETags : function ( item )
@@ -2049,7 +2048,7 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
            case "#set_filter": // set filter to almbox
              if ( typeof(xPlain) == "undefined" )
                {
-               if ( ! WebSAGE.g_hidetoolbar )
+               // if ( ! WebSAGE.g_hidetoolbar )
                if ( inksage_labelvec[lbv].src != "" )
                if ( document.getElementById("almiframe").src == "" )          
                  {
@@ -2275,7 +2274,7 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
                       WebSAGE.g_seltela.options[t].value == ( "../svg/" + idtela ) ||
                       WebSAGE.g_seltela.options[t].value == ( "../svg/" + idtela + ".svg" ) )
                     {
-                        item.setAttributeNS( null, "onclick", "top.WebSAGE.g_seltela.selectedIndex=" + t + "; top.document.fmTELA.submit();" );
+                        item.setAttributeNS( null, "onclick", "window.parent.WebSAGE.g_seltela.selectedIndex=" + t + "; window.parent.document.fmTELA.submit();" );
                         item.style.cursor = "pointer";
                         // show the linked page preview on mouseover
                         WebSAGE.setPreview( item, 'screen.html?SELTELA=../svg/' + idtela + '&ZPX=0&ZPY=0&ZPW=5280&ZPH=3300&HIDETB=1', 700, 480 );
@@ -2439,11 +2438,11 @@ if ( typeof( inksage_labeltxt ) != 'undefined' )
          // quando o objeto for clicado, amplia e apaga o objeto clicado (desobstrui a área).
          bb = item.getBoundingClientRect();
          item.setAttributeNS( null, "onclick", 
-                              " top.WebSAGE.g_zpX = " + ( bb.left ) + 
-                              ";top.WebSAGE.g_zpY = " + ( bb.top ) + 
-                              ";top.WebSAGE.g_zpW = " + ( bb.width * 2.0  ) +
-                              ";top.WebSAGE.g_zpH = " + ( bb.height * 2.0 ) +
-                              ";top.WebSAGE.zoomPan(10);evt.currentTarget.style.display='none';"
+                              " window.parent.WebSAGE.g_zpX = " + ( bb.left ) + 
+                              ";window.parent.WebSAGE.g_zpY = " + ( bb.top ) + 
+                              ";window.parent.WebSAGE.g_zpW = " + ( bb.width * 2.0  ) +
+                              ";window.parent.WebSAGE.g_zpH = " + ( bb.height * 2.0 ) +
+                              ";window.parent.WebSAGE.zoomPan(10);evt.currentTarget.style.display='none';"
                             );  
          break;               
       case "script":
@@ -2500,7 +2499,7 @@ preprocessaTela: function()
       
     // Obtem a Lista de pontos RTDA, objeto enumerado (para os digitais)
     nohs = SVGDoc.getElementsByTagNameNS("http://www.itris.fr/2003/animation","tag.enumerated");
-    // top.nohs=nohs;
+    // window.parent.nohs=nohs;
     for ( i = 0; i < nohs.length; i++ )
       {
       val = nohs.item(i).id || nohs.item(i).attributes[0].value; // a primeira forma funciona no IE, a outra no FF
@@ -4375,19 +4374,20 @@ falhaTudo: function ()
 // faz sumir e aparecer a barra superior de botões  
 hideShowBar : function ()
 { 
+// não permite esconder a toolbar quando tem máquina do tempo
+if ( document.getElementById("timemachinecontrols").style.display!="none" )
+    return;
 if ( document.getElementById("svgdiv").style.top == '0px' )
   {
-  document.getElementById("bardiv").style.height = '40px';
-  document.getElementById("svgdiv").style.top = '40px';
-  // mostra a caixa de alarme
-  document.getElementById('almiframe').style.display = '';
+  $("#bardiv").animate({top:"0px"});
+  $("#svgdiv").animate({top:"40px"});
+  $("#almbox").animate({top:"0px"});
   }
 else
   {
-  document.getElementById("bardiv").style.height = '0px';
-  document.getElementById("svgdiv").style.top = '0px';
-  // esconde a caixa de alarme
-  document.getElementById('almiframe').style.display = 'none';
+  $("#bardiv").animate({top:"-35px"});
+  $("#svgdiv").animate({top:"0px"});
+  $("#almbox").animate({top:"-40px"});
   }  
 },
 
@@ -4879,7 +4879,7 @@ init: function()
       // Quando clicado o SVG, puxa o foco para a barra de seleção e libera. Necessário para que funcionem as teclas de atalho.
       if ( BrowserDetect.OS != "iPad" ) // não sendo iPad      
         { 
-          SVGDoc.onclick = function () { var elem = top.document.getElementById('SELTELA'); elem.focus(); elem.blur(); }; 
+          SVGDoc.onclick = function () { var elem = window.document.getElementById('SELTELA'); elem.focus(); elem.blur(); }; 
         }
       else
         { 
@@ -4930,6 +4930,11 @@ init: function()
 if ( typeof(xPlain) == "undefined" )
 {
   $('#bardiv').css('display', ''); // shows toolbar
+  $("#bardiv").bind('mouseover', function(event){
+  if ( document.getElementById("svgdiv").style.top == '0px' ) {
+    WebSAGE.hideShowBar();
+    }
+  });     
 
   shortcut.add( "F9",
                 function() { WebSAGE.doSilenciaBeep(); },
@@ -4973,6 +4978,9 @@ if ( typeof(xPlain) == "undefined" )
   shortcut.add( "", // esconde/mostra barra de comandos, com numlock (numpad *)
                 function() { WebSAGE.hideShowBar(); },
                 {'type':'keydown', 'propagate':false, 'target':document, 'keycode':106} );
+  shortcut.add( "F10", // esconde/mostra barra de comandos, com numlock (F10)
+                function() { WebSAGE.hideShowBar(); },
+                {'type':'keydown', 'propagate':false, 'target':document} );
   shortcut.add( "shift+right", // mostra item selecionado
                 function() {WebSAGE.mostraDestaqSel(1,0);},
                 {'type':'keydown', 'propagate':false, 'target':document} );
@@ -5194,14 +5202,14 @@ if ( typeof(xPlain) == "undefined" )
                            
   // arraste do mouse para mover a tela
   $(rootnode).bind('mousedown', function(event){
-    top.MOUSEX=event.clientX;
-    top.MOUSEY=event.clientY;
-    top.SVGDoc.getElementsByTagName('svg').item(0).style.cursor='move';
+    window.parent.MOUSEX=event.clientX;
+    window.parent.MOUSEY=event.clientY;
+    window.parent.SVGDoc.getElementsByTagName('svg').item(0).style.cursor='move';
     });
   $(rootnode).bind('mouseup', function(event){
-    top.SVGDoc.getElementsByTagName('svg').item(0).style.cursor='default';
-    if ( top.MOUSEX > event.clientX ) top.WebSAGE.zoomPan(3, (top.MOUSEX - event.clientX)/30 ); else top.WebSAGE.zoomPan(5, (event.clientX - top.MOUSEX )/30 ); 
-    if ( top.MOUSEY > event.clientY ) top.WebSAGE.zoomPan(1, (top.MOUSEY - event.clientY)/20 ); else top.WebSAGE.zoomPan(7, (event.clientY - top.MOUSEY )/20 );
+    window.parent.SVGDoc.getElementsByTagName('svg').item(0).style.cursor='default';
+    if ( window.parent.MOUSEX > event.clientX ) window.parent.WebSAGE.zoomPan(3, (window.parent.MOUSEX - event.clientX)/30 ); else window.parent.WebSAGE.zoomPan(5, (event.clientX - window.parent.MOUSEX )/30 ); 
+    if ( window.parent.MOUSEY > event.clientY ) window.parent.WebSAGE.zoomPan(1, (window.parent.MOUSEY - event.clientY)/20 ); else window.parent.WebSAGE.zoomPan(7, (event.clientY - window.parent.MOUSEY )/20 );
     });
   } // init
   

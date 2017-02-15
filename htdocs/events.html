@@ -23,9 +23,9 @@
 <script src="lib/shortcut-2.01b.js"></script>
 <script src="fan.js"></script>
 <script src="legacy_options.js"></script>
+<script src="../i18n/messages_i18n.js"></script>
 <script src="config_viewers_default.js"></script>
 <script src="../conf/config_viewers.js"></script>
-<script src="../i18n/messages_i18n.js"></script>
 <script src="pntserver.js"></script>
 <script src="images.js"></script>
 <script>
@@ -102,6 +102,8 @@ g_loadtime: 0,
 g_infomod: {},
 g_infomodtm: {},
 g_infomodnpt: {},
+g_infomodid: {},
+g_infomodsubest: {},
 g_subst_list: [],
 
 // busca e executa script de um servidor
@@ -843,6 +845,8 @@ var cria = {};
        delete WebSAGE.g_infomod[semod];
        delete WebSAGE.g_infomodtm[semod];
        delete WebSAGE.g_infomodnpt[semod];
+       delete WebSAGE.g_infomodid[semod];
+       delete WebSAGE.g_infomodsubest[semod];
        delete cria[semod];
        }
 
@@ -882,6 +886,8 @@ var cria = {};
             { // a estampa de tempo será a da abertura do DJ
             WebSAGE.g_infomodtm[ semod ] = /* rw[ WebSAGE.g_COL_DATA ] + " " + */ rw[ WebSAGE.g_COL_HORA ]; 
             WebSAGE.g_infomodnpt[ semod ] = rw[ WebSAGE.g_COL_NPONTO ];
+            WebSAGE.g_infomodid[ semod ] = rw[ WebSAGE.g_COL_ID ];
+            WebSAGE.g_infomodsubest[ semod ] = rw[ WebSAGE.g_COL_SUBEST ];
             }
           }
        }
@@ -899,11 +905,23 @@ for ( var c in cria )
                                body: cria[c][1],
                                tag: cria[c][0] + "-" + WebSAGE.g_infomodtm[ cria[c][0] ],
                                requireInteraction: true,
-                               icon: Imgs.imgNotific
+                               icon: Imgs.imgNotific,
+                               vibrate: [200, 100, 200],
+                               renotify: false
                                } ); 
 
-    // quando clicada a notificação, fecha e reconhece o alarme, fecha também por timeout
-    nf.onclick = function() { nf.close(); WebSAGE.ackAlarm( 0, 1, WebSAGE.g_infomodnpt[ cria[c][0] ] ); };
+    // quando clicada a notificação, fecha processa o click, fecha também por timeout
+    // nf.onclick = function() { nf.close(); WebSAGE.ackAlarm( 0, 1, WebSAGE.g_infomodnpt[ cria[c][0] ] ); };
+    nf.onclick = function() { 
+        nf.close(); 
+        if (EventsViewer_NotificationClick) 
+          EventsViewer_NotificationClick(
+            WebSAGE.g_infomodnpt[ cria[c][0] ],
+            WebSAGE.g_infomodid[ cria[c][0] ],
+            WebSAGE.g_infomodsubest[ cria[c][0] ]
+            ); 
+        };
+    
     setTimeout( function() { nf.close(); }, 10 * 60 * 1000 ); // timeout de 10 minutos para a notificação
     }
   }  

@@ -74,9 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle( tr("QTester104 IEC60870-5-104") );
 
-    QIntValidator * validator = new QIntValidator( 0, 255, this );
+    QIntValidator * validator = new QIntValidator( 0, 65535, this );
     ui->leLinkAddress->setValidator( validator );
-    ui->leMasterAddress->setValidator( validator );
+    QIntValidator * validator2 = new QIntValidator( 0, 255, this );
+    ui->leMasterAddress->setValidator( validator2 );
 
     QRegExp rx( "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b" );
     QValidator *valip = new QRegExpValidator( rx, this );
@@ -918,6 +919,9 @@ bool is_select = false;
         // if confirmed select, execute
         if ( obj->se == iec104_class::SELECT && obj->pn == iec104_class::POSITIVE )
         {
+            // if defined ASDU address on UI, use it
+            // else will set to zero and use slave address (send Command will substitute zero to slave address)
+            obj->ca = ui->leASDUAddr->text().toInt();
             obj->se = iec104_class::EXECUTE;
             i104.sendCommand( obj );
         }

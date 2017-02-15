@@ -400,16 +400,16 @@ WebSAGE.alternate = function (period, id1, id2)
   WebSAGE.idalt2 = id2;
   window.setTimeout(function (id)
   {
-    top.WebSAGE.flipOut(id);
+    window.WebSAGE.flipOut(id);
   }, 500, id2);
   window.setInterval(function fn(a, b)
   {
     // use fn to create static variables
     var tmp = fn.ida || a;
     fn.ida = fn.idb || b;
-    fn.idb = tmp
-      top.WebSAGE.flipOut(fn.idb);
-    top.WebSAGE.flipIn(fn.ida);
+    fn.idb = tmp;
+    window.WebSAGE.flipOut(fn.idb);
+    window.WebSAGE.flipIn(fn.ida);
   }, period, id1, id2);
 };
 

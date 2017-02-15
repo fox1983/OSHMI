@@ -1,6 +1,8 @@
 REM Turn off the computer
 REM Desliga a máquina
 
+call ..\etc\stop_services.bat
+
 taskkill /F /IM chrome.exe
 taskkill /F /IM mon_proc.exe
 taskkill /F /IM iec104m.exe

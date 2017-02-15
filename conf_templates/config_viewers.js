@@ -35,6 +35,12 @@
 //
 //var EventsViewer_Notific = 1;  // 0: disable desktop notifications, 1=enable desktop notifications
 //
+// defines how to handle notification click 
+// defaults to open a screen with the substation name
+//function EventsViewer_NotificationClick( nponto, id, subest ) {
+//    window.open('screen.html?SELTELA=../svg/'+subest+'.svg','screen','dependent=no,height=1000,width=800,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,modal=no');
+//    }
+//
 //// Tabular Viewer ----------------------------------------------------------------------------------
 //var TabularViewer_ToolbarColor = '#AA9E97'; // toolbar color
 //
