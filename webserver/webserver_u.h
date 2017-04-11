@@ -50,7 +50,6 @@ private:	// User declarations
         void logaln(String msg);
 public:		// User declarations
         __fastcall TfmWebServ(TComponent* Owner);
-        //void ComandoIEC(unsigned int nponto, unsigned int onoff);
         unsigned getKeyNum(String s);
 };
 //---------------------------------------------------------------------------

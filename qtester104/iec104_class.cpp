@@ -1747,7 +1747,7 @@ switch (obj->type)
     apducmd.nsq58.obj.qu = obj->qu;
     apducmd.nsq58.obj.se = obj->se;
     apducmd.nsq58.obj.time.year=agora->tm_year%100;
-    apducmd.nsq58.obj.time.month=agora->tm_mon;
+    apducmd.nsq58.obj.time.month=agora->tm_mon+1;
     apducmd.nsq58.obj.time.mday=agora->tm_mday;
     apducmd.nsq58.obj.time.hour=agora->tm_hour;
     apducmd.nsq58.obj.time.min=agora->tm_min;
@@ -1796,7 +1796,7 @@ switch (obj->type)
     apducmd.nsq59.obj.qu = obj->qu;
     apducmd.nsq59.obj.se = obj->se;
     apducmd.nsq59.obj.time.year=agora->tm_year%100;
-    apducmd.nsq59.obj.time.month=agora->tm_mon;
+    apducmd.nsq59.obj.time.month=agora->tm_mon+1;
     apducmd.nsq59.obj.time.mday=agora->tm_mday;
     apducmd.nsq59.obj.time.hour=agora->tm_hour;
     apducmd.nsq59.obj.time.min=agora->tm_min;
@@ -1844,7 +1844,7 @@ switch (obj->type)
     apducmd.nsq60.obj.qu = obj->qu;
     apducmd.nsq60.obj.se = obj->se;
     apducmd.nsq60.obj.time.year=agora->tm_year%100;
-    apducmd.nsq60.obj.time.month=agora->tm_mon;
+    apducmd.nsq60.obj.time.month=agora->tm_mon+1;
     apducmd.nsq60.obj.time.mday=agora->tm_mday;
     apducmd.nsq60.obj.time.hour=agora->tm_hour;
     apducmd.nsq60.obj.time.min=agora->tm_min;
@@ -1923,7 +1923,7 @@ switch (obj->type)
     apducmd.nsq61.obj.ql = 0;
     apducmd.nsq61.obj.se = obj->se;
     apducmd.nsq61.obj.time.year=agora->tm_year%100;
-    apducmd.nsq61.obj.time.month=agora->tm_mon;
+    apducmd.nsq61.obj.time.month=agora->tm_mon+1;
     apducmd.nsq61.obj.time.mday=agora->tm_mday;
     apducmd.nsq61.obj.time.hour=agora->tm_hour;
     apducmd.nsq61.obj.time.min=agora->tm_min;
@@ -2001,7 +2001,7 @@ switch (obj->type)
     apducmd.nsq62.obj.ql = 0;
     apducmd.nsq62.obj.se = obj->se;
     apducmd.nsq62.obj.time.year=agora->tm_year%100;
-    apducmd.nsq62.obj.time.month=agora->tm_mon;
+    apducmd.nsq62.obj.time.month=agora->tm_mon+1;
     apducmd.nsq62.obj.time.mday=agora->tm_mday;
     apducmd.nsq62.obj.time.hour=agora->tm_hour;
     apducmd.nsq62.obj.time.min=agora->tm_min;
@@ -2079,7 +2079,7 @@ switch (obj->type)
     apducmd.nsq63.obj.ql = 0;
     apducmd.nsq63.obj.se = obj->se;
     apducmd.nsq63.obj.time.year=agora->tm_year%100;
-    apducmd.nsq63.obj.time.month=agora->tm_mon;
+    apducmd.nsq63.obj.time.month=agora->tm_mon+1;
     apducmd.nsq63.obj.time.mday=agora->tm_mday;
     apducmd.nsq63.obj.time.hour=agora->tm_hour;
     apducmd.nsq63.obj.time.min=agora->tm_min;

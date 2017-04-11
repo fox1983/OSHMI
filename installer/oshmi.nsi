@@ -11,7 +11,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 
-!define VERSION "v.4.2"
+!define VERSION "v.4.3"
 
 Function .onInit
  System::Call 'keexrnel32::CreateMutexA(i 0, i 0, t "MutexOshmiInstall") i .r1 ?e'
@@ -124,6 +124,8 @@ Section "" ; empty string makes it hidden, so would starting with -
   var /GLOBAL NAVVISTRE
   var /GLOBAL NAVVISCUR
   var /GLOBAL NAVVISOVW
+  var /GLOBAL NAVVISDOC
+  var /GLOBAL NAVVISLOG
   
   StrCpy $NAVWINCMD "browser\chrome.exe"
   StrCpy $NAVLINCMD "/usr/bin/chromium-browser"
@@ -138,6 +140,8 @@ Section "" ; empty string makes it hidden, so would starting with -
   StrCpy $NAVVISTRE "--app=http://127.0.0.1:51909/htdocs/trend.html"
   StrCpy $NAVVISCUR "--app=http://127.0.0.1:51909/htdocs/histwebview/histwebview.php"
   StrCpy $NAVVISOVW "--app=http://127.0.0.1:51909/htdocs/overview.html"
+  StrCpy $NAVVISDOC "--app=http://127.0.0.1:51909/docs/listdocs.php"
+  StrCpy $NAVVISLOG "--app=http://127.0.0.1:51909/logs/listlogs.php"
 
   ; write reg info
   StrCpy $1 "POOOOOOOOOOOP"
@@ -248,6 +252,7 @@ Section "" ; empty string makes it hidden, so would starting with -
   File /a "..\htdocs\rss.php"
   File /a "..\htdocs\proxy.php"
   File /a "..\htdocs\vega_websage.js"  
+  File /a "..\htdocs\listlogs.php"
   
   SetOutPath $INSTDIR\htdocs\histwebview
   File /a /r "..\htdocs\histwebview\*.*"
@@ -379,8 +384,10 @@ Section "" ; empty string makes it hidden, so would starting with -
   CreateShortCut "$DESKTOP\OSHMI\Overview.lnk"                    "$INSTDIR\$NAVWINCMD" " $NAVDATDIR $NAVPREOPT $NAVVISOVW $NAVPOSOPT" "$INSTDIR\htdocs\images\oshmi.ico" 
 
   SetOutPath $INSTDIR\docs
-  CreateShortCut "$DESKTOP\OSHMI\Operation Manual.lnk"            "$INSTDIR\bin\operation_manual.bat"  
-  CreateShortCut "$DESKTOP\OSHMI\Configuration Manual.lnk"        "$INSTDIR\bin\configuration_manual.bat"  
+  CreateShortCut "$DESKTOP\OSHMI\Operation Manual.lnk"            "$INSTDIR\bin\operation_manual.bat"
+  CreateShortCut "$DESKTOP\OSHMI\Configuration Manual.lnk"        "$INSTDIR\bin\configuration_manual.bat"
+  CreateShortCut "$DESKTOP\OSHMI\Docs Viewer.lnk"                 "$INSTDIR\$NAVWINCMD" " $NAVDATDIR $NAVPREOPT $NAVVISDOC $NAVPOSOPT" "$INSTDIR\htdocs\images\help2.ico"
+  CreateShortCut "$DESKTOP\OSHMI\Logs Viewer.lnk"                 "$INSTDIR\$NAVWINCMD" " $NAVDATDIR $NAVPREOPT $NAVVISLOG $NAVPOSOPT" "$INSTDIR\htdocs\images\info.ico"
 
   SetOutPath $INSTDIR\svg
   CreateShortCut "$DESKTOP\OSHMI\Inkscape SAGE.lnk"               "$PROGRAMFILES\inkscape SAGE\inkscape.exe"

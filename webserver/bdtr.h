@@ -129,9 +129,21 @@ typedef union
      CMDIEC COMIEC;
      } COM_SEMBANCO;
 
+    struct // somente para o comando analógico T_FLT de varredor sem banco
+    {
+    union {
+        short NRM;
+        short ANA;
+        float FLT;
+    };
+        unsigned char UTR;
+        unsigned char ASDU;
+        CMDIEC COMIEC;
+    } COM_SEMBANCOANA;
+
    } valor;
-                    
-typedef  struct           
+
+typedef  struct
    {                                   // etiqueta de tempo
    unsigned short   ANO;               //  ano (1980 a 2099)               
    unsigned char    MES;               //  mes (1 a 12)                     

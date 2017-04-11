@@ -403,6 +403,7 @@ bool GetAlrIn();
 void SetAlrIn( bool val );
 void AlarmaPonto();
 void AlarmAck();
+bool EhComandoDigital();
 };
 
 // Classe Banco Local, representa um banco de tempo real local
@@ -411,6 +412,7 @@ class TBancoLocal
 {
 private:
 
+TCHAR UserName[200 + 1];
 bool UDPActive;
 int CntIntegridade;
 int TemBeep; // informa se o alarme bipa
@@ -430,6 +432,9 @@ bool BipaNoSpeaker; // informa se o alarme deve bipar no falante interno
 unsigned NumVariacoes; // regista o número de variações digitais
 TBancoLocal(); // construtor
 ~TBancoLocal(); // destrutor
+
+char * getUserName();
+void setUserName(char * str);
 
 // retorna referência ao mapa de pontos
 map <int, TPonto> & GetMapaPontos(void);
@@ -558,7 +563,9 @@ typedef struct {
         float fr;      		// valor em ponto flutuante
         unsigned char qds; 	// qualificador do ponto
 } flutuante_seq;
-   
+
+long round_( double x );
+
 #pragma pack(pop)
 #endif // BCOLOCAL_H_
 

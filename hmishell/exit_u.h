@@ -72,6 +72,7 @@ public:		// User declarations
         bool PasswdTest( char * pswd );
         // senha padrão: hash já em hexa
         String DOC_AJUDA;
+        String LOG_AJUDA;
         String msgAltSenha;
         String msgSalvaSenha;
         bool Fechando;

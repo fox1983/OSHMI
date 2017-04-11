@@ -51,7 +51,8 @@ int  IncluiEvento( unsigned int EndPonto,
 int SetAckCmd(int EndPonto, int falha, int cmd); // seta ack de comando
 void RecebeuIntegridade();
 void RecebeuHora(msg_sinc *m);
-int MandaComando(int nponto, int val, int tipo);
+int MandaComandoDig(int nponto, int val);
+int MandaComandoAna(int nponto, float val);
 void CommandIndication(int endcmd, char flags, float valor);
 };
 

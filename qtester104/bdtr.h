@@ -130,9 +130,13 @@ typedef union
         CMDIEC COMIEC;
     } COM_SEMBANCO;
 
-    struct // somente para o comando analógico T_FLT de varredor sem banco
+    struct // somente para o comando analógico de varredor sem banco
     {
+    union {
+        short NRM;
+        short ANA;
         float FLT;
+    };
         unsigned char UTR;
         unsigned char ASDU;
         CMDIEC COMIEC;

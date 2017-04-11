@@ -3,7 +3,7 @@
 
 // Parâmetros e constantes de configuração do sistema
 
-#define VERSAO "3.15"
+#define VERSAO "4.3"
 
 extern int IEC104_PORT;
 extern int IEC104_1_SEC; // endereço secundário da utr 1
@@ -43,6 +43,7 @@ extern String WEBSERVER_DP_INVALID; // message for iec digital double 11
 
 extern int HIST_RECORD;
 extern int HIST_DEADBANDFACTOR;
+extern int HIST_LIFETIME;
 
 extern int DELAY;
 extern int INTERVAL;
@@ -83,6 +84,8 @@ extern String VISOR_TENDENCIAS;
 #define ARQUIVO_INI_I18N "..\\i18n\\messages_i18n.ini"
 #define ARQUIVO_LOG "..\\logs\\webserver.log"
 #define ARQUIVO_LOGCMD "..\\logs\\cmd.log"
+#define ARQUIVO_LOGANOT "..\\logs\\anot.log"
+#define ARQUIVO_LOGUSER "..\\logs\\user.log"
 
 #define ARQUIVO_LIST1 "..\\conf\\sage_id.txt"
 #define ARQUIVO_LIST2 "..\\conf\\point_list.txt"

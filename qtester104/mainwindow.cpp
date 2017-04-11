@@ -33,9 +33,12 @@
 #include <QDateTime>
 #include <QItemSelectionModel>
 #include <string>
+#include <sstream>
 #include <time.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+using namespace std;
 
 //-------------------------------------------------------------------------------------------------------------------------
 
@@ -273,11 +276,20 @@ void MainWindow::slot_BDTR_pronto_para_ler()
             msg_com * msg;
             msg = (msg_com*)br;
             bool enviar = false;
+            stringstream oss;
 
-            BDTR_Loga("--> BDTR COM");
+            oss.str("");
+            oss << "--> BDTR COM : TVAL="
+                << (unsigned)msg->TVAL
+                << " STATUS="
+                << (unsigned)msg->PONTO.STATUS
+                << " ID="
+                << (unsigned) msg->PONTO.ID;
+            BDTR_Loga((char*)oss.str().c_str());
 
             if ( msg->TVAL == T_DIG ) // DIGITAL
             {
+                BDTR_Loga("    DIGITAL");
                 msg_ack *ms;
                 ms = (msg_ack*)bufOut;
                 // status bits 11 and 00 are used for command blocking
@@ -344,8 +356,9 @@ void MainWindow::slot_BDTR_pronto_para_ler()
                 }
             }
             else
-            if ( msg->TVAL == T_FLT ) // ANALÓGICO FLOAT
+            if ( msg->TVAL == T_FLT || msg->TVAL == T_NORM || msg->TVAL == T_ANA ) // ANALÓGICOS
             {
+                BDTR_Loga("    ANALOG");
                 msg_ack *ms;
                 ms = (msg_ack*)bufOut;
                 iec_obj obj;
@@ -357,16 +370,26 @@ void MainWindow::slot_BDTR_pronto_para_ler()
 
                 switch ( msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU )
                   {
-                  case 0: // if ASDU not defined, use float
-                    msg->PONTO.VALOR.COM_SEMBANCO.ASDU = iec104_class::C_SE_NC_1;
                   case iec104_class::C_SE_NA_1: // analógico normalizado
                   case iec104_class::C_SE_TA_1: // analógico normalizado com time tag
+                    obj.value = msg->PONTO.VALOR.COM_SEMBANCOANA.NRM;
+                    obj.type = msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU;
+                    enviar=true;
+                    break;
+
                   case iec104_class::C_SE_NB_1: // analógico escalado
                   case iec104_class::C_SE_TB_1: // analógico escalado com time tag
+                    obj.value = msg->PONTO.VALOR.COM_SEMBANCOANA.ANA;
+                    obj.type = msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU;
+                    enviar=true;
+                    break;
+
+                  case 0: // 0: use floating point, without time
+                    msg->PONTO.VALOR.COM_SEMBANCO.ASDU = iec104_class::C_SE_NC_1;
                   case iec104_class::C_SE_NC_1: // analógico float
                   case iec104_class::C_SE_TC_1: // analógico float com time tag
-                    obj.type = msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU;
                     obj.value = msg->PONTO.VALOR.COM_SEMBANCOANA.FLT;
+                    obj.type = msg->PONTO.VALOR.COM_SEMBANCOANA.ASDU;
                     enviar=true;
                     break;
 

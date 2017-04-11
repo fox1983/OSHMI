@@ -283,13 +283,13 @@ static hmi_sendcmd( lua_State *L )
          {
          if ( IP_BDTR1 == "" ) // se não tem bdtr, manda pelo 104
            {
-           int ret = fmIEC104M->ComandoIEC( nponto, valor&0x01?0:1 );
+           int ret = fmIEC104M->ComandoIEC_Dig( nponto, valor&0x01?0:1 );
            lua_pushinteger( L, ret );
            return 1;
            }
          else
            {
-           int ret = fmBDTR->bdtr.MandaComando( nponto, valor, T_DIG );
+           int ret = fmBDTR->bdtr.MandaComandoDig( nponto, valor );
            lua_pushinteger( L, ret );
            return 1;
            }

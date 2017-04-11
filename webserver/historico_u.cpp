@@ -21,6 +21,7 @@ OSHMI - Open Substation HMI
 #pragma hdrstop
 #include <stdio.h>
 #include <time.h>
+#include "config.h"
 
 #include "historico_u.h"
 //---------------------------------------------------------------------------
@@ -179,7 +180,7 @@ void __fastcall TfmHist::btApagaAntigosClick(TObject *Sender)
     if ( fp != NULL )
       {
       String SQL = "BEGIN IMMEDIATE TRANSACTION;\n";
-      SQL = SQL + (String)"delete from hist where data < " + (String)( time(NULL) - 60*60*24*36 ) + (String)" ;\n";
+      SQL = SQL + (String)"delete from hist where data < " + (String)( time(NULL) - 60*60*24*HIST_LIFETIME ) + (String)" ;\n";
       SQL = SQL + "COMMIT;\n";
       // Não vou fazer VACUUM/REINDEX pois é muito lento e os espaços vazios tendem a ser ocupados pelos novos dados
       // a tendência é que o tamanho da tabela se mantenha constante após atingir os 36 dias

@@ -1081,10 +1081,20 @@ showValsCmd2 : function()
 
   WebSAGE.g_win_cmd.document.getElementById('CMD_OFF').text = CST_OFF.toUpperCase();    
   WebSAGE.g_win_cmd.document.getElementById('CMD_ON').text = CST_ON.toUpperCase();
-  // WebSAGE.g_win_cmd.document.getElementById('EXECUTAR').innerHTML = CST_OFF.toUpperCase()+"!";
   WebSAGE.g_win_cmd.document.getElementById('EXECUTAR').style.display = "";
   WebSAGE.g_win_cmd.document.getElementById('EXECUTAR').disabled = true;
-  WebSAGE.g_win_cmd.document.getElementById('COMANDO').style.display = "";
+  WebSAGE.g_win_cmd.document.getElementById('COMANDO').style.display = "none";
+  WebSAGE.g_win_cmd.document.getElementById('COMANDOANA').style.display = "none";
+
+  if ( CST_OFF != "" || CST_ON != "" )
+    { // Digital Command
+    WebSAGE.g_win_cmd.document.getElementById('COMANDO').style.display = "";
+    }
+  else  
+    { // Analog Command
+    WebSAGE.g_win_cmd.document.getElementById('COMANDOANA').style.display = "";
+    WebSAGE.g_win_cmd.document.getElementById('COMANDOANA').value = V[NPTO];
+    }      
 }, 
 
 executaComando : function(cmd_01)

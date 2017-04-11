@@ -88,6 +88,7 @@ __fastcall TfmSair::TfmSair(TComponent* Owner)
         : TForm(Owner)
 {
 DOC_AJUDA = "hidec.exe listdocs.bat";
+LOG_AJUDA = "hidec.exe listlogs.bat";
 HIDEPASSWD = 0;
 
 TIniFile *pIni = new TIniFile( ARQ_CONFI18N );
@@ -137,6 +138,27 @@ fmShell->Timer6->Enabled = false;
 fmShell->Timer7->Enabled = false;
 fmShell->Timer8->Enabled = false;
 
+// Log user logout
+// register the system start and (OS) username
+#pragma warn -aus
+TCHAR UserName[200];
+UserName[0]='\0';
+DWORD size = sizeof(UserName) - 1;
+GetUserName((TCHAR*)UserName, &size);
+Loga( (String)"System Shutdown. User=" + (String)UserName );
+
+try
+  {
+  String Rq = (String)"http://" +
+              (String)REMOTE_HOST + (String)":" +
+              (String)REMOTE_PORT + (String)"/" +
+              (String)"htdocs/pntserver.rjs?U=" + (String)UserName + (String)"&O=Shutdown";
+  fmShell->NMHTTP1->TimeOut = 0;
+  fmShell->NMHTTP1->Get( Rq );
+  } catch ( Exception &E ) {}
+
+Sleep(100);
+
 try
   {
   fmShell->NMHTTP1->Host = "127.0.0.1";
@@ -167,6 +189,27 @@ fmShell->Timer5->Enabled = false;
 fmShell->Timer6->Enabled = false;
 fmShell->Timer7->Enabled = false;
 fmShell->Timer8->Enabled = false;
+
+// Log user logout
+// register the system start and (OS) username
+#pragma warn -aus
+TCHAR UserName[200];
+UserName[0]='\0';
+DWORD size = sizeof(UserName) - 1;
+GetUserName((TCHAR*)UserName, &size);
+Loga( (String)"System Reboot. User=" + (String)UserName );
+
+try
+  {
+  String Rq = (String)"http://" +
+              (String)REMOTE_HOST + (String)":" +
+              (String)REMOTE_PORT + (String)"/" +
+              (String)"htdocs/pntserver.rjs?U=" + (String)UserName + (String)"&O=Reboot";
+  fmShell->NMHTTP1->TimeOut = 0;
+  fmShell->NMHTTP1->Get( Rq );
+  } catch ( Exception &E ) {}
+
+Sleep(100);
 
 try
   {
@@ -199,6 +242,27 @@ fmShell->Timer6->Enabled = false;
 fmShell->Timer7->Enabled = false;
 fmShell->Timer8->Enabled = false;
 
+// Log user logout
+// register the system start and (OS) username
+#pragma warn -aus
+TCHAR UserName[200];
+UserName[0]='\0';
+DWORD size = sizeof(UserName) - 1;
+GetUserName((TCHAR*)UserName, &size);
+Loga( (String)"System Logoff. User=" + (String)UserName );
+
+try
+  {
+  String Rq = (String)"http://" +
+              (String)REMOTE_HOST + (String)":" +
+              (String)REMOTE_PORT + (String)"/" +
+              (String)"htdocs/pntserver.rjs?U=" + (String)UserName + (String)"&O=Logoff";
+  fmShell->NMHTTP1->TimeOut = 0;
+  fmShell->NMHTTP1->Get( Rq );
+  } catch ( Exception &E ) {}
+
+Sleep(100);
+  
 try
   {
   fmShell->NMHTTP1->Host = "127.0.0.1";
@@ -417,7 +481,10 @@ else
 
 void __fastcall TfmSair::btAjudaClick(TObject *Sender)
 {
-  WinExec( DOC_AJUDA.c_str(), SW_SHOWNORMAL );
+  if ( GetKeyState(VK_SHIFT) )
+    WinExec( LOG_AJUDA.c_str(), SW_SHOWNORMAL );
+  else
+    WinExec( DOC_AJUDA.c_str(), SW_SHOWNORMAL );
 }
 //---------------------------------------------------------------------------
 

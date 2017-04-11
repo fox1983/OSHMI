@@ -483,7 +483,7 @@ void __fastcall TfmSDE::btEmptyClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-// apaga registros de mais de 40 dias
+// apaga registros de mais de n dias
 void __fastcall TfmSDE::btApagaAntigosClick(TObject *Sender)
 {
     FILE * fp;
@@ -494,7 +494,7 @@ void __fastcall TfmSDE::btApagaAntigosClick(TObject *Sender)
       {
       String SQL = "BEGIN IMMEDIATE TRANSACTION;\n";
       // SQL = SQL + "delete from soe where date(ts, 'unixepoch', 'localtime') < date('now', '-36 days');\n";
-      SQL = SQL + (String)"delete from soe where ts < " + (String)( time(NULL) - 60*60*24*36 ) + (String)" ;\n";
+      SQL = SQL + (String)"delete from soe where ts < " + (String)( time(NULL) - 60*60*24*HIST_LIFETIME ) + (String)" ;\n";
       SQL = SQL + "COMMIT;\n";
       // Não vou fazer VACUUM/REINDEX pois é muito lento e os espaços vazios tendem a ser ocupados pelos novos dados
       // a tendência é que o tamanho da tabela se mantenha constante após atingir os 36 dias

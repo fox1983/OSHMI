@@ -27,8 +27,9 @@
 /*jslint sloppy: true */
 /*jslint plusplus: true */
 
+var toutMaxCnt = 35;
 var cntAck = 0;
-var cnttout = 35;
+var cnttout = toutMaxCnt;
 
 // altera o texto do botão de comando conforme opção selecionada
 function selchg()
@@ -36,10 +37,18 @@ function selchg()
 var obj = document.getElementById( "COMANDO" );
 if ( obj.selectedIndex != -1 )
   {
-  document.getElementById('EXECUTAR').innerHTML = obj.options[obj.selectedIndex].text + "!";
+  document.getElementById('EXECUTAR').innerHTML = obj.options[obj.selectedIndex].text + " !";
   document.getElementById('EXECUTAR').style.display = "";
   document.getElementById('EXECUTAR').disabled = false;
   }
+}
+
+// altera o texto do botão de comando conforme o valor digitado
+function anachg()
+{
+  document.getElementById('EXECUTAR').innerHTML = document.getElementById( "COMANDOANA" ).value + " !";
+  document.getElementById('EXECUTAR').style.display = "";
+  document.getElementById('EXECUTAR').disabled = false;
 }
 
 function testOpener()
@@ -187,8 +196,13 @@ function init() { // executa quando termina de carregar o documento
 // Executa comando e prepara para mostra o ack do comando
 function executa_cmd()
 {
-window.opener.WebSAGE.executaComando( document.getElementById('COMANDO').selectedIndex + 1 );
+if ( document.getElementById('COMANDO').style.display != "none" )
+  window.opener.WebSAGE.executaComando( document.getElementById('COMANDO').selectedIndex + 1 );
+else  
+  window.opener.WebSAGE.executaComando( document.getElementById('COMANDOANA').value );
 
+document.getElementById('COMANDO').disabled = true;  
+document.getElementById('COMANDOANA').disabled = true;  
 document.getElementById("SAIR").style.visibility = "hidden";
 document.getElementById("EXECUTAR").style.visibility = "hidden";
 
@@ -220,10 +234,13 @@ $( init );
 <br>
 <div style="display:table;">
 <div style="display:table-cell;vertical-align:middle;">
-<select id="COMANDO" onclick="setTimeout('selchg()',100);" onchange="setTimeout('selchg()',150);" size="2" style="height:54px; display:none; font-family:tahoma; font-size:14pt;">
+<select id="COMANDO" onclick="setTimeout('selchg()',100);cnttout = toutMaxCnt;" onchange="setTimeout('selchg()',150);cnttout = toutMaxCnt;" size="2" style="display:none; height:54px; font-family:tahoma; font-size:14pt;">
 <option id="CMD_OFF">COMANDO_OFF</option>
 <option id="CMD_ON">COMANDO_ON</option>
-</select>&nbsp;&nbsp;&nbsp;<button id="EXECUTAR"  disabled="disabled" style="display:none; color:red; font-family:tahoma; font-size:14pt; cursor:pointer;" onclick="executa_cmd();" tabindex="1" value="1" type="button"></button>
+</select>
+<input id="COMANDOANA" type="number" size=9 style="display:none;font-family:tahoma; font-size:14pt;" onkeydown="setTimeout('anachg()',100);cnttout = toutMaxCnt;" onchange="setTimeout('anachg()',150);cnttout = toutMaxCnt;">
+</input>
+&nbsp;&nbsp;&nbsp;<button id="EXECUTAR"  disabled="disabled" style="display:none; color:red; font-family:tahoma; font-size:14pt; cursor:pointer;" onclick="executa_cmd();" tabindex="1" value="1" type="button"></button>
 </div>
 </div>
 <span id='TXTACK_CMD' style='color:red;'>&nbsp;</span><br>

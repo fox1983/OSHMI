@@ -113,6 +113,40 @@ QTester104:
 
 -------------------------------------------------------------------
 
+Notes for version 4.3:
+
+Webserver:
+  - Support for analog commands.
+  - Corrected bug importing units of measure.
+  - Configurable lifetime for historical data.
+  - Log of IP address origin of commands.
+  - Logging of annotations.
+  - Logging of remote user login/logout.
+  
+Screen, Tabular and Events Viewers, Command Dialog:
+  - Support for analog commands.
+  - Timeout for commands resets when option selected or analog value changed.
+
+QTester104:
+  - Updated to version 1.21.
+  - Corrected bug of wrong month set on commands with time.
+  - Support for analog commands comming from OSHMI Webserver BDTR converter.
+
+SQLite:
+  - Updated to version 3.18.0.
+  
+HMIShell:
+  - Added log files viewer.
+  - Login/Logout log of user.
+  
+OSHMI Shortcuts Folder:
+  - Added shortcuts to Docs and Logs Viewers.
+
+Chromium:
+  - Updated to version 57.0.2987.133.
+
+-------------------------------------------------------------------
+
 Notes for version 4.2:
 
 QTester104:

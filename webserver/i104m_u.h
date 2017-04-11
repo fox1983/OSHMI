@@ -43,15 +43,19 @@ unsigned char info[2000]; // { 4 bytes unsigned int address, point value (taminf
 
 #define MSGCMD_SIG 0x4b4b4b4b
 typedef struct
-  {
-  unsigned int signature; // 0x4b4b4b4b
-  unsigned int endereco;
-  unsigned int tipo;
-  unsigned int onoff;
-  unsigned int sbo;
-  unsigned int qu;
-  unsigned int utr;
-  } t_msgcmd;
+{
+	unsigned int signature; // 0x4b4b4b4b
+	unsigned int endereco;
+	unsigned int tipo;
+	union
+	{
+		unsigned int onoff;
+		float setpoint;
+	};
+	unsigned int sbo;
+	unsigned int qu;
+	unsigned int utr;
+} t_msgcmd;
 
 //---------------------------------------------------------------------------
 class TfmIEC104M : public TForm
@@ -72,7 +76,8 @@ private:	// User declarations
         void logaln( String msg );
 public:		// User declarations
         __fastcall TfmIEC104M(TComponent* Owner);
-        int ComandoIEC( unsigned int nponto, unsigned int onoff );
+        int ComandoIEC_Dig( unsigned int nponto, unsigned int onoff );
+        int ComandoIEC_Ana( unsigned int nponto, float val );
         int I104_cntIntgr;
         int cntPackt;
         int cntPacktDisc;

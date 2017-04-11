@@ -20,6 +20,7 @@ OSHMI - Open Substation HMI
 
 #include <vcl.h>
 #pragma hdrstop
+#include <math.h>
 
 #include "i104m_u.h"
 #include "config.h"
@@ -42,11 +43,12 @@ I104_cntIntgr = 0;
 cntPackt = 0;
 cntPacktDisc = 0;
 }
+
 //---------------------------------------------------------------------------
 
-// Envia comando ao varredor iec104m
+// Envia comando digital ao varredor iec104m
 // onoff : 1=ON, 0=OFF
-int TfmIEC104M::ComandoIEC( unsigned int nponto, unsigned int onoff )
+int TfmIEC104M::ComandoIEC_Dig( unsigned int nponto, unsigned int onoff )
 {
 bool found;
 TPonto &pt = BL.GetRefPonto( nponto, found );
@@ -78,17 +80,11 @@ else
 
 int tambf = sizeof( msgcmd );
 
-//NMUDP1->RemoteHost = "127.0.0.1";
-//NMUDP1->RemotePort = I104M_REMOTEPORT;
-//NMUDP1->SendBuffer( (char *)&msgcmd, tambf, tambf );
 IdUDPServer1->SendBuffer( "127.0.0.1", I104M_REMOTEPORT, (char *)&msgcmd, tambf );
 
 // manda para o varredor 104 redundante
 if ( IHMRED_IP_OUTRO_IHM != "" )
   {
-  //NMUDP1->RemoteHost = IHMRED_IP_OUTRO_IHM;
-  //NMUDP1->RemotePort = I104M_REMOTEPORT;
-  //NMUDP1->SendBuffer( (char *)&msgcmd, tambf, tambf );
   IdUDPServer1->SendBuffer( IHMRED_IP_OUTRO_IHM, I104M_REMOTEPORT, (char *)&msgcmd, tambf );
   }
 
@@ -106,6 +102,110 @@ IncluiEvento( nponto,
               0 );
 return 0;
 }
+
+//---------------------------------------------------------------------------
+
+// Envia comando analógico ao varredor iec104m
+int TfmIEC104M::ComandoIEC_Ana( unsigned int nponto, float val )
+{
+bool found;
+float temp;
+TPonto &pt = BL.GetRefPonto( nponto, found );
+if ( !found && nponto!=0 )
+  return 1;
+
+static t_msgcmd msgcmd;
+
+msgcmd.signature = MSGCMD_SIG;
+msgcmd.onoff = 0;
+
+if ( nponto == 0 ) // GI
+  {
+  I104_cntIntgr++;
+  msgcmd.tipo = 1001;
+  msgcmd.endereco = 0;
+  msgcmd.sbo = 0;
+  msgcmd.qu = 0;
+  msgcmd.utr = 0;
+  }
+else
+  {
+  msgcmd.endereco = pt.Endereco;
+  msgcmd.tipo = pt.CmdASDU;
+  msgcmd.sbo = pt.CmdSBO;
+  msgcmd.qu = pt.CmdDuracao;
+  msgcmd.utr = pt.UTR;
+
+  switch ( pt.CmdASDU )
+    {
+    case 48: // C_SE_NA_1 Set-point normalized
+    case 61: // C_SE_TA_1 Set-point normalized w/ time
+      if ( pt.KConv1 !=0 )
+        {
+        temp = ((val - pt.KConv2) / pt.KConv1) * 32767;
+        // limit possible values
+        if ( temp > 32767 )
+          temp = 32767;
+        if ( temp < -32768 )
+          temp = -32768;
+        msgcmd.setpoint = temp;
+        }
+      else
+        return 5;
+      break;
+
+    case 49: // C_SE_NB_1 Set-point scaled
+    case 62: // C_SE_TB_1 Set-point scaled w/ time
+      temp = val * pow10 (pt.CasaDecimal);
+      // limit possible values
+      if ( temp > 32767 )
+        temp = 32767;
+      if ( temp < -32768 )
+        temp = -32768;
+      msgcmd.setpoint =  temp;
+      break;
+
+    default:
+    case 50: // C_SE_NC_1 Set-point short floating point
+    case 63: // C_SE_TC_1 Set-point short floating point w/ time
+      msgcmd.setpoint =  val;
+      break;
+    }           
+  }
+
+int tambf = sizeof( msgcmd );
+
+IdUDPServer1->SendBuffer( "127.0.0.1", I104M_REMOTEPORT, (char *)&msgcmd, tambf );
+
+// manda para o varredor 104 redundante
+if ( IHMRED_IP_OUTRO_IHM != "" )
+  {
+  IdUDPServer1->SendBuffer( IHMRED_IP_OUTRO_IHM, I104M_REMOTEPORT, (char *)&msgcmd, tambf );
+  }
+
+// registra evento do envio do comando
+if ( msgcmd.tipo != 1001 ) // não registra pedido de GI
+  {
+  TFA_Qual qlf;
+  qlf.Byte = 0;
+  qlf.Tipo = TIPO_ANALOGICO;
+  qlf.EventoAnalogicoVUTR = 1;
+  qlf.CasaDecimal = pt.CasaDecimal;
+  IncluiEvento( nponto,
+                round_( val * pow10( pt.CasaDecimal ) ),
+                qlf.Byte,
+                0,
+                SDE_GERAHORA,
+                0,
+                0,
+                0,
+                0,
+                0
+                );
+  }
+return 0;
+}
+
 //---------------------------------------------------------------------------
 
 void __fastcall TfmIEC104M::Timer1Timer(TObject *Sender)
@@ -116,7 +216,7 @@ if ( IHM_EstaFinalizando() ) return;
 if ( IP_BDTR1 == "" && !BL.HaSimulacao() )
   {
   // pede uma GI para o iec104m
-  ComandoIEC( 0, 0 );
+  ComandoIEC_Dig( 0, 0 );
   BL.RecebeuIntegridade(); // sinaliza integridade
   }
 
@@ -286,7 +386,7 @@ if ( msg_valid )
     // se estava falhada comunicação com I104 e normalizou, dispara GI, testa quantas
     if ( BL.GetRefPonto(NPONTO_COMUNIC_I104).Qual.Duplo == ESTDUP_OFF && I104_cntIntgr > 1 )
       {
-      ComandoIEC( 0, 0 ); // GI
+      ComandoIEC_Dig( 0, 0 ); // GI
       }
     }
   catch ( char * p )

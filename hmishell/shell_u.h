@@ -167,9 +167,13 @@ public:		// User declarations
 extern PACKAGE TfmShell *fmShell;
 //---------------------------------------------------------------------------
 
+extern String REMOTE_HOST;
+extern int REMOTE_PORT;
+
 #define ARQ_CONF "..\\conf\\hmishell.ini"
 #define ARQ_CONFI18N "..\\i18n\\messages_i18n.ini"
 #define ARQ_CONF_IHM "..\\conf\\hmi.ini"
+#define ARQ_LOG "..\\logs\\hmishell.log"
 
 // estados possíveis de beep 
 #define BEEP_NENHUM 0
@@ -177,5 +181,6 @@ extern PACKAGE TfmShell *fmShell;
 #define BEEP_CRITICO 2
 
 void ExecExternApp(char * cmd);
+void Loga(String msg, String arq=ARQ_LOG );
 
 #endif

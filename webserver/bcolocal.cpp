@@ -418,6 +418,26 @@ bool TPonto::AlarmeInibido()
 return ( AlrIn );
 }
 
+bool TPonto::EhComandoDigital()
+{
+if ( EhComando() &&
+     (
+     TipoAD == 'D' ||
+     CmdASDU==45 ||
+     CmdASDU==46 ||
+     CmdASDU==47 ||
+     CmdASDU==58 ||
+     CmdASDU==59 ||
+     CmdASDU==60 ||
+     // BACALHAU: enquanto temos muitos comandos de tap cadastrados como analógicos, vou forçar que é digital
+     (CodOCR==216 && CodTpEq==16 && CodInfo==0)
+     )
+   )
+   return true;
+else
+   return false;     
+}
+
 String TPonto::GetTipo()
 {
 if ( CodOrigem == CODORIGEM_COMANDO ) // forca tipo digital para comandos
@@ -433,10 +453,10 @@ char * pch;
 
 // register the system start and (OS) username
 #pragma warn -aus
-TCHAR username[200 + 1];
-DWORD size = 200 + 1;
-GetUserName((TCHAR*)username, &size);
-Loga( (String)"System Started. User=" + (String)username + (String)" :-)" );
+UserName[0]='\0';
+DWORD size = sizeof(UserName) - 1;
+GetUserName((TCHAR*)UserName, &size);
+Loga( (String)"System Started. User=" + (String)getUserName() + (String)" :-)" );
 
 NumVariacoes = 0;
 LastBeepPnt = 0;
@@ -629,6 +649,7 @@ if (fp)
         }
 
       strncpy( Pontos[nponto].Unidade, Trim(alarme).c_str(), sizeof(Pontos[nponto].Unidade)-1 );
+      Pontos[nponto].Unidade[sizeof(Pontos[nponto].Unidade)-1] = '\0';
 
       // ajusta banda morta de acordo com tipo ou unidades
       Pontos[nponto].BandaMortaHist = 2.0;
@@ -636,7 +657,7 @@ if (fp)
         Pontos[nponto].BandaMortaHist = 0.4;
       else
       if ( strcmp( Pontos[nponto].Unidade , "MW" ) == 0 ||
-           strcmp( Pontos[nponto].Unidade , "MVAr" ) == 0 ||
+           strcmp( Pontos[nponto].Unidade , "Mvar" ) == 0 ||
            strcmp( Pontos[nponto].Unidade , "MVA" ) == 0
          )
         Pontos[nponto].BandaMortaHist = 2.5;
@@ -658,7 +679,7 @@ if (fp)
          Pontos[nponto].TimeoutCongel = 0;
       }
     else
-      {  // digital
+      { // digital
       if ( estalm == 3 )
         {
         EscrevePonto(nponto, FA_ESTFASIM_OFF, 0x02, 1);
@@ -701,7 +722,10 @@ if (fp)
 
     Pontos[nponto].CodOCR = ocr;
 
-    if ( tipo == 'D' || origem == CODORIGEM_COMANDO )
+    if ( tipo == 'D' ||
+    // força comando de tap como digital
+         ( origem == CODORIGEM_COMANDO && ocr == 216 && tpeq == 16 && info == 0 )
+       )
       {
       strcpy( Pontos[nponto].EstadoOn, strchr(alarme,'/') + 1 );
       S = Trim(alarme);
@@ -766,8 +790,8 @@ if (fp)
     Pontos[nponto].CodOrigem = origem;
     Pontos[nponto].CodTpEq = tpeq;
     Pontos[nponto].CodInfo = info;
-    strncpy( Pontos[nponto].Tag, tag, sizeof(Pontos[nponto].Tag) );
-    Pontos[nponto].Tag[sizeof(Pontos[nponto].Tag)] = '\0';
+    strncpy( Pontos[nponto].Tag, Trim(tag).c_str(), sizeof(Pontos[nponto].Tag)-1 );
+    Pontos[nponto].Tag[sizeof(Pontos[nponto].Tag)-1] = '\0';
     MapNPontoPorTag[Pontos[nponto].Tag] = nponto;
 
     Pontos[nponto].UTR = utr;
@@ -2466,6 +2490,19 @@ int TBancoLocal::GetSimulacao()
 bool TBancoLocal::HaSimulacao()
 {
   return ( ModoSimulacao != SIMULMOD_NAO );
+}
+
+// seta o nome do usuário do sistema
+char * TBancoLocal::getUserName()
+{
+return UserName;
+}
+
+// retorna o nome do usuário do sistema
+void TBancoLocal::setUserName(char * str)
+{
+strncpy(UserName, str, sizeof(UserName)-1);
+UserName[sizeof(UserName)-1]='\0';
 }
 
 //------------------------------------------------------------------------------------------------------------------

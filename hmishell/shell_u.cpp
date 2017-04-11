@@ -213,6 +213,15 @@ tbTabular->Enabled = false;
 tbCurvas->Enabled = false;
 WEBSERVER_DATE_FMT = "yy/mm/dd hh:nn:ss";
 
+// Log user login
+// register the system start and (OS) username
+#pragma warn -aus
+TCHAR UserName[200];
+UserName[0]='\0';
+DWORD size = sizeof(UserName) - 1;
+GetUserName((TCHAR*)UserName, &size);
+Loga( (String)"System Started. User=" + (String)UserName );
+
 // espera mudar segundo par, para sincronizar beep
 int tt = time(NULL)/2;
 do {
@@ -275,6 +284,16 @@ if ( pIni != NULL )
 
   delete pIni;
   }
+
+try
+  {
+  String Rq = (String)"http://" +
+              (String)REMOTE_HOST + (String)":" +
+              (String)REMOTE_PORT + (String)"/" +
+              (String)"htdocs/pntserver.rjs?U=" + (String)UserName + (String)"&O=Login";
+  NMHTTP1->TimeOut = 0;
+  NMHTTP1->Get( Rq );
+  } catch ( Exception &E ) {}
 
 pIni = new TIniFile( ARQ_CONFI18N );
 if ( pIni != NULL )
@@ -1271,5 +1290,25 @@ void TfmShell::AtivaBeep( int tipo )
 {
 if ( TemBeep == BEEP_NENHUM || TemBeep == BEEP_NORMAL )
   TemBeep = tipo;
+}
+
+// Loga mensagem em arquivo 
+void Loga(String msg, String arq )
+{
+FILE *fp;
+
+  if ( ( fp = fopen( arq.c_str(), "at" ) ) != NULL )
+    {
+    TDateTime dt;
+    dt = dt.CurrentDateTime();
+    String S = dt.FormatString( "yy/mm/dd hh:nn:ss(" );
+    String Saux;
+    S = S + Saux.sprintf( "%03d", GetTickCount() % 1000 );
+    S = S + ") - ";
+    fputs( S.c_str(), fp );
+    fputs( msg.c_str(), fp );
+    fputs( "\n", fp );
+    fclose( fp );
+    }
 }
 

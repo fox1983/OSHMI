@@ -420,11 +420,19 @@ if ( nptsup != 0 )
     }
   else
     { // analógico
-    // simula como sobe/desce tap
-    if ( valor == 2 )
-      valor = ptsup.Valor + 1;
+
+    // ponto é analógico, mas comando é digital, então é do tipo sobe/desce
+    if ( ptcmd.EhComandoDigital() )
+      {
+      // simula como sobe/desce tap
+      if ( valor == 2 )
+        valor = ptsup.Valor + 1;
+      else
+        valor = ptsup.Valor - 1;
+      }
     else
-      valor = ptsup.Valor - 1;
+      valor = valor; // vai escrever no ponto supervisionado o valor recebido no comando
+
     flags.Tipo = TIPO_ANALOGICO;
     }
 

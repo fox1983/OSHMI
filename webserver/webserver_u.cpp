@@ -338,6 +338,7 @@ switch ( ARequestInfo->UnparsedParams[1] )
      TCHAR username[200 + 1];
      DWORD size = 200 + 1;
      GetUserName((TCHAR*)username, &size);
+     // Usuário SYSTEM ou SISTEMA, significa rodando como serviço, neste caso não fecha 
      if ( (String)username != (String)"SYSTEM" && (String)username != (String)"SISTEMA" )
        {
        Timer2->Interval = 2000;
@@ -372,6 +373,15 @@ switch ( ARequestInfo->UnparsedParams[1] )
                                       ARequestInfo->Params->Strings[1].SubString(3,1000)+
                                       (String)"();\n";
          }
+     }
+     break;
+
+  case 'U': // Mensagem de usuário remoto Login, Logout, Reboot, Shutdown
+     {
+     String Username = ARequestInfo->Params->Strings[0].SubString(3,100).c_str();
+     String Operation = ARequestInfo->Params->Strings[1].SubString(3,100).c_str();
+     Loga( (String)"IP=" + ARequestInfo->RemoteIP + (String)" user=" + Username + (String)", oper=" + Operation,  ARQUIVO_LOGUSER );
+     AResponseInfo->ContentText = "Ok\n";
      }
      break;
 
@@ -445,10 +455,11 @@ switch ( ARequestInfo->UnparsedParams[1] )
              StringReplaceCh(SVal, '.', ','); // troca os pontos por vírgula (para o excel)
 
            ID = (String)pt.GetNome();
-           Subest = ID.SubString(1,4);
-           if ( Subest.Length() == 4 )
-           if ( Subest[4] == '-' )
-              Subest.SetLength(3);
+           Subest = pt.Estacao;
+           //ID.SubString(1,4);
+           //if ( Subest.Length() == 4 )
+           //if ( Subest[4] == '-' )
+           //   Subest.SetLength(3);
            pt.GetModDescr( descr );
            String S = descr;
            StringReplaceCh(S, ',', '.'); // tira as virgulas da descricao
@@ -643,10 +654,10 @@ switch ( ARequestInfo->UnparsedParams[1] )
              StringReplaceCh(SVal, '.', ','); // troca os pontos por vírgula (para o excel)
 
            ID = (String)pt.GetNome();
-           Subest = ID.SubString(1,4);
-           if ( Subest.Length() == 4 )
-           if ( Subest[4] == '-' )
-              Subest.SetLength(3);
+           Subest = pt.Estacao;
+           //if ( Subest.Length() == 4 )
+           //if ( Subest[4] == '-' )
+           //   Subest.SetLength(3);
            pt.GetModDescr( descr );
            String S = descr;
            StringReplaceCh(S, ',', '.'); // tira as virgulas da descricao
@@ -1193,6 +1204,11 @@ switch ( ARequestInfo->UnparsedParams[1] )
               }
             }
 
+          if ( strcmp(pt.GetAnotacao(), anot.c_str() ) )
+            { // mudou a anotação: loga
+            Loga( (String)"IP=" + ARequestInfo->RemoteIP + (String)" user=" + (String)BL.getUserName() + (String)", point=" + (String)nponto + " id=" + (String)pt.GetNome(), ARQUIVO_LOGANOT );
+            Loga( (String)"TEXT=" + (String)anot, ARQUIVO_LOGANOT );
+            }
           pt.SetAnotacao( anot.c_str() );
 
           } catch ( Exception &E ) { logaln( "E: 7-" + E.Message ); }
@@ -1331,50 +1347,65 @@ switch ( ARequestInfo->UnparsedParams[1] )
 
   case 'K': // comando
      {
-
-#pragma warn -aus
-     TCHAR username[200 + 1];
-     DWORD size = 200 + 1;
-     GetUserName((TCHAR*)username, &size);
-
-     int cnponto, val, tipo, ret = 0;
+     int cnponto, val = 0, tipo, ret = 0;
+     float fval = 0;
      cnponto = ARequestInfo->Params->Strings[0].SubString(3,6).ToInt();
-     val = ARequestInfo->Params->Strings[1].SubString(3,5).ToInt();
-     tipo = ARequestInfo->Params->Strings[2].SubString(3,5).ToInt();
+     // tipo = ARequestInfo->Params->Strings[2].SubString(3,5).ToInt();
 
      bool found;
      TPonto &pt = BL.GetRefPonto( cnponto, found );
-     if ( found && !BL.ComandoIntertravado( cnponto ) ) // testa se o ponto existe e não está intertravado
+     if ( pt.EhComandoDigital() )
+       val = ARequestInfo->Params->Strings[1].SubString(3,5).ToInt();
+     else
+       fval = atof(ARequestInfo->Params->Strings[1].SubString(3,20).c_str());
+
+     if ( found && pt.EhComando() && !BL.ComandoIntertravado( cnponto ) ) // testa se o ponto existe, é de comando e não está intertravado
        {
        // intercepta comando em script lua, se retorna 0 continua ao protocolo/simul
        if ( fmLua->luaInterceptCommands( cnponto, val ) == 0 )
          {
          if ( ( BL.GetSimulacao() == SIMULMOD_MESTRE ) || ( BL.GetSimulacao() == SIMULMOD_LOCAL ) )
            {
-           ret = fmSimul->SimulaComando( cnponto, val );
-           confCmdSimul = ret;
+           if ( pt.EhComandoDigital() )
+             {
+             ret = fmSimul->SimulaComando( cnponto, val );
+             confCmdSimul = ret;
+             }
+           else
+             {
+             ret = fmSimul->SimulaComando( cnponto, fval );
+             confCmdSimul = ret;
+             }
            }
          else
            {
            if ( IP_BDTR1 == "" ) // se não tem bdtr, manda pelo 104
              {
              // manda o comando para o protocolo (varredor iec104m)
-             ret = fmIEC104M->ComandoIEC( cnponto, val&0x01?0:1 );
-
-             // sendo pelo iec104m, manda para a outra ihm também, pois a pode ser a outra que está com o 104 conectado.
-             // se tem outro ihm e não veio dele vou encaminhar a mensagem
-             // if ( IHMRED_IP_OUTRO_IHM != "" )
-             // if ( ARequestInfo->RemoteIP != IHMRED_IP_OUTRO_IHM )
-             //   {
-             //   lstHTTPReq_OutroIHM.push_back( ARequestInfo->Document + "?" + ARequestInfo->UnparsedParams );
-             //   }
-
-             Loga( (String)"Command Sent(IEC): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+             if ( pt.EhComandoDigital() )
+               {
+               ret = fmIEC104M->ComandoIEC_Dig( cnponto, val&0x01?0:1 );
+               Loga( (String)"Command Sent(IEC): IP=" + ARequestInfo->RemoteIP + (String)" user=" + (String)BL.getUserName() + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+               }
+             else
+               {
+               ret = fmIEC104M->ComandoIEC_Ana( cnponto, fval );
+               Loga( (String)"Command Sent(IEC): IP=" + ARequestInfo->RemoteIP + (String)" user=" + (String)BL.getUserName() + (String)", point=" + (String)cnponto + (String)", val=" + (String)fval + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+               }
              }
            else
              {
-             ret = fmBDTR->bdtr.MandaComando( cnponto, val, tipo );
-             Loga( (String)"Command Sent(BDTR): user=" + (String)username + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", type=" + (String)tipo + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+             // Testa se o comando é analógico ou digital
+             if ( pt.EhComandoDigital() )
+               {
+               ret = fmBDTR->bdtr.MandaComandoDig( cnponto, val );
+               Loga( (String)"Command Sent(BDTR): IP=" + ARequestInfo->RemoteIP + (String)" user=" + (String)BL.getUserName() + (String)", point=" + (String)cnponto + (String)", val=" + (String)val + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+               }
+             else
+               {
+               ret = fmBDTR->bdtr.MandaComandoAna( cnponto, fval );
+               Loga( (String)"Command Sent(BDTR): IP=" + ARequestInfo->RemoteIP + (String)" user=" + (String)BL.getUserName() + (String)", point=" + (String)cnponto + (String)", val=" + (String)fval + (String)", id=" + (String)pt.GetNome(), ARQUIVO_LOGCMD );
+               }
              }
            }
          }

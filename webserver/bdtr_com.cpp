@@ -158,12 +158,10 @@ if ( BL.GetSimulacao() == SIMULMOD_MESTRE )
   }
 }
 
-int MyBDTR::MandaComando(int nponto, int val, int tipo)
+int MyBDTR::MandaComandoDig(int nponto, int val)
 {
 if ( BDTR_ENVIA_COMANDOS == 0 )
   return 1;
-if ( tipo != T_DIG )
-  return 2;
 
 bool found;
 TPonto &pt = BL.GetRefPonto(nponto, found);
@@ -176,7 +174,7 @@ if (found)
      return 4;
 
   mc.COD = T_COM;
-  mc.TVAL = tipo;
+  mc.TVAL = T_DIG;
   mc.ORIG = MEU_END;
   mc.PONTO.ID = pt.Endereco;
   mc.PONTO.STATUS = val;
@@ -191,6 +189,117 @@ if (found)
     mc.PONTO.VALOR.COM_SEMBANCO.COMIEC.dcs = val;
     mc.PONTO.VALOR.COM_SEMBANCO.COMIEC.qu = pt.CmdDuracao;
     mc.PONTO.VALOR.COM_SEMBANCO.COMIEC.se = pt.CmdSBO;
+    }
+
+  return EnviaComando( &mc );
+  }
+
+return 3; // nao encontrado
+}
+
+int MyBDTR::MandaComandoAna(int nponto, float val)
+{
+if ( BDTR_ENVIA_COMANDOS == 0 )
+  return 1;
+
+bool found;
+TPonto &pt = BL.GetRefPonto(nponto, found);
+
+if (found)
+  {
+  msg_com mc;
+  float temp;
+
+  if ( BL.ComandoIntertravado( nponto ) ) // só mando se não estiver intertravado
+     return 4;
+
+  mc.COD = T_COM;
+  mc.ORIG = MEU_END;
+  mc.PONTO.ID = pt.Endereco;
+  mc.PONTO.STATUS = ANALOGICO;
+
+  switch ( pt.CmdASDU )
+    {
+    case 48: // C_SE_NA_1 Set-point normalized
+    case 61: // C_SE_TA_1 Set-point normalized w/ time
+      mc.TVAL = T_NORM;
+      if ( pt.KConv1 != 0 )
+        {
+        temp = ((val - pt.KConv2) / pt.KConv1) * 32767;
+        // limit possible values
+        if ( temp > 32767 )
+          temp = 32767;
+        if ( temp < -32768 )
+          temp = -32768;
+        mc.PONTO.VALOR.NRM = temp;
+        }
+      else
+        return 5;
+      break;
+
+    case 49: // C_SE_NB_1 Set-point scaled
+    case 62: // C_SE_TB_1 Set-point scaled w/ time
+      mc.TVAL = T_ANA;
+      temp = val * pow10(pt.CasaDecimal);
+      // limit possible values
+      if ( temp > 32767 )
+        temp = 32767;
+      if ( temp < -32768 )
+        temp = -32768;
+      mc.PONTO.VALOR.ANA = temp;
+      break;
+
+    default:
+    case 50: // C_SE_NC_1 Set-point short floating point
+    case 63: // C_SE_TC_1 Set-point short floating point w/ time
+      mc.TVAL = T_FLT;
+      mc.PONTO.VALOR.FLT = val;
+      break;
+    }
+
+  // se o varredor é conversor (104, DNP, sem banco), formato o valor especificando os parametros devidos
+  if ( VarredorEhConversor() )
+    {
+    mc.PONTO.VALOR.COM_SEMBANCOANA.UTR = pt.UTR;
+    mc.PONTO.VALOR.COM_SEMBANCOANA.ASDU = pt.CmdASDU;
+    mc.PONTO.VALOR.COM_SEMBANCOANA.COMIEC.dcs = 0;
+    mc.PONTO.VALOR.COM_SEMBANCOANA.COMIEC.qu = 0;
+    mc.PONTO.VALOR.COM_SEMBANCOANA.COMIEC.se = pt.CmdSBO;
+    switch ( pt.CmdASDU )
+      {
+      case 48: // C_SE_NA_1 Set-point normalized
+      case 61: // C_SE_TA_1 Set-point normalized w/ time
+        if ( pt.KConv1 != 0 )
+          {
+          temp = ((val - pt.KConv2) / pt.KConv1) * 32767;
+          // limit possible values
+          if ( temp > 32767 )
+            temp = 32767;
+          if ( temp < -32768 )
+            temp = -32768;
+          mc.PONTO.VALOR.COM_SEMBANCOANA.NRM = temp;
+          }
+        else
+          return 5;
+        break;
+
+      case 49: // C_SE_NB_1 Set-point scaled
+      case 62: // C_SE_TB_1 Set-point scaled w/ time
+        temp = val * pow10(pt.CasaDecimal);
+        // limit possible values
+        if ( temp > 32767 )
+          temp = 32767;
+        if ( temp < -32768 )
+          temp = -32768;
+        mc.PONTO.VALOR.COM_SEMBANCOANA.ANA = temp;
+        break;
+
+      default:
+      case 50: // C_SE_NC_1 Set-point short floating point
+      case 63: // C_SE_TC_1 Set-point short floating point w/ time
+        mc.PONTO.VALOR.COM_SEMBANCOANA.FLT = val;
+        break;
+      }
     }
 
   return EnviaComando( &mc );
